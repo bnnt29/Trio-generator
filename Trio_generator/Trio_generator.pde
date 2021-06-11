@@ -1,3 +1,10 @@
+/*TODO:
+1. Button for current_random_numb
+2. Button to reset numbers in grid
+3. show row and colum numbers
+4. clickable grid and automated calculation of clicked box (1.*2.+3., 1./2.+3., 1.*2.-3., 1./2.-3.)
+5. optimisation, etc.....
+*/
 public static ArrayList<Integer> random_numbs = new ArrayList<Integer>();
 public static int grid_min =0;
 public static int grid_max =10;
@@ -21,11 +28,13 @@ void draw(){
   background(0,0,0);
   fill(255, 255, 255);
  
+ //grid setup
   int site_distance=2;
   int column_width=width/(columns+site_distance*2);
   int column_height=height/(rows+site_distance);
   textSize((int)Math.sqrt((column_width*column_height)/site_distance));
   
+  //grid
   int array=0;
   for(int i=0; i< rows;i++){
     for(int e=0;e< columns;e++){
@@ -36,6 +45,8 @@ void draw(){
       array+=1;
     }
   }
+  
+  //random number + field
   fill(255, 255, 255);
   rect(column_width-column_width/1.5, column_height*2, column_width*1.3, column_height*1.3);
   fill(0,0,0);
