@@ -2,8 +2,9 @@
 1. Button for current_random_numb
 2. Button to reset numbers in grid
 3. show row and colum numbers
-4. clickable grid and automated calculation of clicked box (1.*2.+3., 1./2.+3., 1.*2.-3., 1./2.-3.)
-5. optimisation, etc.....
+4. resizable grid (change rows and columns)
+5. clickable grid and automated calculation of clicked box (1.*2.+3., 1./2.+3., 1.*2.-3., 1./2.-3.)
+6. optimisation, etc.....
 */
 public static ArrayList<Integer> random_numbs = new ArrayList<Integer>();
 public static int grid_min =0;
