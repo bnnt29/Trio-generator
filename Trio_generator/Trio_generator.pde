@@ -31,9 +31,10 @@ void draw(){
  
  //grid setup
   int site_distance=2;
-  int column_width=width/(columns+site_distance*2);
   int column_height=height/(rows+site_distance);
-  textSize((int)Math.sqrt((column_width*column_height)/site_distance));
+  int column_width=column_height;//width/(columns+site_distance*2);
+  int nts = (int)Math.round(0.7*column_height);
+  textSize(nts);//(int)Math.sqrt((column_width*column_height)/site_distance));
   
   //grid
   int array=0;
