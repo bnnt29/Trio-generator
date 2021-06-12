@@ -44,6 +44,9 @@ class button {
       textSize((float)Math.floor((float)h*0.8f));
     else
       textSize(ts);
+    fill(tc);
+    stroke(tc);
+    strokeWeight(0);
 
     text(text, x+w/2, y+h/2);
   }

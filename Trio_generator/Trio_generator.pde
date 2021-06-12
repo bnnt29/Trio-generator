@@ -1,4 +1,4 @@
-/*TODO: //<>// //<>//
+/*TODO: //<>// //<>// //<>//
  //1. Button for current_random_numb 
  //2. Button to reset numbers in grid
  //3. show row and colum numbers
@@ -12,6 +12,7 @@ public static boolean use_fullscreen=true;
 public static int recursiv=0;
 
 public static final int roundboxes = 10;
+public ArrayList<button> buttons = new ArrayList<button>();
 
 //numbers
 public static ArrayList<Integer> random_numbs = new ArrayList<Integer>();
@@ -355,6 +356,10 @@ void draw() {
   }
 
   text("use fullscreen", column_width*1.3-column_width/1.02+X_offset/2, column_height*1.32);
+  
+  for(button b : buttons){
+   b.drawMe(); 
+  }
 }
 
 public void rand() {
