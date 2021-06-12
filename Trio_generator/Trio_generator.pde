@@ -11,6 +11,8 @@
 public static boolean use_fullscreen=true;
 public static int recursiv=0;
 
+public static final int roundboxes = 10;
+
 //numbers
 public static ArrayList<Integer> random_numbs = new ArrayList<Integer>();
 public static ArrayList<Integer> used_random_numbs=new ArrayList<Integer>();
@@ -244,7 +246,7 @@ void draw() {
           fill(0, 0, 255);
         }
       }
-      rect(column_width*(e+site_distance)+X_offset, column_height*(i+site_distance/2), column_width, column_height);
+      rect(column_width*(e+site_distance)+X_offset, column_height*(i+site_distance/2), column_width, column_height,roundboxes);
       fill(0, 0, 0);
       textSize(nts);
       text(random_numbs.get(i*columns+e)+"", column_width*(e+site_distance)+column_width/3+X_offset, column_height*(i+site_distance/2)+column_height/1.15);
@@ -262,14 +264,14 @@ void draw() {
 
   //random number + field
   fill(255, 255, 255);
-  rect(column_width-column_width/1.5+X_offset/2, column_height*2, column_width*1.3, column_height*1.3);
+  rect(column_width-column_width/1.5+X_offset/2, column_height*2, column_width*1.3, column_height*1.3,roundboxes);
   fill(0, 0, 0);
   textSize(nts*1.2);
   text(current_random_numb, column_width*1.3-column_width/1.3+X_offset/2, column_height*2+column_height*1.05);
 
   //reroll_button
   fill(button_colorR, button_colorG, button_colorB);
-  rect(column_width-column_width/1.5+X_offset/2, column_height*3.5, column_width*1.3, column_height/2);
+  rect(column_width-column_width/1.5+X_offset/2, column_height*3.5, column_width*1.3, column_height/2,roundboxes);
   if (button_colorR + button_colorG + button_colorB>255) {
     fill(0, 0, 0);
   } else {
@@ -280,7 +282,7 @@ void draw() {
 
   //reset_button
   fill(button_colorR, button_colorG, button_colorB);
-  rect(column_width-column_width/1.5+X_offset/2, height-site_distance*column_height, column_width*1.3, column_height/2);
+  rect(column_width-column_width/1.5+X_offset/2, height-site_distance*column_height, column_width*1.3, column_height/2,roundboxes);
   if (button_colorR + button_colorG + button_colorB>255) {
     fill(0, 0, 0);
   } else {
@@ -291,7 +293,7 @@ void draw() {
 
   //add_column_button
   fill(button_colorR, button_colorG, button_colorB);
-  rect(column_width*(columns+site_distance)+X_offset+10, column_height/2, column_width, column_height/2);
+  rect(column_width*(columns+site_distance)+X_offset+10, column_height/2, column_width, column_height/2,roundboxes);
   if (button_colorR + button_colorG + button_colorB>255) {
     fill(0, 0, 0);
   } else {
@@ -302,7 +304,7 @@ void draw() {
 
   //rem_column_button
   fill(button_colorR, button_colorG, button_colorB);
-  rect(column_width*(columns+site_distance)+X_offset+10, 0, column_width, column_height/2);
+  rect(column_width*(columns+site_distance)+X_offset+10, 0, column_width, column_height/2,roundboxes);
   if (button_colorR + button_colorG + button_colorB>255) {
     fill(0, 0, 0);
   } else {
@@ -313,7 +315,7 @@ void draw() {
 
   //add_row_button
   fill(button_colorR, button_colorG, button_colorB);
-  rect(column_width*(columns+site_distance)+X_offset+10, column_height*(rows+site_distance/2), column_width, column_height/2);
+  rect(column_width*(columns+site_distance)+X_offset+10, column_height*(rows+site_distance/2), column_width, column_height/2,roundboxes);
   if (button_colorR + button_colorG + button_colorB>255) {
     fill(0, 0, 0);
   } else {
@@ -324,7 +326,7 @@ void draw() {
 
   //rem_row_button
   fill(button_colorR, button_colorG, button_colorB);
-  rect(column_width*(columns+site_distance)+X_offset+10, column_height*(rows+site_distance/2)+column_height/2, column_width, column_height/2);
+  rect(column_width*(columns+site_distance)+X_offset+10, column_height*(rows+site_distance/2)+column_height/2, column_width, column_height/2,roundboxes);
   if (button_colorR + button_colorG + button_colorB>255) {
     fill(0, 0, 0);
   } else {
@@ -336,7 +338,7 @@ void draw() {
 
   //use fullscreen
   fill(button_colorR, button_colorG, button_colorB);
-  rect(column_width-column_width/1.5+X_offset/2, column_height, column_width*1.3, column_height/2);
+  rect(column_width-column_width/1.5+X_offset/2, column_height, column_width*1.3, column_height/2,roundboxes);
   if (button_colorR + button_colorG + button_colorB>255) {
     fill(0, 0, 0);
   } else {
