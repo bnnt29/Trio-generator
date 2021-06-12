@@ -86,7 +86,11 @@ void mousePressed() {
         case 1:
           if (clicked_box.get(0)==index-1||clicked_box.get(0)==index+1||clicked_box.get(0)==index-columns||clicked_box.get(0)==index-columns-1||clicked_box.get(0)==index-columns+1||clicked_box.get(0)==index+columns||clicked_box.get(0)==index+columns+1||clicked_box.get(0)==index+columns-1) {
             clicked_box.add(index);
+            if(index-(clicked_box.get(0)-clicked_box.get(1))<0){
+              clicked_box.removeAll(clicked_box);
+            }else{
             clicked_box.add(index-(clicked_box.get(0)-clicked_box.get(1)));
+            }
           } else if (clicked_box.get(0)==index-2||clicked_box.get(0)==index+2||clicked_box.get(0)==index-columns*2||clicked_box.get(0)==index-columns*2-2||clicked_box.get(0)==index-columns*2+2||clicked_box.get(0)==index+columns*2||clicked_box.get(0)==index+columns*2+2||clicked_box.get(0)==index+columns*2-2) {
             clicked_box.add(index+(clicked_box.get(0)-index)/2);
             clicked_box.add(index);
