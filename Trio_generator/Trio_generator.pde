@@ -4,24 +4,30 @@
  //3. show row and colum numbers //<>//
  4. resizable grid (change rows and columns)
  5. clickable grid and automated calculation of clicked box (1.*2.+3., 1./2.+3., 1.*2.-3., 1./2.-3.) (if it is right)
- 6. Button use_fullscreen
+ //6. Button use_fullscreen
  7. optimisation, etc.....
  */
+ 
+public static boolean use_fullscreen=true;
+
+//numbers
 public static ArrayList<Integer> random_numbs = new ArrayList<Integer>();
 public static ArrayList<Integer> used_random_numbs=new ArrayList<Integer>();
 public static int grid_min =0;
 public static int grid_max =10;
 public static int min=grid_min+1;
 public static int max=grid_max*grid_max-1;
+public static int current_random_numb=0;
+
+//grid_setup
 public static int rows = 10; //Zeilen
 public static int columns = 10; //Spalten
-public static int current_random_numb=0;
-public static boolean use_fullscreen=true;
 public static int column_width=0;
 public static int column_height=0;
 public static int X_offset=0;
 public static int site_distance=0;
 
+//colors
 public static int button_colorR=255;
 public static int button_colorG=0;
 public static int button_colorB=0;
