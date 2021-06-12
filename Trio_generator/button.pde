@@ -41,7 +41,7 @@ class button {
 
     textAlign(CENTER, CENTER);
     if (ts == -1)
-      textSize((float)Math.floor((float)h*0.8f));
+      textSize((float)Math.floor((float)((h+w)/2)*0.8f));
     else
       textSize(ts);
       

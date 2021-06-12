@@ -44,15 +44,6 @@ void setup() {
   rand();
 }
 
-public void initButtons(){
-   //use fullscreen
-  int fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
-  int fy = (int)Math.round((float)column_height);
-  int fw = (int)Math.round((float)column_width*1.3f);
-  int fh = (int)Math.round((float)column_height/2);
-  buttons.add(new button(fx, fy, fw, fh, "fullscreen")); 
-}
-
 void mousePressed() {
   //reroll-button
   if (mouseX>=column_width-column_width/1.5+X_offset/2 && mouseX<=column_width-column_width/1.5+column_width+X_offset/2 && mouseY>=column_width*1.3 && mouseY<=column_height*3.5+column_height/2) {
@@ -167,6 +158,13 @@ void draw() {
   } else {
     X_offset=width/8;
     column_width=column_height;
+  }
+  int fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
+  int fy = (int)Math.round((float)column_height);
+  int fw = (int)Math.round((float)column_width*1.3f);
+  int fh = (int)Math.round((float)column_height/2);
+  for(button b:buttons){
+    b.update(fx,fy,fw,fh);
   }
   int nts = (int)Math.round(0.7*(column_height+column_width)/2);
   textSize(nts);//(int)Math.sqrt((column_width*column_height)/site_distance));
@@ -409,4 +407,13 @@ public ArrayList<Integer> gen_random_numbs(int rows, int columns) {
     }
   }
   return save;
+}
+
+public void initButtons(){
+   //use fullscreen
+  int fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
+  int fy = (int)Math.round((float)column_height);
+  int fw = (int)Math.round((float)column_width*1.3f);
+  int fh = (int)Math.round((float)column_height/2);
+  buttons.add(new button(fx, fy, fw, fh, "fullscreen")); 
 }
