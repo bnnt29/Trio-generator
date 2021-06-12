@@ -50,7 +50,7 @@ public void initButtons(){
   int fy = (int)Math.round((float)column_height);
   int fw = (int)Math.round((float)column_width*1.3f);
   int fh = (int)Math.round((float)column_height/2);
-  buttons.add(new button(fx, fy, fw, fh, "use fullscreen")); 
+  buttons.add(new button(fx, fy, fw, fh, "fullscreen")); 
 }
 
 void mousePressed() {
@@ -68,13 +68,16 @@ void mousePressed() {
     rand();
   }
   //use_fullscreen
-  if (mouseX>=column_width-column_width/1.5+X_offset/2 && mouseX<=column_width-column_width/1.5+column_width+X_offset/2 && mouseY>=column_height && mouseY<=column_height+column_height/2) {
-    if (use_fullscreen) {
-      use_fullscreen=false;
-    } else {
-      use_fullscreen=true;
-    }
+  if(buttons.get(0).isPushed()){
+    use_fullscreen = !use_fullscreen;
   }
+  //if (mouseX>=column_width-column_width/1.5+X_offset/2 && mouseX<=column_width-column_width/1.5+column_width+X_offset/2 && mouseY>=column_height && mouseY<=column_height+column_height/2) {
+  //  if (use_fullscreen) {
+  //    use_fullscreen=false;
+  //  } else {
+  //    use_fullscreen=true;
+  //  }
+  //}
 
   //clickable boxes
   if (mouseX>=column_width*(site_distance)+X_offset && mouseX<=column_width*(columns+site_distance)+X_offset && mouseY>=column_height*(site_distance/2) && mouseY<=column_height*(rows+site_distance/2)+column_height) {
