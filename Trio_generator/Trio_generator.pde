@@ -37,9 +37,20 @@ public static int button_colorR=255;
 public static int button_colorG=0;
 public static int button_colorB=0;
 
+boolean buttons_init = false;
+
 void setup() {
   fullScreen();
   rand();
+}
+
+public void initButtons(){
+   //use fullscreen
+  int fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
+  int fy = (int)Math.round((float)column_height);
+  int fw = (int)Math.round((float)column_width*1.3f);
+  int fh = (int)Math.round((float)column_height/2);
+  buttons.add(new button(fx, fy, fw, fh, "use fullscreen")); 
 }
 
 void mousePressed() {
@@ -139,7 +150,7 @@ void mousePressed() {
   }
 }
 
-void draw() {
+void draw() { 
   clear();
   background(0, 0, 0);
   fill(255, 255, 255);
@@ -157,6 +168,10 @@ void draw() {
   int nts = (int)Math.round(0.7*(column_height+column_width)/2);
   textSize(nts);//(int)Math.sqrt((column_width*column_height)/site_distance));
 
+  if(!buttons_init){
+   buttons_init = true;
+   initButtons();
+  }
 
   //grid
   for (int i=0; i< rows; i++) {
@@ -342,20 +357,19 @@ void draw() {
 
 
   //use fullscreen
-  fill(button_colorR, button_colorG, button_colorB);
-  rect(column_width-column_width/1.5+X_offset/2, column_height, column_width*1.3, column_height/2,roundboxes);
-  if (button_colorR + button_colorG + button_colorB>255) {
-    fill(0, 0, 0);
-  } else {
-    fill(255, 255, 255);
-  }
-  if (use_fullscreen) {
-    textSize(nts/3);
-  } else {
-    textSize(nts/4.5);
-  }
-
-  text("use fullscreen", column_width*1.3-column_width/1.02+X_offset/2, column_height*1.32);
+  //fill(button_colorR, button_colorG, button_colorB);
+  //rect(column_width-column_width/1.5+X_offset/2, column_height, column_width*1.3, column_height/2,roundboxes);
+  //if (button_colorR + button_colorG + button_colorB>255) {
+  //  fill(0, 0, 0);
+  //} else {
+  //  fill(255, 255, 255);
+  //}
+  //if (use_fullscreen) {
+  //  textSize(nts/3);
+  //} else {
+  //  textSize(nts/4.5);
+  //}
+  //text("use fullscreen", column_width*1.3-column_width/1.02+X_offset/2, column_height*1.32);
   
   for(button b : buttons){
    b.drawMe(); 

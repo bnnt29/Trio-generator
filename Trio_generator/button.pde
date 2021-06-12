@@ -4,7 +4,7 @@ class button {
 
   private int x, y, w, h;
   private String text = "";
-  private color tc = #000000;
+  private color tc = #FFFFFF;
   private color mc = #FF0000;//tc=textColor, mc=MainColor
   private int ts = -1;
   private long lastPressed;
@@ -44,6 +44,7 @@ class button {
       textSize((float)Math.floor((float)h*0.8f));
     else
       textSize(ts);
+      
     fill(tc);
     stroke(tc);
     strokeWeight(0);
