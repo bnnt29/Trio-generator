@@ -319,11 +319,11 @@ public void initButtons(boolean init) {
 
   //rem_row_button
   fx = (int)Math.round((float)column_width*((float)columns+(float)site_distance)+(float)X_offset+(float)10);
-  fy = (int)Math.round(-1*(float)column_height*((float)rows+(float)site_distance/2)+(float)column_height/2);
+  fy = (int)Math.round((float)column_height*((float)rows+(float)site_distance/2));
   fw = (int)Math.round((float)column_width);
   fh = (int)Math.round((float)column_height/2);
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "-", #000000, #00FF00));
+    buttons.add(new button(fx, fy, fw, fh, "-", #FFFFFF, #00FF00));
   } else {
     if (rows>=5) {
       buttons.get(1).update(fx, fy, fw, fh, #FF0000);
