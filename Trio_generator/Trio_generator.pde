@@ -1,14 +1,4 @@
-/*TODO: //<>// //<>// //<>//
- //1. Button for current_random_numb 
- //2. Button to reset numbers in grid
- //3. show row and colum numbers
- //4. resizable grid (change rows and columns)
- //5. clickable grid and automated calculation of clicked box (1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3) (if it is right)
- //6. Button use_fullscreen
- 7. optimisation, etc.....
- */
-
-public static boolean use_fullscreen=true;
+public static boolean use_fullscreen=true; //<>//
 public static int recursiv=0;
 
 public static final int roundboxes = 10;
@@ -31,6 +21,8 @@ public static int column_width=0;
 public static int column_height=0;
 public static int X_offset=0;
 public static int site_distance=0;
+public static int max_columns=40;
+public static int min_columns=5;
 
 
 boolean buttons_init = false;
@@ -48,7 +40,7 @@ void mousePressed() {
   }
 
   //rem row
-  if (rows>5) {
+  if (rows>min_columns) {
     if (buttons.get(1).isPushed()) {
       rows-=1;
       rand();
@@ -56,7 +48,7 @@ void mousePressed() {
   }
 
   //add row
-  if (rows<50) {
+  if (rows<max_columns) {
     if (buttons.get(2).isPushed()) {
       rows+=1;
       rand();
@@ -64,7 +56,7 @@ void mousePressed() {
   }
 
   //rem column
-  if (columns>5) {
+  if (columns>min_columns) {
     if (buttons.get(3).isPushed()) {
       columns-=1;
       rand();
@@ -72,7 +64,7 @@ void mousePressed() {
   }
 
   //add column
-  if (columns<50) {
+  if (columns<max_columns) {
     if (buttons.get(4).isPushed()) {
       columns+=1;
       rand();
@@ -155,8 +147,6 @@ void draw() {
   }
 
   initButtons(false);
-  int nts = (int)Math.round(0.7*(column_height+column_width)/2);
-  textSize(nts);//(int)Math.sqrt((column_width*column_height)/site_distance));
 
   //grid
   for (int i=0; i< rows; i++) {
@@ -164,10 +154,11 @@ void draw() {
       boolean right=false;
       fill(255, 255, 255);
       if (clicked_box.contains(i*columns+e)) {
-        textSize(nts/3);
+        textSize((float)Math.floor((float)((column_height+column_width)/2)*0.17f)*((column_height+column_width)/2)/85);
         if (clicked_box.size()==3) {
           float xcord=column_width*1.3-column_width/1.2+X_offset/2+column_width/2;
           float ycord=column_height;
+          float y_mult=4.15;
           int one=random_numbs.get(clicked_box.get(0));
           int sec=random_numbs.get(clicked_box.get(1));
           int thi=random_numbs.get(clicked_box.get(2));
@@ -178,14 +169,14 @@ void draw() {
           } else {
             fill(255, 0, 0);
           }
-          text(one+" * "+sec+" + "+thi, xcord, ycord*5);
+          text(one+" * "+sec+" + "+thi, xcord, ycord*(y_mult+0.0));
           if (one+sec*thi==current_random_numb) {
             fill(0, 255, 0);
             right=true;
           } else {
             fill(255, 0, 0);
           }
-          text(one+" + "+sec+" * "+thi, xcord, ycord*5.5);
+          text(one+" + "+sec+" * "+thi, xcord, ycord*(y_mult+(float)45/column_height*1));
           if (sec!=0) {
             if (one/sec+thi==current_random_numb) {
               fill(0, 255, 0);
@@ -193,7 +184,7 @@ void draw() {
             } else {
               fill(255, 0, 0);
             }
-            text(one+" / "+sec+" + "+thi, xcord, ycord*6);
+            text(one+" / "+sec+" + "+thi, xcord, ycord*(y_mult+(float)45/column_height*2));
           }
           if (thi!=0) {
             if (one+sec/thi==current_random_numb) {
@@ -202,7 +193,7 @@ void draw() {
             } else {
               fill(255, 0, 0);
             }
-            text(one+" + "+sec+" / "+thi, xcord, ycord*6.5);
+            text(one+" + "+sec+" / "+thi, xcord, ycord*(y_mult+(float)45/column_height*3));
           }
           if (one*sec-thi==current_random_numb) {
             fill(0, 255, 0);
@@ -210,14 +201,14 @@ void draw() {
           } else {
             fill(255, 0, 0);
           }
-          text(one+" * "+sec+" - "+thi, xcord, ycord*7);
+          text(one+" * "+sec+" - "+thi, xcord, ycord*(y_mult+(float)45/column_height*4));
           if (one-sec*thi==current_random_numb) {
             fill(0, 255, 0);
             right=true;
           } else {
             fill(255, 0, 0);
           }
-          text(one+" - "+sec+" * "+thi, xcord, ycord*7.5);
+          text(one+" - "+sec+" * "+thi, xcord, ycord*(y_mult+(float)45/column_height*5));
           if (sec!=0) {
             if (one/sec-thi==current_random_numb) {
               fill(0, 255, 0);
@@ -225,7 +216,7 @@ void draw() {
             } else {
               fill(255, 0, 0);
             }
-            text(one+" / "+sec+" - "+thi, xcord, ycord*8);
+            text(one+" / "+sec+" - "+thi, xcord, ycord*(y_mult+(float)45/column_height*6));
           }
           if (thi!=0) {
             if (one-sec/thi==current_random_numb) {
@@ -234,7 +225,7 @@ void draw() {
             } else {
               fill(255, 0, 0);
             }
-            text(one+" - "+sec+" / "+thi, xcord, ycord*8.5);
+            text(one+" - "+sec+" / "+thi, xcord, ycord*(y_mult+(float)45/column_height*7));
           }
           if (right) {
             fill(0, 255, 0);
@@ -254,7 +245,7 @@ void draw() {
   }
   //row+column numbers
   fill(255, 255, 255);
-  textSize(nts/2);
+  textSize((float)Math.floor((float)((column_height+column_width)/2)*0.2f));
   for (int i=0; i<rows; i++) {
     text(i+1, column_width*(columns+site_distance)+X_offset+column_width/2.5, column_height*(i+site_distance/2)+column_height/2);
   }
@@ -319,13 +310,13 @@ public void initButtons(boolean init) {
 
   //rem_row_button
   fx = (int)Math.round((float)column_width*((float)columns+(float)site_distance)+(float)X_offset+(float)10);
-  fy = (int)Math.round((float)column_height*((float)rows+(float)site_distance/2));
+  fy = (int)Math.round((float)column_height*((float)rows+(float)site_distance/2)+column_height/2);
   fw = (int)Math.round((float)column_width);
   fh = (int)Math.round((float)column_height/2);
   if (init) {
     buttons.add(new button(fx, fy, fw, fh, "-", #FFFFFF, #00FF00));
   } else {
-    if (rows>=5) {
+    if (rows<=5) {
       buttons.get(1).update(fx, fy, fw, fh, #FF0000);
     } else {
       buttons.get(1).update(fx, fy, fw, fh, #00FF00);
@@ -340,7 +331,7 @@ public void initButtons(boolean init) {
   if (init) {
     buttons.add(new button(fx, fy, fw, fh, "+"));
   } else {
-    if (rows<=50) {
+    if (rows>=max_columns) {
       buttons.get(2).update(fx, fy, fw, fh, #FF0000);
     } else {
       buttons.get(2).update(fx, fy, fw, fh, #00FF00);
@@ -355,10 +346,10 @@ public void initButtons(boolean init) {
   if (init) {
     buttons.add(new button(fx, fy, fw, fh, "-"));
   } else {
-    if (columns>=5) {
-      buttons.get(1).update(fx, fy, fw, fh, #FF0000);
+    if (columns<=min_columns) {
+      buttons.get(3).update(fx, fy, fw, fh, #FF0000);
     } else {
-      buttons.get(1).update(fx, fy, fw, fh, #00FF00);
+      buttons.get(3).update(fx, fy, fw, fh, #00FF00);
     }
   }
 
@@ -370,16 +361,16 @@ public void initButtons(boolean init) {
   if (init) {
     buttons.add(new button(fx, fy, fw, fh, "+"));
   } else {
-    if (columns<=50) {
-      buttons.get(1).update(fx, fy, fw, fh, #FF0000);
+    if (columns>=max_columns) {
+      buttons.get(4).update(fx, fy, fw, fh, #FF0000);
     } else {
-      buttons.get(1).update(fx, fy, fw, fh, #00FF00);
+      buttons.get(4).update(fx, fy, fw, fh, #00FF00);
     }
   }
 
   //reset_button
   fx = (int)Math.round((float)column_width-(float)column_width/1.5+(float)X_offset/2);
-  fy = (int)Math.round((float)height-(float)site_distance*(float)column_height);
+  fy = (int)Math.round((float)height-(float)column_height/1.5);
   fw = (int)Math.round((float)column_width*1.3f);
   fh = (int)Math.round((float)column_height/2);
   if (init) {
@@ -400,11 +391,11 @@ public void initButtons(boolean init) {
   }
 
   //random number + field
-  fx = (int)Math.round((float)column_width-(float)column_width/1.5+(float)X_offset/2);
+  fx = (int)Math.round((float)column_width-(float)column_width/1.16+(float)X_offset/2);
   fy = (int)Math.round((float)column_height*2f);
-  fw = (int)Math.round((float)column_width*1.3f);
+  fw = (int)Math.round((float)column_width*1.5f);
   fh = (int)Math.round((float)column_height*1.3f);
-  ts = (float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*4);
+  ts = (float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*3.5);
   if (init) {
     buttons.add(new button(fx, fy, fw, fh, current_random_numb+"", #000000, #FFFFFF, ts));
   } else {
