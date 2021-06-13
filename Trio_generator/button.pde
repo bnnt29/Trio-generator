@@ -6,9 +6,9 @@ class button {
   private String text = "";
   private color tc = #FFFFFF;
   private color mc = #FF0000;//tc=textColor, mc=MainColor
-  private int ts = -1;
+  private float ts = -1;
   private long lastPressed;
-  private static final long DELAY_TIME = 200;
+  private static final long DELAY_TIME = 150;
 
   public button(int x, int y, int w, int h) {
     this.x = x;
@@ -28,7 +28,7 @@ class button {
     this.mc = mc;
   }
 
-  public button(int x, int y, int w, int h, String text, color tc, color mc, int ts) {
+  public button(int x, int y, int w, int h, String text, color tc, color mc, float ts) {
     this(x, y, w, h, text, tc, mc);
     this.ts = ts;
   }
@@ -41,10 +41,10 @@ class button {
 
     textAlign(CENTER, CENTER);
     if (ts == -1)
-      textSize((float)Math.floor((float)((h+w)/2)*0.8f));
+      textSize((float)Math.floor((float)((h+w)/2)*0.2f));
     else
       textSize(ts);
-      
+
     fill(tc);
     stroke(tc);
     strokeWeight(0);
@@ -59,11 +59,28 @@ class button {
     }
     return false;
   }
-  
-  public void update(int x, int y, int w, int h){
+
+  public void update(int x, int y, int w, int h) {
     this.x = x;
     this.y = y;
     this.w = w;
     this.h = h;
+  }
+
+  public void update(int x, int y, int w, int h, color mc) {
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.mc = mc;
+  }
+
+  public void update(int x, int y, int w, int h, String text, float ts) {
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.text = text;
+    this.ts = ts;
   }
 }

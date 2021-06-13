@@ -32,10 +32,6 @@ public static int column_height=0;
 public static int X_offset=0;
 public static int site_distance=0;
 
-//colors
-public static int button_colorR=255;
-public static int button_colorG=0;
-public static int button_colorB=0;
 
 boolean buttons_init = false;
 
@@ -45,37 +41,63 @@ void setup() {
 }
 
 void mousePressed() {
-  //reroll-button
-  if (mouseX>=column_width-column_width/1.5+X_offset/2 && mouseX<=column_width-column_width/1.5+column_width+X_offset/2 && mouseY>=column_width*1.3 && mouseY<=column_height*3.5+column_height/2) {
-    used_random_numbs.add(gen_current_random_numb(0));
-    clicked_box.removeAll(clicked_box);
+
+  //use_fullscreen
+  if (buttons.get(0).isPushed()) {
+    use_fullscreen = !use_fullscreen;
+  }
+
+  //rem row
+  if (rows>5) {
+    if (buttons.get(1).isPushed()) {
+      rows-=1;
+      rand();
+    }
+  }
+
+  //add row
+  if (rows<50) {
+    if (buttons.get(2).isPushed()) {
+      rows+=1;
+      rand();
+    }
+  }
+
+  //rem column
+  if (columns>5) {
+    if (buttons.get(3).isPushed()) {
+      columns-=1;
+      rand();
+    }
+  }
+
+  //add column
+  if (columns<50) {
+    if (buttons.get(4).isPushed()) {
+      columns+=1;
+      rand();
+    }
   }
 
   //reset_button
-  if (mouseX>=column_width-column_width/1.5+X_offset/2 && mouseX<=column_width-column_width/1.5+column_width+X_offset/2 && mouseY>=height-site_distance*column_height && mouseY<=height-site_distance*column_height+column_height/2) {
+  if (buttons.get(5).isPushed()) {
     clicked_box.removeAll(clicked_box);
     rows=10;
     columns=10;
     rand();
   }
-  //use_fullscreen
-  if(buttons.get(0).isPushed()){
-    use_fullscreen = !use_fullscreen;
+
+  //reroll-button
+  if (buttons.get(6).isPushed()) {
+    used_random_numbs.add(gen_current_random_numb(0));
+    clicked_box.removeAll(clicked_box);
   }
-  //if (mouseX>=column_width-column_width/1.5+X_offset/2 && mouseX<=column_width-column_width/1.5+column_width+X_offset/2 && mouseY>=column_height && mouseY<=column_height+column_height/2) {
-  //  if (use_fullscreen) {
-  //    use_fullscreen=false;
-  //  } else {
-  //    use_fullscreen=true;
-  //  }
-  //}
 
   //clickable boxes
   if (mouseX>=column_width*(site_distance)+X_offset && mouseX<=column_width*(columns+site_distance)+X_offset && mouseY>=column_height*(site_distance/2) && mouseY<=column_height*(rows+site_distance/2)+column_height) {
     int column = ((mouseX-X_offset)/column_width)-site_distance;
     int row = ((mouseY)/column_height)-(site_distance/2);
     int index = row*columns+column;
-    //println(column+", "+row+", "+index);
     if (clicked_box.contains(index)) {
       if (clicked_box.indexOf(index)==0) {
         clicked_box.removeAll(clicked_box);
@@ -92,10 +114,10 @@ void mousePressed() {
         case 1:
           if (clicked_box.get(0)==index-1||clicked_box.get(0)==index+1||clicked_box.get(0)==index-columns||clicked_box.get(0)==index-columns-1||clicked_box.get(0)==index-columns+1||clicked_box.get(0)==index+columns||clicked_box.get(0)==index+columns+1||clicked_box.get(0)==index+columns-1) {
             clicked_box.add(index);
-            if(index-(clicked_box.get(0)-clicked_box.get(1))<0 || (index-(clicked_box.get(0)-clicked_box.get(1))>random_numbs.size())){
+            if (index-(clicked_box.get(0)-clicked_box.get(1))<0 || (index-(clicked_box.get(0)-clicked_box.get(1))>random_numbs.size())) {
               clicked_box.removeAll(clicked_box);
-            }else{
-            clicked_box.add(index-(clicked_box.get(0)-clicked_box.get(1)));
+            } else {
+              clicked_box.add(index-(clicked_box.get(0)-clicked_box.get(1)));
             }
           } else if (clicked_box.get(0)==index-2||clicked_box.get(0)==index+2||clicked_box.get(0)==index-columns*2||clicked_box.get(0)==index-columns*2-2||clicked_box.get(0)==index-columns*2+2||clicked_box.get(0)==index+columns*2||clicked_box.get(0)==index+columns*2+2||clicked_box.get(0)==index+columns*2-2) {
             clicked_box.add(index+(clicked_box.get(0)-index)/2);
@@ -108,38 +130,6 @@ void mousePressed() {
       } else {
         clicked_box.removeAll(clicked_box);
       }
-    }
-  }
-
-  //add column
-  if (columns<50) {
-    if (mouseX>=column_width*(columns+site_distance)+X_offset+10 && mouseX<=column_width*(columns+site_distance)+X_offset+10+column_width && mouseY>=column_height/2&&mouseY<=column_height/2+column_height/2) {
-      columns+=1;
-      rand();
-    }
-  }
-
-  //rem column
-  if (columns>5) {
-    if (mouseX>=column_width*(columns+site_distance)+X_offset+10 && mouseX<=column_width*(columns+site_distance)+X_offset+10+column_width && mouseY>=0&&mouseY<=0+column_height/2) {
-      columns-=1;
-      rand();
-    }
-  }
-
-  //add row
-  if (rows<50) {
-    if (mouseX>=column_width*(columns+site_distance)+X_offset+10 && mouseX<=column_width*(columns+site_distance)+X_offset+10+column_width && mouseY>=column_height*(rows+site_distance/2)&&mouseY<=column_height*(rows+site_distance/2)+column_height/2) {
-      rows+=1;
-      rand();
-    }
-  }
-
-  //rem row
-  if (rows>5) {
-    if (mouseX>=column_width*(columns+site_distance)+X_offset+10 && mouseX<=column_width*(columns+site_distance)+X_offset+10+column_width && mouseY>=column_height*(rows+site_distance/2)+column_height/2&&mouseY<=column_height*(rows+site_distance/2)+column_height/2+column_height/2) {
-      rows-=1;
-      rand();
     }
   }
 }
@@ -159,106 +149,94 @@ void draw() {
     X_offset=width/8;
     column_width=column_height;
   }
-  int fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
-  int fy = (int)Math.round((float)column_height);
-  int fw = (int)Math.round((float)column_width*1.3f);
-  int fh = (int)Math.round((float)column_height/2);
-  for(button b:buttons){
-    b.update(fx,fy,fw,fh);
+  if (!buttons_init) {
+    buttons_init = true;
+    initButtons(buttons_init);
   }
+
+  initButtons(false);
   int nts = (int)Math.round(0.7*(column_height+column_width)/2);
   textSize(nts);//(int)Math.sqrt((column_width*column_height)/site_distance));
-
-  if(!buttons_init){
-   buttons_init = true;
-   initButtons();
-  }
 
   //grid
   for (int i=0; i< rows; i++) {
     for (int e=0; e< columns; e++) {
-      boolean rigth=false;
+      boolean right=false;
       fill(255, 255, 255);
       if (clicked_box.contains(i*columns+e)) {
         textSize(nts/3);
         if (clicked_box.size()==3) {
+          float xcord=column_width*1.3-column_width/1.2+X_offset/2+column_width/2;
+          float ycord=column_height;
           int one=random_numbs.get(clicked_box.get(0));
           int sec=random_numbs.get(clicked_box.get(1));
           int thi=random_numbs.get(clicked_box.get(2));
           //(1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3)
           if (one*sec+thi==current_random_numb) {
             fill(0, 255, 0);
-            text(one+" * "+sec+" + "+thi, column_width*1.3-column_width/1.2+X_offset/2, column_height*5);
-            rigth=true;
+            right=true;
           } else {
             fill(255, 0, 0);
-            text(one+" * "+sec+" + "+thi, column_width*1.3-column_width/1.2+X_offset/2, column_height*5);
           }
+          text(one+" * "+sec+" + "+thi, xcord, ycord*5);
           if (one+sec*thi==current_random_numb) {
             fill(0, 255, 0);
-            text(one+" + "+sec+" * "+thi, column_width*1.3-column_width/1.2+X_offset/2, column_height*5.5);
-            rigth=true;
+            right=true;
           } else {
             fill(255, 0, 0);
-            text(one+" + "+sec+" * "+thi, column_width*1.3-column_width/1.2+X_offset/2, column_height*5.5);
           }
+          text(one+" + "+sec+" * "+thi, xcord, ycord*5.5);
           if (sec!=0) {
             if (one/sec+thi==current_random_numb) {
               fill(0, 255, 0);
-              text(one+" / "+sec+" + "+thi, column_width*1.3-column_width/1.2+X_offset/2, column_height*6);
-              rigth=true;
+              right=true;
             } else {
               fill(255, 0, 0);
-              text(one+" / "+sec+" + "+thi, column_width*1.3-column_width/1.2+X_offset/2, column_height*6);
             }
+            text(one+" / "+sec+" + "+thi, xcord, ycord*6);
           }
           if (thi!=0) {
             if (one+sec/thi==current_random_numb) {
               fill(0, 255, 0);
-              text(one+" + "+sec+" / "+thi, column_width*1.3-column_width/1.2+X_offset/2, column_height*6.5);
-              rigth=true;
+              right=true;
             } else {
               fill(255, 0, 0);
-              text(one+" + "+sec+" / "+thi, column_width*1.3-column_width/1.2+X_offset/2, column_height*6.5);
             }
+            text(one+" + "+sec+" / "+thi, xcord, ycord*6.5);
           }
           if (one*sec-thi==current_random_numb) {
             fill(0, 255, 0);
-            text(one+" * "+sec+" - "+thi, column_width*1.3-column_width/1.2+X_offset/2, column_height*7);
-            rigth=true;
+            right=true;
           } else {
             fill(255, 0, 0);
-            text(one+" * "+sec+" - "+thi, column_width*1.3-column_width/1.2+X_offset/2, column_height*7);
           }
+          text(one+" * "+sec+" - "+thi, xcord, ycord*7);
           if (one-sec*thi==current_random_numb) {
             fill(0, 255, 0);
-            text(one+" - "+sec+" * "+thi, column_width*1.3-column_width/1.2+X_offset/2, column_height*7.5);
-            rigth=true;
+            right=true;
           } else {
             fill(255, 0, 0);
-            text(one+" - "+sec+" * "+thi, column_width*1.3-column_width/1.2+X_offset/2, column_height*7.5);
           }
+          text(one+" - "+sec+" * "+thi, xcord, ycord*7.5);
           if (sec!=0) {
             if (one/sec-thi==current_random_numb) {
               fill(0, 255, 0);
-              text(one+" / "+sec+" - "+thi, column_width*1.3-column_width/1.2+X_offset/2, column_height*8);
-              rigth=true;
+              right=true;
             } else {
               fill(255, 0, 0);
-              text(one+" / "+sec+" - "+thi, column_width*1.3-column_width/1.2+X_offset/2, column_height*8);
             }
+            text(one+" / "+sec+" - "+thi, xcord, ycord*8);
           }
           if (thi!=0) {
             if (one-sec/thi==current_random_numb) {
               fill(0, 255, 0);
-              text(one+" - "+sec+" / "+thi, column_width*1.3-column_width/1.2+X_offset/2, column_height*8.5);
-              rigth=true;
+              right=true;
             } else {
               fill(255, 0, 0);
-              text(one+" - "+sec+" / "+thi, column_width*1.3-column_width/1.2+X_offset/2, column_height*8.5);
             }
+            text(one+" - "+sec+" / "+thi, xcord, ycord*8.5);
           }
-          if (rigth) {
+          if (right) {
             fill(0, 255, 0);
           } else {
             fill(255, 0, 0);
@@ -267,113 +245,25 @@ void draw() {
           fill(0, 0, 255);
         }
       }
-      rect(column_width*(e+site_distance)+X_offset, column_height*(i+site_distance/2), column_width, column_height,roundboxes);
+      rect(column_width*(e+site_distance)+X_offset, column_height*(i+site_distance/2), column_width, column_height, roundboxes);
       fill(0, 0, 0);
-      textSize(nts);
-      text(random_numbs.get(i*columns+e)+"", column_width*(e+site_distance)+column_width/3+X_offset, column_height*(i+site_distance/2)+column_height/1.15);
+      textAlign(CENTER, CENTER);
+      textSize((float)Math.floor((float)((column_width+column_height)/2)*0.5f));
+      text(random_numbs.get(i*columns+e)+"", column_width*(e+site_distance)+X_offset+column_width/2, column_height*(i+site_distance/2)+column_height/2);
     }
   }
   //row+column numbers
   fill(255, 255, 255);
   textSize(nts/2);
   for (int i=0; i<rows; i++) {
-    text(i+1, column_width*(columns+site_distance)+X_offset+column_width/5, column_height*(i+site_distance/2)+column_height/2);
+    text(i+1, column_width*(columns+site_distance)+X_offset+column_width/2.5, column_height*(i+site_distance/2)+column_height/2);
   }
   for (int i=0; i<columns; i++) {
     text(i+1, column_width*(i+site_distance)+X_offset+column_width/2.5, column_height*site_distance/2-column_height/3);
   }
 
-  //random number + field
-  fill(255, 255, 255);
-  rect(column_width-column_width/1.5+X_offset/2, column_height*2, column_width*1.3, column_height*1.3,roundboxes);
-  fill(0, 0, 0);
-  textSize(nts*1.2);
-  text(current_random_numb, column_width*1.3-column_width/1.3+X_offset/2, column_height*2+column_height*1.05);
-
-  //reroll_button
-  fill(button_colorR, button_colorG, button_colorB);
-  rect(column_width-column_width/1.5+X_offset/2, column_height*3.5, column_width*1.3, column_height/2,roundboxes);
-  if (button_colorR + button_colorG + button_colorB>255) {
-    fill(0, 0, 0);
-  } else {
-    fill(255, 255, 255);
-  }
-  textSize(nts/2);
-  text("reroll", column_width*1.3-column_width/1.5+X_offset/2, column_height*2.8+column_height*1.05);
-
-  //reset_button
-  fill(button_colorR, button_colorG, button_colorB);
-  rect(column_width-column_width/1.5+X_offset/2, height-site_distance*column_height, column_width*1.3, column_height/2,roundboxes);
-  if (button_colorR + button_colorG + button_colorB>255) {
-    fill(0, 0, 0);
-  } else {
-    fill(255, 255, 255);
-  }
-  textSize(nts/2);
-  text("reset", column_width*1.3-column_width/1.5+X_offset/2, height-site_distance*column_height+column_height/3);
-
-  //add_column_button
-  fill(button_colorR, button_colorG, button_colorB);
-  rect(column_width*(columns+site_distance)+X_offset+10, column_height/2, column_width, column_height/2,roundboxes);
-  if (button_colorR + button_colorG + button_colorB>255) {
-    fill(0, 0, 0);
-  } else {
-    fill(255, 255, 255);
-  }
-  textSize(nts/2);
-  text("+", column_width*(columns+site_distance)+X_offset+column_width/2.2, column_height/2+column_height/2.7);
-
-  //rem_column_button
-  fill(button_colorR, button_colorG, button_colorB);
-  rect(column_width*(columns+site_distance)+X_offset+10, 0, column_width, column_height/2,roundboxes);
-  if (button_colorR + button_colorG + button_colorB>255) {
-    fill(0, 0, 0);
-  } else {
-    fill(255, 255, 255);
-  }
-  textSize(nts/2);
-  text("-", column_width*(columns+site_distance)+X_offset+column_width/2.2, 0+column_height/2.7);
-
-  //add_row_button
-  fill(button_colorR, button_colorG, button_colorB);
-  rect(column_width*(columns+site_distance)+X_offset+10, column_height*(rows+site_distance/2), column_width, column_height/2,roundboxes);
-  if (button_colorR + button_colorG + button_colorB>255) {
-    fill(0, 0, 0);
-  } else {
-    fill(255, 255, 255);
-  }
-  textSize(nts/2);
-  text("+", column_width*(columns+site_distance)+X_offset+column_width/2.2, column_height*(rows+site_distance/2)+column_height/2.7);
-
-  //rem_row_button
-  fill(button_colorR, button_colorG, button_colorB);
-  rect(column_width*(columns+site_distance)+X_offset+10, column_height*(rows+site_distance/2)+column_height/2, column_width, column_height/2,roundboxes);
-  if (button_colorR + button_colorG + button_colorB>255) {
-    fill(0, 0, 0);
-  } else {
-    fill(255, 255, 255);
-  }
-  textSize(nts/2);
-  text("-", column_width*(columns+site_distance)+X_offset+column_width/2.2, column_height*(rows+site_distance/2)+column_height/2+column_height/2.7);
-
-
-  //use fullscreen
-  //fill(button_colorR, button_colorG, button_colorB);
-  //rect(column_width-column_width/1.5+X_offset/2, column_height, column_width*1.3, column_height/2,roundboxes);
-  //if (button_colorR + button_colorG + button_colorB>255) {
-  //  fill(0, 0, 0);
-  //} else {
-  //  fill(255, 255, 255);
-  //}
-  //if (use_fullscreen) {
-  //  textSize(nts/3);
-  //} else {
-  //  textSize(nts/4.5);
-  //}
-  //text("use fullscreen", column_width*1.3-column_width/1.02+X_offset/2, column_height*1.32);
-  
-  for(button b : buttons){
-   b.drawMe(); 
+  for (button b : buttons) {
+    b.drawMe();
   }
 }
 
@@ -409,11 +299,115 @@ public ArrayList<Integer> gen_random_numbs(int rows, int columns) {
   return save;
 }
 
-public void initButtons(){
-   //use fullscreen
-  int fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
-  int fy = (int)Math.round((float)column_height);
-  int fw = (int)Math.round((float)column_width*1.3f);
-  int fh = (int)Math.round((float)column_height/2);
-  buttons.add(new button(fx, fy, fw, fh, "fullscreen")); 
+public void initButtons(boolean init) {
+  int fx = 0;
+  int fy = 0;
+  int fw = 0;
+  int fh = 0;
+  float ts=0;
+
+  //use fullscreen
+  fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
+  fy = (int)Math.round((float)column_height);
+  fw = (int)Math.round((float)column_width*1.3f);
+  fh = (int)Math.round((float)column_height/2);
+  if (init) {
+    buttons.add(new button(fx, fy, fw, fh, "fullscreen"));
+  } else {
+    buttons.get(0).update(fx, fy, fw, fh);
+  }
+
+  //rem_row_button
+  fx = (int)Math.round((float)column_width*((float)columns+(float)site_distance)+(float)X_offset+(float)10);
+  fy = (int)Math.round(-1*(float)column_height*((float)rows+(float)site_distance/2)+(float)column_height/2);
+  fw = (int)Math.round((float)column_width);
+  fh = (int)Math.round((float)column_height/2);
+  if (init) {
+    buttons.add(new button(fx, fy, fw, fh, "-", #000000, #00FF00));
+  } else {
+    if (rows>=5) {
+      buttons.get(1).update(fx, fy, fw, fh, #FF0000);
+    } else {
+      buttons.get(1).update(fx, fy, fw, fh, #00FF00);
+    }
+  }
+
+  //add_row_button
+  fx = (int)Math.round((float)column_width*((float)columns+(float)site_distance)+(float)X_offset+(float)10);
+  fy = (int)Math.round((float)column_height*((float)rows+(float)site_distance/2));
+  fw = (int)Math.round((float)column_width);
+  fh = (int)Math.round((float)column_height/2);
+  if (init) {
+    buttons.add(new button(fx, fy, fw, fh, "+"));
+  } else {
+    if (rows<=50) {
+      buttons.get(2).update(fx, fy, fw, fh, #FF0000);
+    } else {
+      buttons.get(2).update(fx, fy, fw, fh, #00FF00);
+    }
+  }
+
+  //rem_column_button
+  fx = (int)Math.round((float)column_width*((float)columns+(float)site_distance)+(float)X_offset+(float)10);
+  fy = (int)Math.round(0);
+  fw = (int)Math.round((float)column_width);
+  fh = (int)Math.round((float)column_height/2);
+  if (init) {
+    buttons.add(new button(fx, fy, fw, fh, "-"));
+  } else {
+    if (columns>=5) {
+      buttons.get(1).update(fx, fy, fw, fh, #FF0000);
+    } else {
+      buttons.get(1).update(fx, fy, fw, fh, #00FF00);
+    }
+  }
+
+  //add_column_button
+  fx = (int)Math.round((float)column_width*((float)columns+(float)site_distance)+(float)X_offset+(float)10);
+  fy = (int)Math.round((float)column_height/2);
+  fw = (int)Math.round((float)column_width);
+  fh = (int)Math.round((float)column_height/2);
+  if (init) {
+    buttons.add(new button(fx, fy, fw, fh, "+"));
+  } else {
+    if (columns<=50) {
+      buttons.get(1).update(fx, fy, fw, fh, #FF0000);
+    } else {
+      buttons.get(1).update(fx, fy, fw, fh, #00FF00);
+    }
+  }
+
+  //reset_button
+  fx = (int)Math.round((float)column_width-(float)column_width/1.5+(float)X_offset/2);
+  fy = (int)Math.round((float)height-(float)site_distance*(float)column_height);
+  fw = (int)Math.round((float)column_width*1.3f);
+  fh = (int)Math.round((float)column_height/2);
+  if (init) {
+    buttons.add(new button(fx, fy, fw, fh, "reset"));
+  } else {
+    buttons.get(5).update(fx, fy, fw, fh);
+  }
+
+  //reroll_button
+  fx = (int)Math.round((float)column_width-(float)column_width/1.5+(float)X_offset/2);
+  fy = (int)Math.round((float)column_height*3.5f);
+  fw = (int)Math.round((float)column_width*1.3f);
+  fh = (int)Math.round((float)column_height/2);
+  if (init) {
+    buttons.add(new button(fx, fy, fw, fh, "reroll"));
+  } else {
+    buttons.get(6).update(fx, fy, fw, fh);
+  }
+
+  //random number + field
+  fx = (int)Math.round((float)column_width-(float)column_width/1.5+(float)X_offset/2);
+  fy = (int)Math.round((float)column_height*2f);
+  fw = (int)Math.round((float)column_width*1.3f);
+  fh = (int)Math.round((float)column_height*1.3f);
+  ts = (float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*4);
+  if (init) {
+    buttons.add(new button(fx, fy, fw, fh, current_random_numb+"", #000000, #FFFFFF, ts));
+  } else {
+    buttons.get(7).update(fx, fy, fw, fh, current_random_numb+"", ts);
+  }
 }
