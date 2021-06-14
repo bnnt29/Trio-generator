@@ -160,7 +160,6 @@ void draw() {
       boolean right=false;
       fill(255, 255, 255);
       if (clicked_box.contains(i*columns+e)) {
-        textAlign(CENTER, CENTER);
         textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(buttons.get(5).getX()-(buttons.get(6).getX()+buttons.get(6).getX())))/8+(site_distance*column_width*2))/8)*0.5f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
         if (clicked_box.size()==3) {
           float xcord=column_width*1.3-column_width/1.2+X_offset/2+column_width/2;
