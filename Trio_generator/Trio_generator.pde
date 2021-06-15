@@ -20,7 +20,7 @@ public static int columns = 10; //Spalten
 public static int column_width=0;
 public static int column_height=0;
 public static int X_offset=0;
-public static int site_distance=0;
+public static int site_distance=2;
 public static int max_columns=40;
 public static int min_columns=5;
 
@@ -34,7 +34,7 @@ void setup() {
 
 void mousePressed() {
   //disselect selected boxes
-  if (!(mouseX>site_distance*column_width && mouseX<(site_distance+columns)*column_width && mouseY>(site_distance/2)*column_height&&mouseY<(site_distance/2+rows)*column_height)) {
+  if (!(mouseX>site_distance*column_width && mouseX<(site_distance+columns)*column_width && mouseY>(site_distance/2)*column_height && mouseY<(site_distance/2+rows)*column_height)) {
     clicked_box.removeAll(clicked_box);
   }
 
@@ -156,7 +156,6 @@ void draw() {
   fill(255, 255, 255);
 
   //grid setup
-  site_distance=2;
   column_height=height/(rows+site_distance);
   if (use_fullscreen) {
     X_offset=0;
@@ -377,7 +376,7 @@ public boolean check(int r) {
             if (possibilities(index, index-columns, index-columns*2, r)) return true;
 
             if (possibilities(index, index+columns, index+columns*2, r)) return true;
-            
+
             if (possibilities(index, index-columns-1, index-columns*2-2, r)) return true;
 
             if (possibilities(index, index+columns-1, index+columns*2-2, r)) return true;
