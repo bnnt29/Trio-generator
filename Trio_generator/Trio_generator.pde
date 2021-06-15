@@ -1,4 +1,4 @@
-import java.util.Random; //<>// //<>//
+import java.util.Random; //<>// //<>// //<>// //<>//
 import java.awt.datatransfer.StringSelection;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -762,4 +762,6 @@ public void initButtons(boolean init) {
       seed_green_fade+=3;
     }
   }
+  fill(255, 255, 255);
+  stroke(255, 255, 255);
 }
