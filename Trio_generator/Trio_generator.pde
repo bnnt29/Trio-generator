@@ -1,9 +1,14 @@
+<<<<<<< Updated upstream
 import java.util.Random; //<>//
 import java.awt.datatransfer.StringSelection;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 
 public static boolean draw=true;
+=======
+import java.awt.Point; //<>//
+
+>>>>>>> Stashed changes
 public static boolean use_fullscreen=true;
 public static int labeled=1;
 
@@ -160,9 +165,36 @@ void mousePressed() {
             clicked_box.add(index);
           } else {
             clicked_box.removeAll(clicked_box);
-            clicked_box.add(index);
+            clicked_box.add(getIndexForPoint(newPoint));
+            break;
           }
-          break;
+
+          if (newNewPoint.equals(new Point())) {
+            break;
+          }
+          if (newnewIstAussen) {
+            clicked_box.add(getIndexForPoint(newPoint));
+            clicked_box.add(getIndexForPoint(newNewPoint));
+          }else{
+            clicked_box.add(getIndexForPoint(newNewPoint));
+            clicked_box.add(getIndexForPoint(newPoint));
+          }
+
+          //if (clicked_box.get(0)==index-1||clicked_box.get(0)==index+1||clicked_box.get(0)==index-columns||clicked_box.get(0)==index-columns-1||clicked_box.get(0)==index-columns+1||clicked_box.get(0)==index+columns||clicked_box.get(0)==index+columns+1||clicked_box.get(0)==index+columns-1) {
+          //  clicked_box.add(index);
+          //  if (index-(clicked_box.get(0)-clicked_box.get(1))<0 || (index-(clicked_box.get(0)-clicked_box.get(1))>=random_numbs.size())) {
+          //    clicked_box.removeAll(clicked_box);
+          //  } else {
+          //    clicked_box.add(index-(clicked_box.get(0)-clicked_box.get(1)));
+          //  }
+          //} else if (clicked_box.get(0)==index-2||clicked_box.get(0)==index+2||clicked_box.get(0)==index-columns*2||clicked_box.get(0)==index-columns*2-2||clicked_box.get(0)==index-columns*2+2||clicked_box.get(0)==index+columns*2||clicked_box.get(0)==index+columns*2+2||clicked_box.get(0)==index+columns*2-2) {
+          //  clicked_box.add(index+(clicked_box.get(0)-index)/2);
+          //  clicked_box.add(index);
+          //} else {
+          //  clicked_box.removeAll(clicked_box);
+          //  clicked_box.add(index);
+          //}
+          //break;
         }
       } else {
         clicked_box.removeAll(clicked_box);
@@ -172,7 +204,24 @@ void mousePressed() {
   }
 }
 
+Point getCoordinatesForIndex(int i) {
+  Point result = new Point();
+  int index = i+1;
+  int x = (int)(index-(Math.floor((float)index/(float)rows)*rows));
+  int y = (int)(Math.floor((float)index/(float)rows))+1;
+  result.setLocation(x, y);
+  if (x<1 || x>columns || y<1 || y>rows)
+    return new Point();
+  return result;
+}
+
+int getIndexForPoint(Point p) {
+  int result = (int)(p.getX()-1 + rows*(p.getY()-1));
+  return result;
+}
+
 void draw() { 
+<<<<<<< Updated upstream
   if (draw) {
     clear();
     background(0, 0, 0);
@@ -191,6 +240,27 @@ void draw() {
       buttons_init = true;
       initButtons(buttons_init);
     }
+=======
+  
+  clear();
+  background(0, 0, 0);
+  fill(255, 255, 255);
+
+  //grid setup
+  site_distance=2;
+  column_height=height/(rows+site_distance);
+  if (use_fullscreen) {
+    X_offset=0;
+    column_width=width/(columns+site_distance*2);
+  } else {
+    X_offset=width/8;
+    column_width=column_height;
+  }
+  if (!buttons_init) {
+    buttons_init = true;
+    initButtons(buttons_init);
+  }
+>>>>>>> Stashed changes
 
     initButtons(false);
 
@@ -349,7 +419,7 @@ public boolean check(int r) {
   for (int i=0; i<rows-0; i++) {
     for (int e=0; e<columns-0; e++) {
       int index=i*columns+e;
-      if (i>2&&i<rows-2&&e>2&&e<columns-2) {
+      if (i>2 && i<rows-2 && e>2 && e<columns-2) {
         if (possibilities(index, index+1, index+2, r)) return true;
 
         if (possibilities(index, index-1, index-2, r)) return true;
