@@ -431,10 +431,11 @@ void draw() {
 }
 
 public void rand() {
+  used_random_numbs.removeAll(used_random_numbs);
   if (r_seed==0) {
-    r_seed=(int)Math.random()*100;
-    System.out.print(Math.random()*100);
+    r_seed=(int)((double)Math.random()*(double)10000*(double)Math.random());
   }
+  System.out.println(r_seed);
   gen=new Random(r_seed);
   clicked_box.removeAll(clicked_box);
   random_numbs = gen_random_numbs(rows, columns);
@@ -755,7 +756,7 @@ public void initButtons(boolean init) {
   tc =color(seed_green_fade, 255, seed_green_fade);
   mc=#000000;
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "seed: "+r_seed, tc, mc));
+    buttons.add(new button(fx, fy, fw, fh, "seed: "+Integer.toHexString(r_seed), tc, mc));
   } else {
     buttons.get(9).update(fx, fy, fw, fh, tc, mc);
     if (seed_green_fade<255) {
