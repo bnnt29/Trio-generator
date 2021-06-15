@@ -1,4 +1,4 @@
-import java.util.Random; //<>// //<>// //<>// //<>//
+import java.util.Random; //<>// //<>// //<>// //<>// //<>// //<>//
 import java.awt.datatransfer.StringSelection;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -150,114 +150,114 @@ void mousePressed() {
           clicked_box.add(index);
           break;
         case 1:
-          //System.out.println("Case 1: " + getCoordinatesForIndex(clicked_box.get(0)).toString());
-          //Point
-          Point origin = getCoordinatesForIndex(clicked_box.get(0));
-          Point newPoint = getCoordinatesForIndex(index);
-          Point newNewPoint = new Point();
-          boolean newnewIstAussen = false;
-          if (newPoint.equals(new Point()))
-            break;
+          if (!(rows>10||columns>10)) {
+            //System.out.println("Case 1: " + getCoordinatesForIndex(clicked_box.get(0)).toString());
+            //Point
+            Point origin = getCoordinatesForIndex(clicked_box.get(0));
+            Point newPoint = getCoordinatesForIndex(index);
+            Point newNewPoint = new Point();
+            boolean newnewIstAussen = false;
+            if (newPoint.equals(new Point()))
+              break;
             if (newPoint.equals(new Point())) {
               System.out.println("Second point is not valid");
               break;
             }
-          //Auf x daneben
-          if (newPoint.getX() == origin.getX()+1 && newPoint.getY() == origin.getY()) {
-            newNewPoint.setLocation(origin.getX()+2, origin.getY());
-            newnewIstAussen = true;
-          } else if (newPoint.getX() == origin.getX()+2 && newPoint.getY() == origin.getY()) {
-            newNewPoint.setLocation(origin.getX()+1, origin.getY());
-          } else if (newPoint.getX() == origin.getX()-1 && newPoint.getY() == origin.getY()) {
-            newNewPoint.setLocation(origin.getX()-2, origin.getY());  
-            newnewIstAussen = true;
-          } else if (newPoint.getX() == origin.getX()-2 && newPoint.getY() == origin.getY()) {
-            newNewPoint.setLocation(origin.getX()-1, origin.getY());
+            //Auf x daneben
+            if (newPoint.getX() == origin.getX()+1 && newPoint.getY() == origin.getY()) {
+              newNewPoint.setLocation(origin.getX()+2, origin.getY());
+              newnewIstAussen = true;
+            } else if (newPoint.getX() == origin.getX()+2 && newPoint.getY() == origin.getY()) {
+              newNewPoint.setLocation(origin.getX()+1, origin.getY());
+            } else if (newPoint.getX() == origin.getX()-1 && newPoint.getY() == origin.getY()) {
+              newNewPoint.setLocation(origin.getX()-2, origin.getY());  
+              newnewIstAussen = true;
+            } else if (newPoint.getX() == origin.getX()-2 && newPoint.getY() == origin.getY()) {
+              newNewPoint.setLocation(origin.getX()-1, origin.getY());
 
-            //Auf y daneben
-          } else if (newPoint.getY() == origin.getY()+1 && newPoint.getX() == origin.getX()) {
-            newNewPoint.setLocation(origin.getX(), origin.getY()+2);
-            newnewIstAussen = true;
-          } else if (newPoint.getY() == origin.getY()+2 && newPoint.getX() == origin.getX()) {
-            newNewPoint.setLocation(origin.getX(), origin.getY()+1);
-          } else if (newPoint.getY() == origin.getY()-1 && newPoint.getX() == origin.getX()) {
-            newNewPoint.setLocation(origin.getX(), origin.getY()-2);
-            newnewIstAussen = true;
-          } else if (newPoint.getY() == origin.getY()-2 && newPoint.getX() == origin.getX()) {
-            newNewPoint.setLocation(origin.getX(), origin.getY()-1);
+              //Auf y daneben
+            } else if (newPoint.getY() == origin.getY()+1 && newPoint.getX() == origin.getX()) {
+              newNewPoint.setLocation(origin.getX(), origin.getY()+2);
+              newnewIstAussen = true;
+            } else if (newPoint.getY() == origin.getY()+2 && newPoint.getX() == origin.getX()) {
+              newNewPoint.setLocation(origin.getX(), origin.getY()+1);
+            } else if (newPoint.getY() == origin.getY()-1 && newPoint.getX() == origin.getX()) {
+              newNewPoint.setLocation(origin.getX(), origin.getY()-2);
+              newnewIstAussen = true;
+            } else if (newPoint.getY() == origin.getY()-2 && newPoint.getX() == origin.getX()) {
+              newNewPoint.setLocation(origin.getX(), origin.getY()-1);
 
-            //Dagonal positiv
-          } else if (newPoint.getY() == origin.getY()+1 && newPoint.getX() == origin.getX()+1) {
-            newNewPoint.setLocation(origin.getX()+2, origin.getY()+2);
-            newnewIstAussen = true;
-          } else if (newPoint.getY() == origin.getY()+2 && newPoint.getX() == origin.getX()+2) {
-            newNewPoint.setLocation(origin.getX()+1, origin.getY()+1);
+              //Dagonal positiv
+            } else if (newPoint.getY() == origin.getY()+1 && newPoint.getX() == origin.getX()+1) {
+              newNewPoint.setLocation(origin.getX()+2, origin.getY()+2);
+              newnewIstAussen = true;
+            } else if (newPoint.getY() == origin.getY()+2 && newPoint.getX() == origin.getX()+2) {
+              newNewPoint.setLocation(origin.getX()+1, origin.getY()+1);
 
-            //Diagonal negativ
-          } else if (newPoint.getY() == origin.getY()-1 && newPoint.getX() == origin.getX()-1) {
-            newNewPoint.setLocation(origin.getX()-2, origin.getY()-2);
-            newnewIstAussen = true;
-          } else if (newPoint.getY() == origin.getY()-2 && newPoint.getX() == origin.getX()-2) {
-            newNewPoint.setLocation(origin.getX()-1, origin.getY()-1);
-          
-           //Dagonal positiv negativ
+              //Diagonal negativ
+            } else if (newPoint.getY() == origin.getY()-1 && newPoint.getX() == origin.getX()-1) {
+              newNewPoint.setLocation(origin.getX()-2, origin.getY()-2);
+              newnewIstAussen = true;
+            } else if (newPoint.getY() == origin.getY()-2 && newPoint.getX() == origin.getX()-2) {
+              newNewPoint.setLocation(origin.getX()-1, origin.getY()-1);
 
-            //Dagonal positiv negativ
-          } else if (newPoint.getY() == origin.getY()+1 && newPoint.getX() == origin.getX()-1) {
-            newNewPoint.setLocation(origin.getX()-2, origin.getY()+2);
-            newnewIstAussen = true;
-          } else if (newPoint.getY() == origin.getY()+2 && newPoint.getX() == origin.getX()-2) {
-            newNewPoint.setLocation(origin.getX()-1, origin.getY()+1);
+              //Dagonal positiv negativ
 
-            //Diagonal negativ positiv
-          } else if (newPoint.getY() == origin.getY()-1 && newPoint.getX() == origin.getX()+1) {
-            newNewPoint.setLocation(origin.getX()+2, origin.getY()-2);
-            newnewIstAussen = true;
-          } else if (newPoint.getY() == origin.getY()-2 && newPoint.getX() == origin.getX()+2) {
-            newNewPoint.setLocation(origin.getX()+1, origin.getY()-1);
-            
-            
-          }else {
-            //System.out.println("Nothing found");
-            clicked_box.removeAll(clicked_box);
-            clicked_box.add(getIndexForPoint(newPoint));
-            break;
-          }
+              //Dagonal positiv negativ
+            } else if (newPoint.getY() == origin.getY()+1 && newPoint.getX() == origin.getX()-1) {
+              newNewPoint.setLocation(origin.getX()-2, origin.getY()+2);
+              newnewIstAussen = true;
+            } else if (newPoint.getY() == origin.getY()+2 && newPoint.getX() == origin.getX()-2) {
+              newNewPoint.setLocation(origin.getX()-1, origin.getY()+1);
 
-          if (newNewPoint.equals(new Point())) {
-            System.out.println("No valid third point");
-            break;
-          }
-          if(getIndexForPoint(newPoint) == -1 || getIndexForPoint(newNewPoint) == -1){
+              //Diagonal negativ positiv
+            } else if (newPoint.getY() == origin.getY()-1 && newPoint.getX() == origin.getX()+1) {
+              newNewPoint.setLocation(origin.getX()+2, origin.getY()-2);
+              newnewIstAussen = true;
+            } else if (newPoint.getY() == origin.getY()-2 && newPoint.getX() == origin.getX()+2) {
+              newNewPoint.setLocation(origin.getX()+1, origin.getY()-1);
+            } else {
+              //System.out.println("Nothing found");
+              clicked_box.removeAll(clicked_box);
+              clicked_box.add(getIndexForPoint(newPoint));
+              break;
+            }
+
+            if (newNewPoint.equals(new Point())) {
+              System.out.println("No valid third point");
+              break;
+            }
+            if (getIndexForPoint(newPoint) == -1 || getIndexForPoint(newNewPoint) == -1) {
               //System.out.println("Out of bounce");
+              break;
+            }
+            if (newnewIstAussen) {
+              //System.out.println("NewNew ist außen");
+              //System.out.println("NewNew ist außen");
+              clicked_box.add(getIndexForPoint(newPoint));
+              clicked_box.add(getIndexForPoint(newNewPoint));
+            } else {
+              //System.out.println("NewNew ist innen");
+              clicked_box.add(getIndexForPoint(newNewPoint));
+              clicked_box.add(getIndexForPoint(newPoint));
+            }
+          } else {
+            if (clicked_box.get(0)==index-1||clicked_box.get(0)==index+1||clicked_box.get(0)==index-columns||clicked_box.get(0)==index-columns-1||clicked_box.get(0)==index-columns+1||clicked_box.get(0)==index+columns||clicked_box.get(0)==index+columns+1||clicked_box.get(0)==index+columns-1) {
+              clicked_box.add(index);
+              if (index-(clicked_box.get(0)-clicked_box.get(1))<0 || (index-(clicked_box.get(0)-clicked_box.get(1))>=random_numbs.size())) {
+                clicked_box.removeAll(clicked_box);
+              } else {
+                clicked_box.add(index-(clicked_box.get(0)-clicked_box.get(1)));
+              }
+            } else if (clicked_box.get(0)==index-2||clicked_box.get(0)==index+2||clicked_box.get(0)==index-columns*2||clicked_box.get(0)==index-columns*2-2||clicked_box.get(0)==index-columns*2+2||clicked_box.get(0)==index+columns*2||clicked_box.get(0)==index+columns*2+2||clicked_box.get(0)==index+columns*2-2) {
+              clicked_box.add(index+(clicked_box.get(0)-index)/2);
+              clicked_box.add(index);
+            } else {
+              clicked_box.removeAll(clicked_box);
+              clicked_box.add(index);
+            }
             break;
           }
-          if (newnewIstAussen) {
-            //System.out.println("NewNew ist außen");
-            //System.out.println("NewNew ist außen");
-            clicked_box.add(getIndexForPoint(newPoint));
-            clicked_box.add(getIndexForPoint(newNewPoint));
-          }else{
-            //System.out.println("NewNew ist innen");
-            clicked_box.add(getIndexForPoint(newNewPoint));
-            clicked_box.add(getIndexForPoint(newPoint));
-          }
-
-          //if (clicked_box.get(0)==index-1||clicked_box.get(0)==index+1||clicked_box.get(0)==index-columns||clicked_box.get(0)==index-columns-1||clicked_box.get(0)==index-columns+1||clicked_box.get(0)==index+columns||clicked_box.get(0)==index+columns+1||clicked_box.get(0)==index+columns-1) {
-          //  clicked_box.add(index);
-          //  if (index-(clicked_box.get(0)-clicked_box.get(1))<0 || (index-(clicked_box.get(0)-clicked_box.get(1))>=random_numbs.size())) {
-          //    clicked_box.removeAll(clicked_box);
-          //  } else {
-          //    clicked_box.add(index-(clicked_box.get(0)-clicked_box.get(1)));
-          //  }
-          //} else if (clicked_box.get(0)==index-2||clicked_box.get(0)==index+2||clicked_box.get(0)==index-columns*2||clicked_box.get(0)==index-columns*2-2||clicked_box.get(0)==index-columns*2+2||clicked_box.get(0)==index+columns*2||clicked_box.get(0)==index+columns*2+2||clicked_box.get(0)==index+columns*2-2) {
-          //  clicked_box.add(index+(clicked_box.get(0)-index)/2);
-          //  clicked_box.add(index);
-          //} else {
-          //  clicked_box.removeAll(clicked_box);
-          //  clicked_box.add(index);
-          //}
-          //break;
         }
       } else {
         clicked_box.removeAll(clicked_box);
@@ -274,10 +274,11 @@ Point getCoordinatesForIndex(int i) {
   int y = (int)(Math.floor((float)index/(float)rows))+1;
   result.setLocation(x, y);
   if (x<1 || x>(columns) || y<1 || y>(rows))
-  if (result.getX() == 0)
-    result.setLocation(columns, result.getY()-1);
+    if (result.getX() == 0)
+      result.setLocation(columns, result.getY()-1);
   //System.out.println("Index: " + i + " " + result.toString());
   if (result.getX()<1 || result.getX()>(columns) || result.getY()<1 || result.getY()>(rows)) {
+    System.out.println(result.getX()+", "+columns+", "+result.getY()+", "+rows);
     System.out.println("Point not existent");
     return new Point();
   }
@@ -453,7 +454,7 @@ void draw() {
 public void rand() {
   used_random_numbs.removeAll(used_random_numbs);
   if (r_seed==0) {
-    r_seed=(int)((double)Math.random()*(double)10000*(double)Math.random());
+    r_seed=(int)((double)Math.random()*(double)100000*(double)Math.random());
   }
   System.out.println(r_seed);
   gen=new Random(r_seed);
@@ -541,9 +542,9 @@ public boolean check(int r) {
 }
 
 public boolean possibilities(int one_, int sec_, int thi_, int current_random_numb) {
- double one=random_numbs.get(one_);
- double sec=random_numbs.get(sec_);
- double thi=random_numbs.get(thi_);
+  double one=random_numbs.get(one_);
+  double sec=random_numbs.get(sec_);
+  double thi=random_numbs.get(thi_);
 
   if (Math.abs((double)one*sec+thi)==current_random_numb) return true;
 
@@ -778,7 +779,7 @@ public void initButtons(boolean init) {
   if (init) {
     buttons.add(new button(fx, fy, fw, fh, "seed: "+Integer.toHexString(r_seed), tc, mc));
   } else {
-    buttons.get(9).update(fx, fy, fw, fh, tc, mc);
+    buttons.get(9).update(fx, fy, fw, fh, tc, "seed: "+Integer.toHexString(r_seed), mc);
     if (seed_green_fade<255) {
       seed_green_fade+=3;
     }

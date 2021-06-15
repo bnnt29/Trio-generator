@@ -81,6 +81,16 @@ class button {
     this.mc = mc;
   }
   
+  public void update(int x, int y, int w, int h, color tc,  String text, color mc) {
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.mc = mc;
+    this.tc = tc;
+    this.text = text;
+  }
+  
   public void update(int x, int y, int w, int h, color mc) {
     this.x = x;
     this.y = y;
