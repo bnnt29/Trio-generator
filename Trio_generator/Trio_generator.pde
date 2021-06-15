@@ -1,4 +1,5 @@
-public static boolean use_fullscreen=true; //<>//
+import java.util.Random; //<>//
+public static boolean use_fullscreen=true;
 public static int labeled=1;
 
 public static final int roundboxes = 10;
@@ -13,6 +14,8 @@ public static int grid_max =10;
 public static int min=grid_min+1;
 public static int max=grid_max*grid_max-1;
 public static int current_random_numb=0;
+public static int r_seed=0;
+public static Random gen;
 
 //grid_setup
 public static int rows = 10; //Zeilen
@@ -80,6 +83,7 @@ void mousePressed() {
     clicked_box.removeAll(clicked_box);
     rows=10;
     columns=10;
+    r_seed=0;
     rand();
   }
 
@@ -305,6 +309,10 @@ void draw() {
 }
 
 public void rand() {
+  if(r_seed==0){
+    r_seed=(int)Math.random()*1000;
+  }
+  gen=new Random(r_seed);
   clicked_box.removeAll(clicked_box);
   random_numbs = gen_random_numbs(rows, columns);
   used_random_numbs.add(gen_current_random_numb(0));
@@ -438,10 +446,11 @@ public int gen_current_random_numb(int rec) {
 
 public ArrayList<Integer> gen_random_numbs(int rows, int columns) {
   //generates random Numbers
+  Random gen = new Random(r_seed);
   ArrayList<Integer> save =new ArrayList<Integer>(rows*columns);
   for (int i =0; i < rows; i++) {
     for (int e =0; e < columns; e++) {
-      save.add((int)(((double)Math.random()*grid_max)+grid_min));
+      save.add((int)(((double)gen.nextDouble()*grid_max)+grid_min));
     }
   }
   return save;
@@ -487,6 +496,7 @@ public ArrayList<Character> init_abc_list() {
  5.reset
  6.reroll
  7.random number field
+ 8.label
  */
 public void initButtons(boolean init) {
   int fx = 0;
