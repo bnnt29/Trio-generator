@@ -153,16 +153,51 @@ void mousePressed() {
           clicked_box.add(index);
           break;
         case 1:
-          if (clicked_box.get(0)==index-1||clicked_box.get(0)==index+1||clicked_box.get(0)==index-columns||clicked_box.get(0)==index-columns-1||clicked_box.get(0)==index-columns+1||clicked_box.get(0)==index+columns||clicked_box.get(0)==index+columns+1||clicked_box.get(0)==index+columns-1) {
-            clicked_box.add(index);
-            if (index-(clicked_box.get(0)-clicked_box.get(1))<0 || (index-(clicked_box.get(0)-clicked_box.get(1))>=random_numbs.size())) {
-              clicked_box.removeAll(clicked_box);
-            } else {
-              clicked_box.add(index-(clicked_box.get(0)-clicked_box.get(1)));
-            }
-          } else if (clicked_box.get(0)==index-2||clicked_box.get(0)==index+2||clicked_box.get(0)==index-columns*2||clicked_box.get(0)==index-columns*2-2||clicked_box.get(0)==index-columns*2+2||clicked_box.get(0)==index+columns*2||clicked_box.get(0)==index+columns*2+2||clicked_box.get(0)==index+columns*2-2) {
-            clicked_box.add(index+(clicked_box.get(0)-index)/2);
-            clicked_box.add(index);
+          //Point
+          Point origin = getCoordinatesForIndex(clicked_box.get(0));
+          Point newPoint = getCoordinatesForIndex(index);
+          Point newNewPoint = new Point();
+          boolean newnewIstAussen = false;
+          if (newPoint.equals(new Point()))
+            break;
+          //Auf x daneben
+          if (newPoint.getX() == origin.getX()+1 && newPoint.getY() == origin.getY()) {
+            newNewPoint.setLocation(origin.getX()+2, origin.getY());
+            newnewIstAussen = true;
+          } else if (newPoint.getX() == origin.getX()+2 && newPoint.getY() == origin.getY()) {
+            newNewPoint.setLocation(origin.getX()+1, origin.getY());
+          } else if (newPoint.getX() == origin.getX()-1 && newPoint.getY() == origin.getY()) {
+            newNewPoint.setLocation(origin.getX()-2, origin.getY());  
+            newnewIstAussen = true;
+          } else if (newPoint.getX() == origin.getX()-2 && newPoint.getY() == origin.getY()) {
+            newNewPoint.setLocation(origin.getX()-1, origin.getY());
+
+            //Auf y daneben
+          } else if (newPoint.getY() == origin.getY()+1 && newPoint.getX() == origin.getX()) {
+            newNewPoint.setLocation(origin.getX(), origin.getY()+2);
+            newnewIstAussen = true;
+          } else if (newPoint.getY() == origin.getY()+2 && newPoint.getX() == origin.getX()) {
+            newNewPoint.setLocation(origin.getX(), origin.getY()+1);
+          } else if (newPoint.getY() == origin.getY()-1 && newPoint.getX() == origin.getX()) {
+            newNewPoint.setLocation(origin.getX(), origin.getY()-2);
+            newnewIstAussen = true;
+          } else if (newPoint.getY() == origin.getY()-2 && newPoint.getX() == origin.getX()) {
+            newNewPoint.setLocation(origin.getX(), origin.getY()-1);
+
+            //Dagonal positiv
+          } else if (newPoint.getY() == origin.getY()+1 && newPoint.getX() == origin.getX()+1) {
+            newNewPoint.setLocation(origin.getX()+2, origin.getY()+2);
+            newnewIstAussen = true;
+          } else if (newPoint.getY() == origin.getY()+2 && newPoint.getX() == origin.getX()+2) {
+            newNewPoint.setLocation(origin.getX()+1, origin.getY()+1);
+            newnewIstAussen = true;
+
+            //Diagonal negativ
+          } else if (newPoint.getY() == origin.getY()-1 && newPoint.getX() == origin.getX()-1) {
+            newNewPoint.setLocation(origin.getX()-2, origin.getY()-2);
+          } else if (newPoint.getY() == origin.getY()-2 && newPoint.getX() == origin.getX()-2) {
+            newNewPoint.setLocation(origin.getX()-1, origin.getY()-1);
+            newnewIstAussen = true;
           } else {
             clicked_box.removeAll(clicked_box);
             clicked_box.add(getIndexForPoint(newPoint));
