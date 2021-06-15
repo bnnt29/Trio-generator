@@ -1,4 +1,6 @@
 public static boolean use_fullscreen=true; //<>//
+public static int labeled=1;
+
 public static int recursiv=0;
 
 public static final int roundboxes = 10;
@@ -89,6 +91,24 @@ void mousePressed() {
     clicked_box.removeAll(clicked_box);
   }
 
+  //label
+  if (buttons.get(8).isPushed()) {
+    switch(labeled) {
+    case 0:
+      labeled=1;
+      break;
+    case 1:
+      labeled=2;
+      break;
+    case 2:
+      labeled=0;
+      break;
+    default:
+      labeled=0;
+      break;
+    }
+  }
+
   //clickable boxes
   if (mouseX>=column_width*(site_distance)+X_offset && mouseX<=column_width*(columns+site_distance)+X_offset && mouseY>=column_height*(site_distance/2) && mouseY<=column_height*(rows+site_distance/2)+column_height) {
     int column = ((mouseX-X_offset)/column_width)-site_distance;
@@ -110,7 +130,7 @@ void mousePressed() {
         case 1:
           if (clicked_box.get(0)==index-1||clicked_box.get(0)==index+1||clicked_box.get(0)==index-columns||clicked_box.get(0)==index-columns-1||clicked_box.get(0)==index-columns+1||clicked_box.get(0)==index+columns||clicked_box.get(0)==index+columns+1||clicked_box.get(0)==index+columns-1) {
             clicked_box.add(index);
-            if (index-(clicked_box.get(0)-clicked_box.get(1))<0 || (index-(clicked_box.get(0)-clicked_box.get(1))>random_numbs.size())) {
+            if (index-(clicked_box.get(0)-clicked_box.get(1))<0 || (index-(clicked_box.get(0)-clicked_box.get(1))>=random_numbs.size())) {
               clicked_box.removeAll(clicked_box);
             } else {
               clicked_box.add(index-(clicked_box.get(0)-clicked_box.get(1)));
@@ -263,11 +283,20 @@ void draw() {
       text(random_numbs.get(i*columns+e)+"", column_width*(e+site_distance)+X_offset+column_width/2, column_height*(i+site_distance/2)+column_height/2);
     }
   }
+
   //row+column numbers
   fill(255, 255, 255);
   textSize((float)Math.floor((float)((column_height+column_width)/2)*0.2f));
+  if (labeled==2) {
+    text("y", column_width*(columns+site_distance)+X_offset+column_width/2.5+column_width/3, column_height*(0+site_distance/2)+column_height/2); 
+    text("x", column_width*(0+site_distance)+X_offset+column_width/2.5, column_height*site_distance/2-column_height/3-column_height/3);
+  }
   for (int i=0; i<rows; i++) {
-    text(i+1, column_width*(columns+site_distance)+X_offset+column_width/2.5, column_height*(i+site_distance/2)+column_height/2);
+    if (labeled==0 || labeled==2) {
+      text(i+1, column_width*(columns+site_distance)+X_offset+column_width/2.5, column_height*(i+site_distance/2)+column_height/2);
+    } else if (labeled==1) {
+      text(init_abc_list().get(i), column_width*(columns+site_distance)+X_offset+column_width/2.5, column_height*(i+site_distance/2)+column_height/2);
+    }
   }
   for (int i=0; i<columns; i++) {
     text(i+1, column_width*(i+site_distance)+X_offset+column_width/2.5, column_height*site_distance/2-column_height/3);
@@ -308,6 +337,37 @@ public ArrayList<Integer> gen_random_numbs(int rows, int columns) {
     }
   }
   return save;
+}
+
+public ArrayList<Character> init_abc_list() {
+  ArrayList<Character> abc = new ArrayList<Character>();
+  abc.add('a'); 
+  abc.add('b'); 
+  abc.add('c'); 
+  abc.add('d'); 
+  abc.add('e'); 
+  abc.add('f'); 
+  abc.add('g'); 
+  abc.add('h'); 
+  abc.add('i'); 
+  abc.add('j');
+  abc.add('k');
+  abc.add('l');
+  abc.add('m');
+  abc.add('n');
+  abc.add('o');
+  abc.add('p');
+  abc.add('q');
+  abc.add('r');
+  abc.add('s');
+  abc.add('t');
+  abc.add('u');
+  abc.add('v');
+  abc.add('w');
+  abc.add('x');
+  abc.add('y');
+  abc.add('z');
+  return abc;
 }
 
 /*
@@ -430,5 +490,16 @@ public void initButtons(boolean init) {
     buttons.add(new button(fx, fy, fw, fh, current_random_numb+"", #000000, #FFFFFF, ts));
   } else {
     buttons.get(7).update(fx, fy, fw, fh, current_random_numb+"", ts);
+  }
+
+  //label
+  fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
+  fy = (int)Math.round((float)column_height/3);
+  fw = (int)Math.round((float)column_width*1.3f);
+  fh = (int)Math.round((float)column_height/2);
+  if (init) {
+    buttons.add(new button(fx, fy, fw, fh, "label"));
+  } else {
+    buttons.get(8).update(fx, fy, fw, fh);
   }
 }
