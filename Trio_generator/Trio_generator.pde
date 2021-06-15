@@ -1,10 +1,10 @@
-import java.util.Random; //<>//
+import java.util.Random; //<>// //<>//
 import java.awt.datatransfer.StringSelection;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 
 public static boolean draw=true;
-import java.awt.Point; //<>//
+import java.awt.Point;
 
 public static boolean use_fullscreen=true;
 public static int labeled=1;
@@ -207,7 +207,7 @@ void mousePressed() {
           if (newnewIstAussen) {
             clicked_box.add(getIndexForPoint(newPoint));
             clicked_box.add(getIndexForPoint(newNewPoint));
-          }else{
+          } else {
             clicked_box.add(getIndexForPoint(newNewPoint));
             clicked_box.add(getIndexForPoint(newPoint));
           }
@@ -288,14 +288,14 @@ void draw() {
             int sec=random_numbs.get(clicked_box.get(1));
             int thi=random_numbs.get(clicked_box.get(2));
             //(1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3)
-            if (Math.abs(one*sec+thi)==current_random_numb) {
+            if (Math.abs((double)one*sec+thi)==current_random_numb) {
               fill(0, 255, 0);
               right=true;
             } else {
               fill(255, 0, 0);
             }
             text(one+" * "+sec+" + "+thi, xcord, (float)(y_mult*0)+y_add);
-            if (Math.abs(one+sec*thi)==current_random_numb) {
+            if (Math.abs((double)one+sec*thi)==current_random_numb) {
               fill(0, 255, 0);
               right=true;
             } else {
@@ -303,7 +303,7 @@ void draw() {
             }
             text(one+" + "+sec+" * "+thi, xcord, (float)(y_mult*1)+y_add);
             if (sec!=0) {
-              if (Math.abs(one/sec+thi)==current_random_numb) {
+              if (Math.abs((double)one/sec+thi)==current_random_numb) {
                 fill(0, 255, 0);
                 right=true;
               } else {
@@ -312,7 +312,7 @@ void draw() {
               text(one+" / "+sec+" + "+thi, xcord, (float)(y_mult*2)+y_add);
             }
             if (thi!=0) {
-              if (Math.abs(one+sec/thi)==current_random_numb) {
+              if (Math.abs((double)one+sec/thi)==current_random_numb) {
                 fill(0, 255, 0);
                 right=true;
               } else {
@@ -320,14 +320,14 @@ void draw() {
               }
               text(one+" + "+sec+" / "+thi, xcord, (float)(y_mult*3)+y_add);
             }
-            if (Math.abs(one*sec-thi)==current_random_numb) {
+            if (Math.abs((double)one*sec-thi)==current_random_numb) {
               fill(0, 255, 0);
               right=true;
             } else {
               fill(255, 0, 0);
             }
             text(one+" * "+sec+" - "+thi, xcord, (float)(y_mult*4)+y_add);
-            if (Math.abs(one-sec*thi)==current_random_numb) {
+            if (Math.abs((double)one-sec*thi)==current_random_numb) {
               fill(0, 255, 0);
               right=true;
             } else {
@@ -335,7 +335,7 @@ void draw() {
             }
             text(one+" - "+sec+" * "+thi, xcord, (float)(y_mult*5)+y_add);
             if (sec!=0) {
-              if (Math.abs(one/sec-thi)==current_random_numb) {
+              if (Math.abs((double)one/sec-thi)==current_random_numb) {
                 fill(0, 255, 0);
                 right=true;
               } else {
@@ -344,7 +344,7 @@ void draw() {
               text(one+" / "+sec+" - "+thi, xcord, (float)(y_mult*6)+y_add);
             }
             if (thi!=0) {
-              if (Math.abs(one-sec/thi)==current_random_numb) {
+              if (Math.abs((double)one-sec/thi)==current_random_numb) {
                 fill(0, 255, 0);
                 right=true;
               } else {
@@ -352,14 +352,14 @@ void draw() {
               }
               text(one+" - "+sec+" / "+thi, xcord, (float)(y_mult*7)+y_add);
             }
-            if (Math.abs(one+sec-thi)==current_random_numb) {
+            if (Math.abs((double)one+sec-thi)==current_random_numb) {
               fill(0, 255, 0);
               right=true;
             } else {
               fill(255, 0, 0);
             }
             text(one+" + "+sec+" - "+thi, xcord, (float)(y_mult*8)+y_add);
-            if (Math.abs(one-sec+thi)==current_random_numb) {
+            if (Math.abs((double)one-sec+thi)==current_random_numb) {
               fill(0, 255, 0);
               right=true;
             } else {
@@ -406,14 +406,15 @@ void draw() {
       b.drawMe();
     }
     draw=!draw;
-  }else{
-  draw=!draw;
+  } else {
+    draw=!draw;
   }
 }
 
 public void rand() {
   if (r_seed==0) {
-    r_seed=(int)Math.random()*1000;
+    r_seed=(int)Math.random()*100;
+    System.out.print(Math.random()*100);
   }
   gen=new Random(r_seed);
   clicked_box.removeAll(clicked_box);
@@ -499,30 +500,30 @@ public boolean check(int r) {
   return false;
 }
 
-public boolean possibilities(int one, int sec, int thi, int current_random_numb) {
-  one=random_numbs.get(one);
-  sec=random_numbs.get(sec);
-  thi=random_numbs.get(thi);
+public boolean possibilities(int one_, int sec_, int thi_, int current_random_numb) {
+ double one=random_numbs.get(one_);
+ double sec=random_numbs.get(sec_);
+ double thi=random_numbs.get(thi_);
 
-  if (Math.abs(one*sec+thi)==current_random_numb) return true;
+  if (Math.abs((double)one*sec+thi)==current_random_numb) return true;
 
-  if (Math.abs(one+sec*thi)==current_random_numb) return true;
+  if (Math.abs((double)one+sec*thi)==current_random_numb) return true;
 
-  if (sec!=0) if (Math.abs(one/sec+thi)==current_random_numb) return true;
+  if (sec!=0) if (Math.abs((double)one/sec+thi)==current_random_numb) return true;
 
-  if (thi!=0) if (Math.abs(one+sec/thi)==current_random_numb)return true;
+  if (thi!=0) if (Math.abs((double)one+sec/thi)==current_random_numb)return true;
 
-  if (Math.abs(one*sec-thi)==current_random_numb) return true;
+  if (Math.abs((double)one*sec-thi)==current_random_numb) return true;
 
-  if (Math.abs(one-sec*thi)==current_random_numb) return true;
+  if (Math.abs((double)one-sec*thi)==current_random_numb) return true;
 
-  if (sec!=0) if (Math.abs(one/sec-thi)==current_random_numb) return true;
+  if (sec!=0) if (Math.abs((double)one/sec-thi)==current_random_numb) return true;
 
-  if (thi!=0) if (Math.abs(one-sec/thi)==current_random_numb) return true;
+  if (thi!=0) if (Math.abs((double)one-sec/thi)==current_random_numb) return true;
 
-  if (Math.abs(one+sec-thi)==current_random_numb) return true;
+  if (Math.abs((double)one+sec-thi)==current_random_numb) return true;
 
-  if (Math.abs(one-sec+thi)==current_random_numb) return true;
+  if (Math.abs((double)one-sec+thi)==current_random_numb) return true;
 
   return false;
 }
