@@ -1,14 +1,11 @@
-<<<<<<< Updated upstream
 import java.util.Random; //<>//
 import java.awt.datatransfer.StringSelection;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 
 public static boolean draw=true;
-=======
 import java.awt.Point; //<>//
 
->>>>>>> Stashed changes
 public static boolean use_fullscreen=true;
 public static int labeled=1;
 
@@ -256,7 +253,6 @@ int getIndexForPoint(Point p) {
 }
 
 void draw() { 
-<<<<<<< Updated upstream
   if (draw) {
     clear();
     background(0, 0, 0);
@@ -275,28 +271,6 @@ void draw() {
       buttons_init = true;
       initButtons(buttons_init);
     }
-=======
-  
-  clear();
-  background(0, 0, 0);
-  fill(255, 255, 255);
-
-  //grid setup
-  site_distance=2;
-  column_height=height/(rows+site_distance);
-  if (use_fullscreen) {
-    X_offset=0;
-    column_width=width/(columns+site_distance*2);
-  } else {
-    X_offset=width/8;
-    column_width=column_height;
-  }
-  if (!buttons_init) {
-    buttons_init = true;
-    initButtons(buttons_init);
-  }
->>>>>>> Stashed changes
-
     initButtons(false);
 
     //grid
