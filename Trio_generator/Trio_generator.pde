@@ -218,8 +218,6 @@ void mousePressed() {
             
             
           }else {
-            System.out.println("Nothing found");
-          } else {
             //System.out.println("Nothing found");
             clicked_box.removeAll(clicked_box);
             clicked_box.add(getIndexForPoint(newPoint));
@@ -235,13 +233,11 @@ void mousePressed() {
             break;
           }
           if (newnewIstAussen) {
-            System.out.println("NewNew ist außen");
+            //System.out.println("NewNew ist außen");
             //System.out.println("NewNew ist außen");
             clicked_box.add(getIndexForPoint(newPoint));
             clicked_box.add(getIndexForPoint(newNewPoint));
           }else{
-            System.out.println("NewNew ist innen");
-          } else {
             //System.out.println("NewNew ist innen");
             clicked_box.add(getIndexForPoint(newNewPoint));
             clicked_box.add(getIndexForPoint(newPoint));
@@ -548,9 +544,6 @@ public boolean possibilities(int one_, int sec_, int thi_, int current_random_nu
  double one=random_numbs.get(one_);
  double sec=random_numbs.get(sec_);
  double thi=random_numbs.get(thi_);
-  double one=random_numbs.get(one_);
-  double sec=random_numbs.get(sec_);
-  double thi=random_numbs.get(thi_);
 
   if (Math.abs((double)one*sec+thi)==current_random_numb) return true;
 
