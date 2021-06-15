@@ -187,14 +187,14 @@ void draw() {
           int sec=random_numbs.get(clicked_box.get(1));
           int thi=random_numbs.get(clicked_box.get(2));
           //(1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3)
-          if (one*sec+thi==current_random_numb) {
+          if (Math.abs(one*sec+thi)==current_random_numb) {
             fill(0, 255, 0);
             right=true;
           } else {
             fill(255, 0, 0);
           }
           text(one+" * "+sec+" + "+thi, xcord, (float)(y_mult*0)+y_add);
-          if (one+sec*thi==current_random_numb) {
+          if (Math.abs(one+sec*thi)==current_random_numb) {
             fill(0, 255, 0);
             right=true;
           } else {
@@ -202,7 +202,7 @@ void draw() {
           }
           text(one+" + "+sec+" * "+thi, xcord, (float)(y_mult*1)+y_add);
           if (sec!=0) {
-            if (one/sec+thi==current_random_numb) {
+            if (Math.abs(one/sec+thi)==current_random_numb) {
               fill(0, 255, 0);
               right=true;
             } else {
@@ -211,7 +211,7 @@ void draw() {
             text(one+" / "+sec+" + "+thi, xcord, (float)(y_mult*2)+y_add);
           }
           if (thi!=0) {
-            if (one+sec/thi==current_random_numb) {
+            if (Math.abs(one+sec/thi)==current_random_numb) {
               fill(0, 255, 0);
               right=true;
             } else {
@@ -219,14 +219,14 @@ void draw() {
             }
             text(one+" + "+sec+" / "+thi, xcord, (float)(y_mult*3)+y_add);
           }
-          if (one*sec-thi==current_random_numb) {
+          if (Math.abs(one*sec-thi)==current_random_numb) {
             fill(0, 255, 0);
             right=true;
           } else {
             fill(255, 0, 0);
           }
           text(one+" * "+sec+" - "+thi, xcord, (float)(y_mult*4)+y_add);
-          if (one-sec*thi==current_random_numb) {
+          if (Math.abs(one-sec*thi)==current_random_numb) {
             fill(0, 255, 0);
             right=true;
           } else {
@@ -234,7 +234,7 @@ void draw() {
           }
           text(one+" - "+sec+" * "+thi, xcord, (float)(y_mult*5)+y_add);
           if (sec!=0) {
-            if (one/sec-thi==current_random_numb) {
+            if (Math.abs(one/sec-thi)==current_random_numb) {
               fill(0, 255, 0);
               right=true;
             } else {
@@ -243,7 +243,7 @@ void draw() {
             text(one+" / "+sec+" - "+thi, xcord, (float)(y_mult*6)+y_add);
           }
           if (thi!=0) {
-            if (one-sec/thi==current_random_numb) {
+            if (Math.abs(one-sec/thi)==current_random_numb) {
               fill(0, 255, 0);
               right=true;
             } else {
@@ -251,14 +251,14 @@ void draw() {
             }
             text(one+" - "+sec+" / "+thi, xcord, (float)(y_mult*7)+y_add);
           }
-          if (one+sec-thi==current_random_numb) {
+          if (Math.abs(one+sec-thi)==current_random_numb) {
             fill(0, 255, 0);
             right=true;
           } else {
             fill(255, 0, 0);
           }
           text(one+" + "+sec+" - "+thi, xcord, (float)(y_mult*8)+y_add);
-          if (one-sec+thi==current_random_numb) {
+          if (Math.abs(one-sec+thi)==current_random_numb) {
             fill(0, 255, 0);
             right=true;
           } else {
@@ -394,25 +394,25 @@ public boolean possibilities(int one, int sec, int thi, int current_random_numb)
   sec=random_numbs.get(sec);
   thi=random_numbs.get(thi);
 
-  if (one*sec+thi==current_random_numb) return true;
+  if (Math.abs(one*sec+thi)==current_random_numb) return true;
 
-  if (one+sec*thi==current_random_numb) return true;
+  if (Math.abs(one+sec*thi)==current_random_numb) return true;
 
-  if (sec!=0) if (one/sec+thi==current_random_numb) return true;
+  if (sec!=0) if (Math.abs(one/sec+thi)==current_random_numb) return true;
 
-  if (thi!=0) if (one+sec/thi==current_random_numb)return true;
+  if (thi!=0) if (Math.abs(one+sec/thi)==current_random_numb)return true;
 
-  if (one*sec-thi==current_random_numb) return true;
+  if (Math.abs(one*sec-thi)==current_random_numb) return true;
 
-  if (one-sec*thi==current_random_numb) return true;
+  if (Math.abs(one-sec*thi)==current_random_numb) return true;
 
-  if (sec!=0) if (one/sec-thi==current_random_numb) return true;
+  if (sec!=0) if (Math.abs(one/sec-thi)==current_random_numb) return true;
 
-  if (thi!=0) if (one-sec/thi==current_random_numb) return true;
+  if (thi!=0) if (Math.abs(one-sec/thi)==current_random_numb) return true;
 
-  if (one+sec-thi==current_random_numb) return true;
+  if (Math.abs(one+sec-thi)==current_random_numb) return true;
 
-  if (one-sec+thi==current_random_numb) return true;
+  if (Math.abs(one-sec+thi)==current_random_numb) return true;
 
   return false;
 }
