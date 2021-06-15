@@ -320,7 +320,7 @@ void draw() {
       }
     }
     for (int i=0; i<columns; i++) {
-      text(i+1, column_width*(i+site_distance)+X_offset+column_width/2.5, column_height*site_distance/2-column_height/3);
+      text(i+1, column_width*(i+site_distance)+X_offset+column_width/2, column_height*site_distance/2-column_height/3);
     }
 
     for (button b : buttons) {
