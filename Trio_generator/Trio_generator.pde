@@ -160,11 +160,11 @@ void draw() {
       boolean right=false;
       fill(255, 255, 255);
       if (clicked_box.contains(i*columns+e)) {
-        textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(buttons.get(5).getX()-(buttons.get(6).getX()+buttons.get(6).getX())))/8+(site_distance*column_width*2))/8)*0.5f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
+        textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(buttons.get(5).getX()-(buttons.get(6).getX()+buttons.get(6).getX())))/8+(site_distance*column_width*2))/11)*0.5f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
         if (clicked_box.size()==3) {
           float xcord=column_width*1.3-column_width/1.2+X_offset/2+column_width/2;
           float y_add=(float)((buttons.get(6).getY()+buttons.get(6).getH())+(float)((float)((column_height+column_width)/2)*site_distance)/8);
-          float y_mult=(float)((buttons.get(5).getY()-(buttons.get(6).getY()+buttons.get(6).getH()))/9)*1.0f;
+          float y_mult=(float)((buttons.get(5).getY()-(buttons.get(6).getY()+buttons.get(6).getH()))/11)*1.0f;
           int one=random_numbs.get(clicked_box.get(0));
           int sec=random_numbs.get(clicked_box.get(1));
           int thi=random_numbs.get(clicked_box.get(2));
@@ -233,6 +233,20 @@ void draw() {
             }
             text(one+" - "+sec+" / "+thi, xcord, (float)(y_mult*7)+y_add);
           }
+          if (one+sec-thi==current_random_numb) {
+            fill(0, 255, 0);
+            right=true;
+          } else {
+            fill(255, 0, 0);
+          }
+          text(one+" + "+sec+" - "+thi, xcord, (float)(y_mult*8)+y_add);
+          if (one-sec+thi==current_random_numb) {
+            fill(0, 255, 0);
+            right=true;
+          } else {
+            fill(255, 0, 0);
+          }
+          text(one+" - "+sec+" + "+thi, xcord, (float)(y_mult*9)+y_add);
           if (right) {
             fill(0, 255, 0);
           } else {
@@ -298,14 +312,14 @@ public ArrayList<Integer> gen_random_numbs(int rows, int columns) {
 
 /*
 0.fullscreen
-1.-row
-2.+row
-3.-column
-4.+column
-5.reset
-6.reroll
-7.random number field
-*/
+ 1.-row
+ 2.+row
+ 3.-column
+ 4.+column
+ 5.reset
+ 6.reroll
+ 7.random number field
+ */
 public void initButtons(boolean init) {
   int fx = 0;
   int fy = 0;
