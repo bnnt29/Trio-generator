@@ -1,8 +1,6 @@
 public static boolean use_fullscreen=true; //<>//
 public static int labeled=1;
 
-public static int recursiv=0;
-
 public static final int roundboxes = 10;
 public ArrayList<button> buttons = new ArrayList<button>();
 
@@ -313,6 +311,112 @@ public void rand() {
   used_random_numbs.add(gen_current_random_numb(0));
 }
 
+public boolean check(int r) {
+  if (rows*columns>450) {
+    return true;
+  }
+  for (int i=0; i<rows-0; i++) {
+    for (int e=0; e<columns-0; e++) {
+      int index=i*columns+e;
+      if (i>2&&i<rows-2&&e>2&&e<columns-2) {
+        if (possibilities(index, index+1, index+2, r)) return true;
+
+        if (possibilities(index, index-1, index-2, r)) return true;
+
+        if (possibilities(index, index-columns, index-columns*2, r)) return true;
+
+        if (possibilities(index, index+columns, index+columns*2, r)) return true;
+
+        if (possibilities(index, index-columns+1, index-columns*2+2, r)) return true;
+
+        if (possibilities(index, index+columns+1, index+columns*2+2, r)) return true;
+
+        if (possibilities(index, index-columns-1, index-columns*2-2, r)) return true;
+
+        if (possibilities(index, index+columns-1, index+columns*2-2, r)) return true;
+      } else {
+        if (i<2) {
+          if (possibilities(index, index+columns, index+columns*2, r)) return true;
+          if (e>2&&e<columns-2) {
+            if (possibilities(index, index+1, index+2, r)) return true;
+
+            if (possibilities(index, index-1, index-2, r)) return true;
+
+            if (possibilities(index, index+columns+1, index+columns*2+2, r)) return true;
+
+            if (possibilities(index, index+columns-1, index+columns*2-2, r)) return true;
+          }
+        }
+        if (i>rows-2) {
+          if (possibilities(index, index-columns, index-columns*2, r)) return true;
+          if (e>2&&e<columns-2) {
+            if (possibilities(index, index+1, index+2, r)) return true;
+
+            if (possibilities(index, index-1, index-2, r)) return true;
+
+            if (possibilities(index, index-columns+1, index-columns*2+2, r)) return true;
+
+            if (possibilities(index, index-columns-1, index-columns*2-2, r)) return true;
+          }
+        }
+        if (e<2) {
+          if (possibilities(index, index+1, index+2, r)) return true;
+          if (i>2&&i<rows-2) {
+            if (possibilities(index, index-columns, index-columns*2, r)) return true;
+
+            if (possibilities(index, index+columns, index+columns*2, r)) return true;
+
+            if (possibilities(index, index-columns+1, index-columns*2+2, r)) return true;
+
+            if (possibilities(index, index+columns+1, index+columns*2+2, r)) return true;
+          }
+        }
+        if (e>columns-2) {
+          if (possibilities(index, index-1, index-2, r)) return true;
+          if (i>2&&i<rows-2) {
+            if (possibilities(index, index-columns, index-columns*2, r)) return true;
+
+            if (possibilities(index, index+columns, index+columns*2, r)) return true;
+            
+            if (possibilities(index, index-columns-1, index-columns*2-2, r)) return true;
+
+            if (possibilities(index, index+columns-1, index+columns*2-2, r)) return true;
+          }
+        }
+      }
+    }
+  }
+  return false;
+}
+
+public boolean possibilities(int one, int sec, int thi, int current_random_numb) {
+  one=random_numbs.get(one);
+  sec=random_numbs.get(sec);
+  thi=random_numbs.get(thi);
+
+  if (one*sec+thi==current_random_numb) return true;
+
+  if (one+sec*thi==current_random_numb) return true;
+
+  if (sec!=0) if (one/sec+thi==current_random_numb) return true;
+
+  if (thi!=0) if (one+sec/thi==current_random_numb)return true;
+
+  if (one*sec-thi==current_random_numb) return true;
+
+  if (one-sec*thi==current_random_numb) return true;
+
+  if (sec!=0) if (one/sec-thi==current_random_numb) return true;
+
+  if (thi!=0) if (one-sec/thi==current_random_numb) return true;
+
+  if (one+sec-thi==current_random_numb) return true;
+
+  if (one-sec+thi==current_random_numb) return true;
+
+  return false;
+}
+
 public int gen_current_random_numb(int rec) {
   //gen current random Number (unique)
   rec+=1;
@@ -323,8 +427,13 @@ public int gen_current_random_numb(int rec) {
   current_random_numb=(int)(((double)Math.random()*max)+min);
   if (used_random_numbs.contains(current_random_numb)) {
     gen_current_random_numb(rec);
+  } else if (check(current_random_numb)) {
+    used_random_numbs.add(current_random_numb);
+    return current_random_numb;
+  } else {
+    gen_current_random_numb(rec);
   }
-  return current_random_numb;
+  return  (int)(((double)Math.random()*max)+min);
 }
 
 
