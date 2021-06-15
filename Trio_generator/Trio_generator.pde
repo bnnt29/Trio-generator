@@ -150,7 +150,7 @@ void mousePressed() {
           clicked_box.add(index);
           break;
         case 1:
-          if (!(rows>10||columns>10)) {
+          if ((rows/columns==1)) {
             //System.out.println("Case 1: " + getCoordinatesForIndex(clicked_box.get(0)).toString());
             //Point
             Point origin = getCoordinatesForIndex(clicked_box.get(0));
