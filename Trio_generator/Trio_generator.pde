@@ -150,6 +150,7 @@ void mousePressed() {
           clicked_box.add(index);
           break;
         case 1:
+          //System.out.println("Case 1: " + getCoordinatesForIndex(clicked_box.get(0)).toString());
           //Point
           Point origin = getCoordinatesForIndex(clicked_box.get(0));
           Point newPoint = getCoordinatesForIndex(index);
@@ -157,6 +158,10 @@ void mousePressed() {
           boolean newnewIstAussen = false;
           if (newPoint.equals(new Point()))
             break;
+            if (newPoint.equals(new Point())) {
+              System.out.println("Second point is not valid");
+              break;
+            }
           //Auf x daneben
           if (newPoint.getX() == origin.getX()+1 && newPoint.getY() == origin.getY()) {
             newNewPoint.setLocation(origin.getX()+2, origin.getY());
@@ -196,6 +201,8 @@ void mousePressed() {
             newNewPoint.setLocation(origin.getX()-1, origin.getY()-1);
           
            //Dagonal positiv negativ
+
+            //Dagonal positiv negativ
           } else if (newPoint.getY() == origin.getY()+1 && newPoint.getX() == origin.getX()-1) {
             newNewPoint.setLocation(origin.getX()-2, origin.getY()+2);
             newnewIstAussen = true;
@@ -212,6 +219,8 @@ void mousePressed() {
             
           }else {
             System.out.println("Nothing found");
+          } else {
+            //System.out.println("Nothing found");
             clicked_box.removeAll(clicked_box);
             clicked_box.add(getIndexForPoint(newPoint));
             break;
@@ -221,12 +230,19 @@ void mousePressed() {
             System.out.println("No valid third point");
             break;
           }
+          if(getIndexForPoint(newPoint) == -1 || getIndexForPoint(newNewPoint) == -1){
+              //System.out.println("Out of bounce");
+            break;
+          }
           if (newnewIstAussen) {
             System.out.println("NewNew ist außen");
+            //System.out.println("NewNew ist außen");
             clicked_box.add(getIndexForPoint(newPoint));
             clicked_box.add(getIndexForPoint(newNewPoint));
           }else{
             System.out.println("NewNew ist innen");
+          } else {
+            //System.out.println("NewNew ist innen");
             clicked_box.add(getIndexForPoint(newNewPoint));
             clicked_box.add(getIndexForPoint(newPoint));
           }
@@ -262,11 +278,19 @@ Point getCoordinatesForIndex(int i) {
   int y = (int)(Math.floor((float)index/(float)rows))+1;
   result.setLocation(x, y);
   if (x<1 || x>(columns) || y<1 || y>(rows))
+  if (result.getX() == 0)
+    result.setLocation(columns, result.getY()-1);
+  //System.out.println("Index: " + i + " " + result.toString());
+  if (result.getX()<1 || result.getX()>(columns) || result.getY()<1 || result.getY()>(rows)) {
+    System.out.println("Point not existent");
     return new Point();
+  }
   return result;
 }
 
 int getIndexForPoint(Point p) {
+  if (p.getX() < 1 || p.getX() > columns || p.getY() < 1 || p.getY() > rows)
+    return -1;
   int result = (int)(p.getX()-1 + rows*(p.getY()-1));
   return result;
 }
@@ -524,6 +548,9 @@ public boolean possibilities(int one_, int sec_, int thi_, int current_random_nu
  double one=random_numbs.get(one_);
  double sec=random_numbs.get(sec_);
  double thi=random_numbs.get(thi_);
+  double one=random_numbs.get(one_);
+  double sec=random_numbs.get(sec_);
+  double thi=random_numbs.get(thi_);
 
   if (Math.abs((double)one*sec+thi)==current_random_numb) return true;
 
