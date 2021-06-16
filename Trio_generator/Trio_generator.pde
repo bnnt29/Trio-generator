@@ -1,4 +1,4 @@
-import java.util.Random; //<>// //<>// //<>// //<>// //<>// //<>//
+import java.util.Random; //<>//
 import java.awt.datatransfer.StringSelection;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -10,6 +10,7 @@ import java.awt.Point;
 
 public static boolean use_fullscreen=true;
 public static int labeled=1;
+public static boolean minimalistic=false;
 
 public static final int roundboxes = 10;
 public ArrayList<button> buttons = new ArrayList<button>();
@@ -55,56 +56,62 @@ void mousePressed() {
     clicked_box.removeAll(clicked_box);
   }
 
-  //use_fullscreen
-  if (buttons.get(0).isPushed()) {
-    use_fullscreen = !use_fullscreen;
-  }
+  if (!minimalistic) {
+    //use_fullscreen
+    if (buttons.get(0).isPushed()) {
+      use_fullscreen = !use_fullscreen;
+    }
 
-  //rem row
-  if (rows>min_columns) {
-    if (buttons.get(1).isPushed()) {
-      rows-=1;
+    //rem row
+    if (rows>min_columns) {
+      if (buttons.get(1).isPushed()) {
+        rows-=1;
+        rand();
+      }
+    }
+
+    //add row
+    if (rows<max_columns) {
+      if (buttons.get(2).isPushed()) {
+        rows+=1;
+        rand();
+      }
+    }
+
+    //rem column
+    if (columns>min_columns) {
+      if (buttons.get(3).isPushed()) {
+        columns-=1;
+        rand();
+      }
+    }
+
+    //add column
+    if (columns<max_columns) {
+      if (buttons.get(4).isPushed()) {
+        columns+=1;
+        rand();
+      }
+    }
+
+    //reset_button
+    if (buttons.get(5).isPushed()) {
+      clicked_box.removeAll(clicked_box);
+      rows=10;
+      columns=10;
+      r_seed=0;
       rand();
     }
-  }
 
-  //add row
-  if (rows<max_columns) {
-    if (buttons.get(2).isPushed()) {
-      rows+=1;
-      rand();
+    //reroll-button
+    if (buttons.get(6).isPushed()) {
+      rerand();
     }
-  }
-
-  //rem column
-  if (columns>min_columns) {
-    if (buttons.get(3).isPushed()) {
-      columns-=1;
-      rand();
+  } else {
+    //reroll-field
+    if (buttons.get(7).isPushed()) {
+      rerand();
     }
-  }
-
-  //add column
-  if (columns<max_columns) {
-    if (buttons.get(4).isPushed()) {
-      columns+=1;
-      rand();
-    }
-  }
-
-  //reset_button
-  if (buttons.get(5).isPushed()) {
-    clicked_box.removeAll(clicked_box);
-    rows=10;
-    columns=10;
-    r_seed=0;
-    rand();
-  }
-
-  //reroll-button
-  if (buttons.get(6).isPushed()) {
-    used_random_numbs.add(gen_current_random_numb(0));
-    clicked_box.removeAll(clicked_box);
   }
 
   //label
@@ -134,6 +141,12 @@ void mousePressed() {
     seed_green_fade=0;
   }
 
+  //minimalistic
+  if (buttons.get(10).isPushed()) {
+    minimalistic=!minimalistic;
+    buttons.get(0).set_lastPressed(System.currentTimeMillis()+5);
+  }
+
   //clickable boxes
   if (mouseX>=column_width*(site_distance)+X_offset && mouseX<=column_width*(columns+site_distance)+X_offset && mouseY>=column_height*(site_distance/2) && mouseY<=column_height*(rows+site_distance/2)+column_height) {
     int column = ((mouseX-X_offset)/column_width)-site_distance;
@@ -153,7 +166,9 @@ void mousePressed() {
           clicked_box.add(index);
           break;
         case 1:
-          if ((rows/columns==1)) {
+        boolean test=false;
+        if(!test){
+          //if (!(rows/columns==1)) {
             //System.out.println("Case 1: " + getCoordinatesForIndex(clicked_box.get(0)).toString());
             //Point
             Point origin = getCoordinatesForIndex(clicked_box.get(0));
@@ -190,7 +205,7 @@ void mousePressed() {
             } else if (newPoint.getY() == origin.getY()-2 && newPoint.getX() == origin.getX()) {
               newNewPoint.setLocation(origin.getX(), origin.getY()-1);
 
-              //Dagonal positiv
+              //Diagonal positiv
             } else if (newPoint.getY() == origin.getY()+1 && newPoint.getX() == origin.getX()+1) {
               newNewPoint.setLocation(origin.getX()+2, origin.getY()+2);
               newnewIstAussen = true;
@@ -203,8 +218,8 @@ void mousePressed() {
               newnewIstAussen = true;
             } else if (newPoint.getY() == origin.getY()-2 && newPoint.getX() == origin.getX()-2) {
               newNewPoint.setLocation(origin.getX()-1, origin.getY()-1);
-              
-              //Dagonal positiv negativ
+
+              //Diagonal positiv negativ
             } else if (newPoint.getY() == origin.getY()+1 && newPoint.getX() == origin.getX()-1) {
               newNewPoint.setLocation(origin.getX()-2, origin.getY()+2);
               newnewIstAussen = true;
@@ -271,11 +286,12 @@ void mousePressed() {
 Point getCoordinatesForIndex(int i) {
   Point result = new Point();
   int index = i+1;
-  int x = (int)(index-(Math.floor((float)index/(float)rows)*rows));
+  int x = (int)(index-(Math.floor((float)index/(float)columns)*columns));
   int y = (int)(Math.floor((float)index/(float)rows))+1;
+  System.out.println(x+", "+y);
   result.setLocation(x, y);
   if (x<1 || x>(columns) || y<1 || y>(rows))
-    if (result.getX() == 0){
+    if (result.getX() == 0) {
       result.setLocation(columns, result.getY()-1);
       System.out.println("x = 0");
     }
@@ -321,11 +337,11 @@ void draw() {
         boolean right=false;
         fill(255, 255, 255);
         if (clicked_box.contains(i*columns+e)) {
-          textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(buttons.get(5).getX()-(buttons.get(6).getX()+buttons.get(6).getX())))/8+(site_distance*column_width*2))/11)*0.5f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
+          textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(buttons.get(5).getX()-(buttons.get(0).getX()+buttons.get(0).getX())))/8+(site_distance*column_width*2))/11)*0.5f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
           if (clicked_box.size()==3) {
             float xcord=column_width*1.3-column_width/1.2+X_offset/2+column_width/2;
-            float y_add=(float)((buttons.get(6).getY()+buttons.get(6).getH())+(float)((float)((column_height+column_width)/2)*site_distance)/8);
-            float y_mult=(float)((buttons.get(5).getY()-(buttons.get(6).getY()+buttons.get(6).getH()))/11)*1.0f;
+            float y_add=(float)((buttons.get(0).getY()+buttons.get(0).getH())+(float)((float)((column_height+column_width)/2)*site_distance)/8);
+            float y_mult=(float)((buttons.get(5).getY()-(buttons.get(0).getY()+buttons.get(0).getH()))/11)*1.0f;
             int one=random_numbs.get(clicked_box.get(0));
             int sec=random_numbs.get(clicked_box.get(1));
             int thi=random_numbs.get(clicked_box.get(2));
@@ -444,13 +460,23 @@ void draw() {
       text(i+1, column_width*(i+site_distance)+X_offset+column_width/2, column_height*site_distance/2-column_height/3);
     }
 
-    for (button b : buttons) {
-      b.drawMe();
+    if (!minimalistic) {
+      for (button b : buttons) {
+        b.drawMe();
+      }
+    } else {
+      buttons.get(7).drawMe(); 
+      buttons.get(10).drawMe();
     }
     draw=!draw;
   } else {
     draw=!draw;
   }
+}
+
+public void rerand() {
+  used_random_numbs.add(gen_current_random_numb(0));
+  clicked_box.removeAll(clicked_box);
 }
 
 public void rand() {
@@ -625,6 +651,7 @@ public ArrayList<Character> init_abc_list() {
  7.random number field
  8.label
  9.seed
+ 10.minimalistic
  */
 public void initButtons(boolean init) {
   int fx = 0;
@@ -636,8 +663,8 @@ public void initButtons(boolean init) {
   color tc;
 
   //use fullscreen
-  fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
-  fy = (int)Math.round((float)column_height);
+  fx = (int)Math.round((float)column_width-(float)column_width/1.5+(float)X_offset/2);
+  fy = (int)Math.round((float)column_height*4.5f);
   fw = (int)Math.round((float)column_width*1.3f);
   fh = (int)Math.round((float)column_height/2);
   if (init) {
@@ -734,11 +761,17 @@ public void initButtons(boolean init) {
   fw = (int)Math.round((float)column_width*1.5f);
   fh = (int)Math.round((float)column_height*1.3f);
   ts = (float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*3.5);
-  if (init) {
-    buttons.add(new button(fx, fy, fw, fh, current_random_numb+"", #000000, #FFFFFF, ts));
+  if (used_random_numbs.size()<=max-min) {
+    tc = #000000;
   } else {
-    buttons.get(7).update(fx, fy, fw, fh, current_random_numb+"", ts);
+    tc = #FF0000;
   }
+  if (init) {
+    buttons.add(new button(fx, fy, fw, fh, current_random_numb+"", tc, #FFFFFF, ts));
+  } else {
+    buttons.get(7).update(fx, fy, fw, fh, current_random_numb+"", ts, tc);
+  }
+
 
   //label
   fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
@@ -765,6 +798,17 @@ public void initButtons(boolean init) {
     if (seed_green_fade<255) {
       seed_green_fade+=3;
     }
+  }
+
+  //minimalistic
+  fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
+  fy = (int)Math.round((float)column_height);
+  fw = (int)Math.round((float)column_width*1.3f);
+  fh = (int)Math.round((float)column_height/2);
+  if (init) {
+    buttons.add(new button(fx, fy, fw, fh, "minimalize"));
+  } else {
+    buttons.get(10).update(fx, fy, fw, fh);
   }
   fill(255, 255, 255);
   stroke(255, 255, 255);

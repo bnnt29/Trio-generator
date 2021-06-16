@@ -87,10 +87,11 @@ class button {
     this.mc = mc;
   }
 
-  public void update(int x, int y, int w, int h, String text, float ts) {
+  public void update(int x, int y, int w, int h, String text, float ts, color tc) {
     update(x, y, w, h);
     this.text = text;
     this.ts = ts;
+    this.tc = tc;
   }
 
   public int getX() {
@@ -106,5 +107,9 @@ class button {
 
   public int getH() {
     return h;
+  }
+  
+  public void set_lastPressed(long lastPressed){
+    this.lastPressed=lastPressed;
   }
 }
