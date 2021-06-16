@@ -217,7 +217,6 @@ void mousePressed() {
               newnewIstAussen = true;
             } else if (newPoint.getY() == origin.getY()-2 && newPoint.getX() == origin.getX()+2) {
               newNewPoint.setLocation(origin.getX()+1, origin.getY()-1);
-              
             } else {
               //System.out.println("Nothing found");
               clicked_box.removeAll(clicked_box);
