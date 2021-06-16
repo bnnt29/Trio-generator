@@ -27,6 +27,7 @@ public static int grid_max =10;
 public static int min=grid_min+1;
 public static int max=grid_max*grid_max-1;
 public static int current_random_numb=0;
+//random
 public static int r_seed=0;
 public static String Hex_r_seed="0000";
 public static Random gen;
