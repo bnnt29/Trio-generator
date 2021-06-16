@@ -28,6 +28,11 @@ class button {
     this.mc = mc;
   }
 
+  public button(int x, int y, int w, int h, String text, color mc) {
+    this(x, y, w, h, text);
+    this.mc = mc;
+  }
+
   public button(int x, int y, int w, int h, String text, color tc, color mc, float ts) {
     this(x, y, w, h, text, tc, mc);
     this.ts = ts;
@@ -67,35 +72,39 @@ class button {
     this.h = h;
   }
 
+  public void update(int x, int y, int w, int h, color tc, color mc) {
+    update(x, y, w, h, mc);
+    this.tc = tc;
+  }
+
+  public void update(int x, int y, int w, int h, color tc, String text, color mc) {
+    update(x, y, w, h, tc, mc);
+    this.text = text;
+  }
+
   public void update(int x, int y, int w, int h, color mc) {
-    this.x = x;
-    this.y = y;
-    this.w = w;
-    this.h = h;
+    update(x, y, w, h);
     this.mc = mc;
   }
 
   public void update(int x, int y, int w, int h, String text, float ts) {
-    this.x = x;
-    this.y = y;
-    this.w = w;
-    this.h = h;
+    update(x, y, w, h);
     this.text = text;
     this.ts = ts;
   }
-  
-  public int getX(){
-   return x; 
+
+  public int getX() {
+    return x;
   }
-  
-   public int getY(){
-   return y; 
+
+  public int getY() {
+    return y;
   }
-  public int getW(){
-   return w; 
+  public int getW() {
+    return w;
   }
-  
-   public int getH(){
-   return h; 
+
+  public int getH() {
+    return h;
   }
 }
