@@ -102,19 +102,8 @@ void mousePressed() {
       r_seed=0;
       rand();
     }
-
-    //reroll-button
-    if (buttons.get(6).isPushed()) {
-      rerand();
-    }
-  } else {
-    //reroll-field
-    if (buttons.get(7).isPushed()) {
-      rerand();
-    }
-  }
-
-  //label
+    
+    //label
   if (buttons.get(8).isPushed()) {
     switch(labeled) {
     case 0:
@@ -131,6 +120,18 @@ void mousePressed() {
       break;
     }
   }
+
+    //reroll-button
+    if (buttons.get(6).isPushed()) {
+      rerand();
+    }
+  } else {
+    //reroll-field
+    if (buttons.get(7).isPushed()) {
+      rerand();
+    }
+  }
+
 
   //seed-button
   if (buttons.get(9).isPushed()) {
