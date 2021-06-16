@@ -25,6 +25,7 @@ public static int min=grid_min+1;
 public static int max=grid_max*grid_max-1;
 public static int current_random_numb=0;
 public static int r_seed=0;
+public static String Hex_r_seed="0000";
 public static Random gen;
 
 
@@ -453,6 +454,8 @@ void draw() {
 
 public void rand() {
   used_random_numbs.removeAll(used_random_numbs);
+   r_seed=Integer.parseInt(Hex_r_seed, 16);
+   Hex_r_seed="0000";
   if (r_seed==0) {
     r_seed=(int)((double)Math.random()*(double)100000*(double)Math.random());
   }
