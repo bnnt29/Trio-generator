@@ -18,12 +18,14 @@ public static final int roundboxes = 10;
 public ArrayList<button> buttons = new ArrayList<button>();
 
 //colors
+public static boolean wait=false;
 public static color right_color=#00FF00;
 public static color wrong_color=#FF0000;
 public static color pending_color=#0000FF;
 public static int seed_green_fade = 255;
 
 //numbers
+public static String[] calculations_list = {"*+", "+*", "/+", "+/", "*-", "-*", "/-", "-/", "*/", "/*", "+-", "-+"};
 public static ArrayList<String> calculations = new ArrayList<String>();
 public static ArrayList<Integer> random_numbs = new ArrayList<Integer>();
 public static ArrayList<Integer> used_random_numbs=new ArrayList<Integer>();
@@ -33,6 +35,7 @@ public static int grid_max =10;
 public static int min=grid_min+1;
 public static int max=(grid_max-1)*(grid_max-1)+grid_max-1;
 public static int current_random_numb=0;
+public static boolean found_nothing=false;
 //random
 public static int r_seed=0;
 public static String Hex_r_seed="0000";
@@ -96,11 +99,12 @@ void mousePressed() {
     }
 
     //reset_button
-    if (buttons.get(5).isPushed()) {
+    if (buttons.get(5).isPushed()&&!wait) {
       clicked_box.removeAll(clicked_box);
       rows=10;
       columns=10;
       r_seed=0;
+      found_nothing=false;
       rand();
     }
 
@@ -124,12 +128,12 @@ void mousePressed() {
     }
 
     //reroll-button
-    if (buttons.get(6).isPushed()) {
+    if (buttons.get(6).isPushed()&&!wait) {
       rerand();
     }
   } else {
     //reroll-field
-    if (buttons.get(7).isPushed()) {
+    if (buttons.get(7).isPushed()&&!wait) {
       rerand();
     }
   }
@@ -310,7 +314,6 @@ void draw() {
     for (int i=0; i< rows; i++) {
       for (int e=0; e< columns; e++) {
         boolean right=false;
-        String[] calculations_list = {"*+", "+*", "/+", "+/", "*-", "-*", "/-", "-/", "*/", "/*", "+-", "-+"};
         int possibilities=calculations_list.length;
         fill(#FFFFFF);
         if (clicked_box.contains(i*columns+e)) {
@@ -434,6 +437,7 @@ public void rerand() {
 }
 
 public void rand() {
+  wait=true;
   used_random_numbs.removeAll(used_random_numbs);
   r_seed=Integer.parseInt(Hex_r_seed, 16);
   Hex_r_seed="0000";
@@ -444,6 +448,7 @@ public void rand() {
   clicked_box.removeAll(clicked_box);
   random_numbs = gen_random_numbs(rows, columns);
   used_random_numbs.add(gen_current_random_numb(0));
+  wait=false;
 }
 
 public boolean check(int r) {
@@ -528,34 +533,34 @@ public boolean possibilities(int one_, int sec_, int thi_, int current_random_nu
   double one=random_numbs.get(one_);
   double sec=random_numbs.get(sec_);
   double thi=random_numbs.get(thi_);
-
-  if (Math.abs((double)one*sec+thi)==current_random_numb) return true;
-
-  if (Math.abs((double)one+sec*thi)==current_random_numb) return true;
-
-  if (sec!=0) if (Math.abs((double)one/sec+thi)==current_random_numb) return true;
-
-  if (thi!=0) if (Math.abs((double)one+sec/thi)==current_random_numb)return true;
-
-  if (Math.abs((double)one*sec-thi)==current_random_numb) return true;
-
-  if (Math.abs((double)one-sec*thi)==current_random_numb) return true;
-
-  if (sec!=0) if (Math.abs((double)one/sec-thi)==current_random_numb) return true;
-
-  if (thi!=0) if (Math.abs((double)one-sec/thi)==current_random_numb) return true;
-
-  if (Math.abs((double)one+sec-thi)==current_random_numb) return true;
-
-  if (Math.abs((double)one-sec+thi)==current_random_numb) return true;
-
+  for (int o=0; o<calculations_list.length; o++) {
+    String s=calculations_list[o];
+    if (s.substring(0, 1).equals("/") && sec==0||s.substring(1, 2).equals("/") && thi==0) {
+      continue;
+    }
+    try {
+      //never use eval if with user input
+      if (engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi) instanceof Integer) {
+        if ((int)(engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi))==current_random_numb) return true;
+      } else if (engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi) instanceof Double) {
+        if ((double)(engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi))==(double)current_random_numb)return true;
+      } else {
+        System.out.println("unexpected class: "+engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi).getClass());
+      }
+    }
+    catch(Exception q) {
+      System.out.println(q);
+      return false;
+    }
+  }
   return false;
 }
 
 public int gen_current_random_numb(int rec) {
   //gen current random Number (unique)
   rec+=1;
-  if (rec>=1000) {
+  if (rec>=150) {
+    found_nothing=true;
     current_random_numb=(int)(((double)Math.random()*max)+min);
     return current_random_numb;
   }
@@ -566,9 +571,9 @@ public int gen_current_random_numb(int rec) {
     used_random_numbs.add(current_random_numb);
     return current_random_numb;
   } else {
-    gen_current_random_numb(rec);
+    return gen_current_random_numb(rec);
   }
-  return  (int)(((double)Math.random()*max)+min);
+  return  current_random_numb;
 }
 
 
@@ -620,7 +625,7 @@ public void initButtons(boolean init) {
   fw = 0;
   fh = 0;
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh));
+    buttons.add(new button(fx, fy, fw, fh, 1));
   }
 
   //rem_row_button
@@ -711,15 +716,20 @@ public void initButtons(boolean init) {
   fw = (int)Math.round((float)column_width*1.5f);
   fh = (int)Math.round((float)column_height*1.3f);
   ts = (float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*3.6);
-  if (used_random_numbs.size()<=max-min) {
+  if (!found_nothing) {
     tc = #000000;
   } else {
     tc = #FF0000;
   }
-  if (init) {
-    buttons.add(new button(fx, fy, fw, fh, current_random_numb+"", tc, #FFFFFF, ts));
+  if (wait) {
+    mc=#FF0000;
   } else {
-    buttons.get(7).update(fx, fy, fw, fh, current_random_numb+"", ts, tc);
+    mc=#FFFFFF;
+  }
+  if (init) {
+    buttons.add(new button(fx, fy, fw, fh, current_random_numb+"", tc, mc, ts));
+  } else {
+    buttons.get(7).update(fx, fy, fw, fh, current_random_numb+"", ts, tc, mc);
   }
 
 
