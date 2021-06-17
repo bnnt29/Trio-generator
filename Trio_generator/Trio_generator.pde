@@ -11,7 +11,6 @@ import javax.script.ScriptException;
 public static boolean draw=true;
 import java.awt.Point;
 
-public static boolean use_fullscreen=true;
 public static int labeled=1;
 public static boolean minimalistic=false;
 
@@ -64,12 +63,6 @@ void mousePressed() {
   boolean clicked_button=false;
 
   if (!minimalistic) {
-    //use_fullscreen
-    if (buttons.get(0).isPushed()) {
-      clicked_button=true;
-      use_fullscreen = !use_fullscreen;
-    }
-
     //rem row
     if (rows>min_columns) {
       if (buttons.get(1).isPushed()) {
@@ -305,13 +298,8 @@ void draw() {
 
     //grid setup
     column_height=height/(rows+site_distance);
-    if (use_fullscreen) {
-      X_offset=0;
-      column_width=width/(columns+site_distance*2);
-    } else {
-      X_offset=width/8;
-      column_width=column_height;
-    }
+    X_offset=0;
+    column_width=width/(columns+site_distance*2);
     if (!buttons_init) {
       buttons_init = true;
       initButtons(buttons_init);
@@ -332,15 +320,18 @@ void draw() {
             float y_add=0;
             float y_mult=0;
             if (minimalistic) {
+              button ref_one=buttons.get(7);
               xcord=column_width*1.3-column_width/1.2+X_offset/2+column_width/2;
-              y_add=(float)((buttons.get(7).getY()+buttons.get(7).getH())+(float)((float)((column_height+column_width)/2)*(site_distance-1.7)));
-              y_mult=(float)(((height-column_height)-(buttons.get(7).getY()+buttons.get(7).getH()))/possibilities+5)*1.0f;
-              textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs((height-column_height)-(buttons.get(7).getX()+buttons.get(7).getX())))/8+(site_distance*column_width*2))/11)*0.8f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
+              y_add=(float)((ref_one.getY()+ref_one.getH())+(float)((float)((column_height+column_width)/2)*(site_distance-1.7)));
+              y_mult=(float)(((height-column_height)-(ref_one.getY()+ref_one.getH()))/possibilities+5)*1.0f;
+              textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs((height-column_height)-(ref_one.getX()+ref_one.getX())))/8+(site_distance*column_width*2))/11)*0.8f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
             } else {
+              button ref_one=buttons.get(6);
+              button ref_sec=buttons.get(5);
               xcord=column_width*1.3-column_width/1.2+X_offset/2+column_width/2;
-              y_add=(float)((buttons.get(0).getY()+buttons.get(0).getH())+(float)((float)((column_height+column_width)/2)*(site_distance-1.7)));
-              y_mult=(float)((buttons.get(5).getY()-(buttons.get(0).getY()+buttons.get(0).getH()))/(possibilities+7))*1.5f;
-              textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(buttons.get(5).getX()-(buttons.get(0).getX()+buttons.get(0).getX())))/8+(site_distance*column_width*2))/11)*0.8f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
+              y_add=(float)((ref_one.getY()+ref_one.getH())+(float)((float)((column_height+column_width)/2)*(site_distance-1.7)));
+              y_mult=(float)((ref_sec.getY()-(ref_one.getY()+ref_one.getH()))/(possibilities+7))*1.5f;
+              textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(ref_sec.getX()-(ref_one.getX()+ref_one.getX())))/8+(site_distance*column_width*2))/11)*0.8f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
             }
 
             int one=random_numbs.get(clicked_box.get(0));
@@ -402,10 +393,10 @@ void draw() {
 
     //row+column numbers
     fill(255, 255, 255);
-    if(minimalistic){
-          textSize((float)Math.floor((float)((column_height+column_width)/2)*0.5f));
-    }else{
-    textSize((float)Math.floor((float)((column_height+column_width)/2)*0.4f));
+    if (minimalistic) {
+      textSize((float)Math.floor((float)((column_height+column_width)/2)*0.5f));
+    } else {
+      textSize((float)Math.floor((float)((column_height+column_width)/2)*0.4f));
     }
     if (labeled==2) {
       text("y", column_width*(columns+site_distance)+X_offset+column_width/2.5+column_width/3, column_height*(0+site_distance/2)+column_height/2); 
@@ -603,7 +594,7 @@ public ArrayList<Character> init_abc_list() {
 }
 
 /*
- 0.fullscreen
+ 0.zero
  1.-row
  2.+row
  3.-column
@@ -624,15 +615,12 @@ public void initButtons(boolean init) {
   color mc;
   color tc;
 
-  //use fullscreen
-  fx = (int)Math.round((float)column_width-(float)column_width/1.5+(float)X_offset/2);
-  fy = (int)Math.round((float)column_height*4.2f);
-  fw = (int)Math.round((float)column_width*1.3f);
-  fh = (int)Math.round((float)column_height/2);
+  fx = 0;
+  fy = 0;
+  fw = 0;
+  fh = 0;
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "fullscreen"));
-  } else {
-    buttons.get(0).update(fx, fy, fw, fh);
+    buttons.add(new button(fx, fy, fw, fh));
   }
 
   //rem_row_button
