@@ -16,7 +16,10 @@ public static final int roundboxes = 10;
 public ArrayList<button> buttons = new ArrayList<button>();
 
 //colors
-public static int seed_green_fade=255;
+public static color right_color=#00FF00;
+public static color wrong_color=#FF0000;
+public static color pending_color=#0000FF;
+public static int seed_green_fade = 255;
 
 //numbers
 public static ArrayList<Integer> random_numbs = new ArrayList<Integer>();
@@ -25,7 +28,7 @@ public static ArrayList<Integer> clicked_box=new ArrayList<Integer>();
 public static int grid_min =0;
 public static int grid_max =10;
 public static int min=grid_min+1;
-public static int max=grid_max*grid_max-1;
+public static int max=(grid_max-1)*(grid_max-1)+grid_max-1;
 public static int current_random_numb=0;
 //random
 public static int r_seed=0;
@@ -53,13 +56,12 @@ void setup() {
 
 void mousePressed() {
   //disselect selected boxes
-  if (!(mouseX>site_distance*column_width && mouseX<(site_distance+columns)*column_width && mouseY>(site_distance/2)*column_height && mouseY<(site_distance/2+rows)*column_height)) {
-    clicked_box.removeAll(clicked_box);
-  }
+  boolean clicked_button=false;
 
   if (!minimalistic) {
     //use_fullscreen
     if (buttons.get(0).isPushed()) {
+      clicked_button=true;
       use_fullscreen = !use_fullscreen;
     }
 
@@ -103,24 +105,25 @@ void mousePressed() {
       r_seed=0;
       rand();
     }
-    
+
     //label
-  if (buttons.get(8).isPushed()) {
-    switch(labeled) {
-    case 0:
-      labeled=1;
-      break;
-    case 1:
-      labeled=2;
-      break;
-    case 2:
-      labeled=0;
-      break;
-    default:
-      labeled=0;
-      break;
+    if (buttons.get(8).isPushed()) {
+      clicked_button=true;
+      switch(labeled) {
+      case 0:
+        labeled=1;
+        break;
+      case 1:
+        labeled=2;
+        break;
+      case 2:
+        labeled=0;
+        break;
+      default:
+        labeled=0;
+        break;
+      }
     }
-  }
 
     //reroll-button
     if (buttons.get(6).isPushed()) {
@@ -142,16 +145,19 @@ void mousePressed() {
     clipboard.setContents(stringSelection, null);
     System.out.println("SEED: "+r_seed);
     seed_green_fade=0;
+    clicked_button=true;
   }
 
   //minimalistic
   if (buttons.get(10).isPushed()) {
     minimalistic=!minimalistic;
     buttons.get(0).set_lastPressed(System.currentTimeMillis()+5);
+    clicked_button=true;
   }
 
   //clickable boxes
   if (mouseX>=column_width*(site_distance)+X_offset && mouseX<=column_width*(columns+site_distance)+X_offset && mouseY>=column_height*(site_distance/2) && mouseY<=column_height*(rows+site_distance/2)+column_height) {
+    clicked_button=true;
     int column = ((mouseX-X_offset)/column_width)-site_distance;
     int row = ((mouseY)/column_height)-(site_distance/2);
     int index = row*columns+column;
@@ -257,6 +263,9 @@ void mousePressed() {
       }
     }
   }
+  if (!clicked_button) {
+    clicked_box.removeAll(clicked_box);
+  }
 }
 
 Point getCoordinatesForIndex(int i) {
@@ -286,7 +295,7 @@ int getIndexForPoint(Point p) {
 void draw() { 
   if (draw) {
     clear();
-    background(0, 0, 0);
+    background(50, 50, 50);
     fill(255, 255, 255);
 
     //grid setup
@@ -308,106 +317,144 @@ void draw() {
     for (int i=0; i< rows; i++) {
       for (int e=0; e< columns; e++) {
         boolean right=false;
-        fill(255, 255, 255);
+        fill(#FFFFFF);
         if (clicked_box.contains(i*columns+e)) {
           textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(buttons.get(5).getX()-(buttons.get(0).getX()+buttons.get(0).getX())))/8+(site_distance*column_width*2))/11)*0.5f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
           if (clicked_box.size()==3) {
-            float xcord=column_width*1.3-column_width/1.2+X_offset/2+column_width/2;
-            float y_add=(float)((buttons.get(0).getY()+buttons.get(0).getH())+(float)((float)((column_height+column_width)/2)*site_distance)/8);
-            float y_mult=(float)((buttons.get(5).getY()-(buttons.get(0).getY()+buttons.get(0).getH()))/11)*1.0f;
+            int possibilities=10;
+            float xcord=0;
+            float y_add=0;
+            float y_mult=0;
+            if (minimalistic) {
+              xcord=column_width*1.3-column_width/1.2+X_offset/2+column_width/2;
+              y_add=(float)((buttons.get(7).getY()+buttons.get(7).getH())+(float)((float)((column_height+column_width)/2)*site_distance)/possibilities);
+              y_mult=(float)(((height-column_height)-(buttons.get(7).getY()+buttons.get(7).getH()))/possibilities+2)*1.0f;
+              textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(buttons.get(5).getX()-(buttons.get(0).getX()+buttons.get(0).getX())))/8+(site_distance*column_width*2))/11)*0.5f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
+            } else {
+              xcord=column_width*1.3-column_width/1.2+X_offset/2+column_width/2;
+              y_add=(float)((buttons.get(0).getY()+buttons.get(0).getH())+(float)((float)((column_height+column_width)/2)*site_distance)/possibilities);
+              y_mult=(float)((buttons.get(5).getY()-(buttons.get(0).getY()+buttons.get(0).getH()))/(possibilities+3))*1.0f;
+              textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(buttons.get(5).getX()-(buttons.get(0).getX()+buttons.get(0).getX())))/8+(site_distance*column_width*2))/11)*0.5f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
+            }
             int one=random_numbs.get(clicked_box.get(0));
             int sec=random_numbs.get(clicked_box.get(1));
             int thi=random_numbs.get(clicked_box.get(2));
             //(1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3)
             if ((double)one*sec+thi==current_random_numb) {
-              fill(0, 255, 0);
+              fill(right_color);
               right=true;
             } else {
-              fill(255, 0, 0);
+              fill(right_color);
             }
             text(one+" * "+sec+" + "+thi, xcord, (float)(y_mult*0)+y_add);
             if ((double)one+sec*thi==current_random_numb) {
-              fill(0, 255, 0);
+              fill(right_color);
               right=true;
             } else {
-              fill(255, 0, 0);
+              fill(wrong_color);
             }
             text(one+" + "+sec+" * "+thi, xcord, (float)(y_mult*1)+y_add);
             if (sec!=0) {
               if ((double)one/sec+thi==current_random_numb) {
-                fill(0, 255, 0);
+                fill(right_color);
                 right=true;
               } else {
-                fill(255, 0, 0);
+                fill(wrong_color);
               }
               text(one+" / "+sec+" + "+thi, xcord, (float)(y_mult*2)+y_add);
             }
             if (thi!=0) {
               if ((double)one+sec/thi==current_random_numb) {
-                fill(0, 255, 0);
+                fill(right_color);
                 right=true;
               } else {
-                fill(255, 0, 0);
+                fill(wrong_color);
               }
               text(one+" + "+sec+" / "+thi, xcord, (float)(y_mult*3)+y_add);
             }
             if ((double)one*sec-thi==current_random_numb) {
-              fill(0, 255, 0);
+              fill(right_color);
               right=true;
             } else {
-              fill(255, 0, 0);
+              fill(wrong_color);
             }
             text(one+" * "+sec+" - "+thi, xcord, (float)(y_mult*4)+y_add);
             if ((double)one-sec*thi==current_random_numb) {
-              fill(0, 255, 0);
+              fill(right_color);
               right=true;
             } else {
-              fill(255, 0, 0);
+              fill(wrong_color);
             }
             text(one+" - "+sec+" * "+thi, xcord, (float)(y_mult*5)+y_add);
             if (sec!=0) {
               if ((double)one/sec-thi==current_random_numb) {
-                fill(0, 255, 0);
+                fill(right_color);
                 right=true;
               } else {
-                fill(255, 0, 0);
+                fill(wrong_color);
               }
               text(one+" / "+sec+" - "+thi, xcord, (float)(y_mult*6)+y_add);
             }
             if (thi!=0) {
               if ((double)one-sec/thi==current_random_numb) {
-                fill(0, 255, 0);
+                fill(right_color);
                 right=true;
               } else {
-                fill(255, 0, 0);
+                fill(wrong_color);
               }
               text(one+" - "+sec+" / "+thi, xcord, (float)(y_mult*7)+y_add);
             }
             if ((double)one+sec-thi==current_random_numb) {//1+2-3=0, 3-2+1=2
-              fill(0, 255, 0);
+              fill(right_color);
               right=true;
             } else {
-              fill(255, 0, 0);
+              fill(wrong_color);
             }
             text(one+" + "+sec+" - "+thi, xcord, (float)(y_mult*8)+y_add);
             if ((double)one-sec+thi==current_random_numb) { //1-2+3=2, 3+2-1=4
-              fill(0, 255, 0);
+              fill(right_color);
               right=true;
             } else {
-              fill(255, 0, 0);
+              fill(wrong_color);
             }
-            text(one+" - "+sec+" + "+thi, xcord, (float)(y_mult*9)+y_add);
+            text(one+" + "+sec+" - "+thi, xcord, (float)(y_mult*9)+y_add);
+            if (thi!=0) {
+              if ((double)one*sec/thi==current_random_numb) { //1-2+3=2, 3+2-1=4
+                fill(right_color);
+                right=true;
+              } else {
+                fill(wrong_color);
+              }
+              text(one+" / "+sec+" * "+thi, xcord, (float)(y_mult*10)+y_add);
+            }
+            if (sec!=0) {
+              if ((double)one/sec*thi==current_random_numb) { //1-2+3=2, 3+2-1=4
+                fill(right_color);
+                right=true;
+              } else {
+                fill(wrong_color);
+              }
+              text(one+" / "+sec+" * "+thi, xcord, (float)(y_mult*11)+y_add);
+            }
             if (right) {
-              fill(0, 255, 0);
+              fill(right_color);
             } else {
-              fill(255, 0, 0);
+              fill(wrong_color);
             }
           } else {
-            fill(0, 0, 255);
+            fill(pending_color);
           }
         }
         rect(column_width*(e+site_distance)+X_offset, column_height*(i+site_distance/2), column_width, column_height, roundboxes);
-        fill(0, 0, 0);
+        if (clicked_box.size()>0&&clicked_box.size()<2) {
+          if (clicked_box.get(0)==i*columns+e) {
+            fill(#FFFFFF);
+          } else {
+            fill(0, 0, 0);
+          }
+        } else {
+          fill(0, 0, 0);
+        }
         textAlign(CENTER, CENTER);
         textSize((float)Math.floor((float)((column_width+column_height)/2)*0.5f));
         text(random_numbs.get(i*columns+e)+"", column_width*(e+site_distance)+X_offset+column_width/2, column_height*(i+site_distance/2)+column_height/2);
@@ -613,7 +660,7 @@ public ArrayList<Character> init_abc_list() {
 }
 
 /*
-0.fullscreen
+ 0.fullscreen
  1.-row
  2.+row
  3.-column
@@ -651,12 +698,12 @@ public void initButtons(boolean init) {
   fw = (int)Math.round((float)column_width);
   fh = (int)Math.round((float)column_height/2);
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "-", #FFFFFF, #00FF00));
+    buttons.add(new button(fx, fy, fw, fh, "-", #000000, #FFFFFF));
   } else {
     if (rows<=5) {
       buttons.get(1).update(fx, fy, fw, fh, #FF0000);
     } else {
-      buttons.get(1).update(fx, fy, fw, fh, #00FF00);
+      buttons.get(1).update(fx, fy, fw, fh, #FFFFFF);
     }
   }
 
@@ -666,12 +713,12 @@ public void initButtons(boolean init) {
   fw = (int)Math.round((float)column_width);
   fh = (int)Math.round((float)column_height/2);
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "+"));
+    buttons.add(new button(fx, fy, fw, fh, "+", #000000, #FFFFFF));
   } else {
     if (rows>=max_columns) {
       buttons.get(2).update(fx, fy, fw, fh, #FF0000);
     } else {
-      buttons.get(2).update(fx, fy, fw, fh, #00FF00);
+      buttons.get(2).update(fx, fy, fw, fh, #FFFFFF);
     }
   }
 
@@ -681,12 +728,12 @@ public void initButtons(boolean init) {
   fw = (int)Math.round((float)column_width);
   fh = (int)Math.round((float)column_height/2);
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "-"));
+    buttons.add(new button(fx, fy, fw, fh, "-", #000000, #FFFFFF));
   } else {
     if (columns<=min_columns) {
       buttons.get(3).update(fx, fy, fw, fh, #FF0000);
     } else {
-      buttons.get(3).update(fx, fy, fw, fh, #00FF00);
+      buttons.get(3).update(fx, fy, fw, fh, #FFFFFF);
     }
   }
 
@@ -696,12 +743,12 @@ public void initButtons(boolean init) {
   fw = (int)Math.round((float)column_width);
   fh = (int)Math.round((float)column_height/2);
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "+"));
+    buttons.add(new button(fx, fy, fw, fh, "+", #000000, #FFFFFF));
   } else {
     if (columns>=max_columns) {
       buttons.get(4).update(fx, fy, fw, fh, #FF0000);
     } else {
-      buttons.get(4).update(fx, fy, fw, fh, #00FF00);
+      buttons.get(4).update(fx, fy, fw, fh, #FFFFFF);
     }
   }
 
@@ -764,9 +811,9 @@ public void initButtons(boolean init) {
   tc =color(seed_green_fade, 255, seed_green_fade);
   mc=#000000;
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "seed: "+Integer.toHexString(r_seed), tc, mc));
+    buttons.add(new button(fx, fy, fw, fh, "seed: "+Integer.toHexString(r_seed), tc, g.backgroundColor));
   } else {
-    buttons.get(9).update(fx, fy, fw, fh, tc, "seed: "+Integer.toHexString(r_seed), mc);
+    buttons.get(9).update(fx, fy, fw, fh, tc, "seed: "+Integer.toHexString(r_seed), g.backgroundColor);
     if (seed_green_fade<255) {
       seed_green_fade+=3;
     }

@@ -4,8 +4,8 @@ class button {
 
   private int x, y, w, h;
   private String text = "";
-  private color tc = #FFFFFF;
-  private color mc = #FF0000;//tc=textColor, mc=MainColor
+  private color mc = #FFFFFF;
+  private color tc = #000000;//tc=textColor, mc=MainColor
   private float ts = -1;
   private long lastPressed;
   private static final long DELAY_TIME = 150;
