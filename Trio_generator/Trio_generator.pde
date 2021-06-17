@@ -4,6 +4,9 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.util.Arrays;
 import java.util.Collections;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
 
 public static boolean draw=true;
 import java.awt.Point;
@@ -22,6 +25,7 @@ public static color pending_color=#0000FF;
 public static int seed_green_fade = 255;
 
 //numbers
+public static ArrayList<String> calculations = new ArrayList<String>();
 public static ArrayList<Integer> random_numbs = new ArrayList<Integer>();
 public static ArrayList<Integer> used_random_numbs=new ArrayList<Integer>();
 public static ArrayList<Integer> clicked_box=new ArrayList<Integer>();
@@ -46,7 +50,8 @@ public static int site_distance=2;
 public static int max_columns=40;
 public static int min_columns=5;
 
-
+public static ScriptEngineManager mgr = new ScriptEngineManager();
+public static ScriptEngine engine = mgr.getEngineByName("JavaScript");
 boolean buttons_init = false;
 
 void setup() {
@@ -317,124 +322,58 @@ void draw() {
     for (int i=0; i< rows; i++) {
       for (int e=0; e< columns; e++) {
         boolean right=false;
+        String[] calculations_list = {"*+", "+*", "/+", "+/", "*-", "-*", "/-", "-/", "*/", "/*", "+-", "-+"};
+        int possibilities=calculations_list.length;
         fill(#FFFFFF);
         if (clicked_box.contains(i*columns+e)) {
-          textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(buttons.get(5).getX()-(buttons.get(0).getX()+buttons.get(0).getX())))/8+(site_distance*column_width*2))/11)*0.5f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
+          textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(buttons.get(5).getX()-(buttons.get(0).getX()+buttons.get(0).getX())))/possibilities+(site_distance*column_width*2))/11)*0.5f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
           if (clicked_box.size()==3) {
-            int possibilities=10;
             float xcord=0;
             float y_add=0;
             float y_mult=0;
             if (minimalistic) {
               xcord=column_width*1.3-column_width/1.2+X_offset/2+column_width/2;
-              y_add=(float)((buttons.get(7).getY()+buttons.get(7).getH())+(float)((float)((column_height+column_width)/2)*site_distance)/possibilities);
-              y_mult=(float)(((height-column_height)-(buttons.get(7).getY()+buttons.get(7).getH()))/possibilities+2)*1.0f;
-              textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(buttons.get(5).getX()-(buttons.get(0).getX()+buttons.get(0).getX())))/8+(site_distance*column_width*2))/11)*0.5f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
+              y_add=(float)((buttons.get(7).getY()+buttons.get(7).getH())+(float)((float)((column_height+column_width)/2)*(site_distance-1.7)));
+              y_mult=(float)(((height-column_height)-(buttons.get(7).getY()+buttons.get(7).getH()))/possibilities+5)*1.0f;
+              textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs((height-column_height)-(buttons.get(7).getX()+buttons.get(7).getX())))/8+(site_distance*column_width*2))/11)*0.8f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
             } else {
               xcord=column_width*1.3-column_width/1.2+X_offset/2+column_width/2;
-              y_add=(float)((buttons.get(0).getY()+buttons.get(0).getH())+(float)((float)((column_height+column_width)/2)*site_distance)/possibilities);
-              y_mult=(float)((buttons.get(5).getY()-(buttons.get(0).getY()+buttons.get(0).getH()))/(possibilities+3))*1.0f;
-              textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(buttons.get(5).getX()-(buttons.get(0).getX()+buttons.get(0).getX())))/8+(site_distance*column_width*2))/11)*0.5f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
+              y_add=(float)((buttons.get(0).getY()+buttons.get(0).getH())+(float)((float)((column_height+column_width)/2)*(site_distance-1.7)));
+              y_mult=(float)((buttons.get(5).getY()-(buttons.get(0).getY()+buttons.get(0).getH()))/(possibilities+7))*1.5f;
+              textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(buttons.get(5).getX()-(buttons.get(0).getX()+buttons.get(0).getX())))/8+(site_distance*column_width*2))/11)*0.8f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
             }
+
             int one=random_numbs.get(clicked_box.get(0));
             int sec=random_numbs.get(clicked_box.get(1));
             int thi=random_numbs.get(clicked_box.get(2));
             //(1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3)
-            if ((double)one*sec+thi==current_random_numb) {
-              fill(right_color);
-              right=true;
-            } else {
-              fill(right_color);
-            }
-            text(one+" * "+sec+" + "+thi, xcord, (float)(y_mult*0)+y_add);
-            if ((double)one+sec*thi==current_random_numb) {
-              fill(right_color);
-              right=true;
-            } else {
-              fill(wrong_color);
-            }
-            text(one+" + "+sec+" * "+thi, xcord, (float)(y_mult*1)+y_add);
-            if (sec!=0) {
-              if ((double)one/sec+thi==current_random_numb) {
+            for (int o=0; o<calculations_list.length; o++) {
+              double out=0;
+              String s=calculations_list[o];
+              calculations.add(s);
+              if (s.substring(0, 1).equals("/") && sec==0||s.substring(1, 2).equals("/") && thi==0) {
+                continue;
+              }
+              try {
+                //never use eval if with user input
+                if (engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi) instanceof Integer) {
+                  out=(double)((int)(engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi)));
+                } else if (engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi) instanceof Double) {
+                  out=(double)(engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi));
+                } else {
+                  System.out.println("unexpected class: "+engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi).getClass());
+                }
+              }
+              catch(Exception q) {
+                System.out.println(q);
+              }
+              if (out==current_random_numb) {
                 fill(right_color);
                 right=true;
               } else {
                 fill(wrong_color);
               }
-              text(one+" / "+sec+" + "+thi, xcord, (float)(y_mult*2)+y_add);
-            }
-            if (thi!=0) {
-              if ((double)one+sec/thi==current_random_numb) {
-                fill(right_color);
-                right=true;
-              } else {
-                fill(wrong_color);
-              }
-              text(one+" + "+sec+" / "+thi, xcord, (float)(y_mult*3)+y_add);
-            }
-            if ((double)one*sec-thi==current_random_numb) {
-              fill(right_color);
-              right=true;
-            } else {
-              fill(wrong_color);
-            }
-            text(one+" * "+sec+" - "+thi, xcord, (float)(y_mult*4)+y_add);
-            if ((double)one-sec*thi==current_random_numb) {
-              fill(right_color);
-              right=true;
-            } else {
-              fill(wrong_color);
-            }
-            text(one+" - "+sec+" * "+thi, xcord, (float)(y_mult*5)+y_add);
-            if (sec!=0) {
-              if ((double)one/sec-thi==current_random_numb) {
-                fill(right_color);
-                right=true;
-              } else {
-                fill(wrong_color);
-              }
-              text(one+" / "+sec+" - "+thi, xcord, (float)(y_mult*6)+y_add);
-            }
-            if (thi!=0) {
-              if ((double)one-sec/thi==current_random_numb) {
-                fill(right_color);
-                right=true;
-              } else {
-                fill(wrong_color);
-              }
-              text(one+" - "+sec+" / "+thi, xcord, (float)(y_mult*7)+y_add);
-            }
-            if ((double)one+sec-thi==current_random_numb) {//1+2-3=0, 3-2+1=2
-              fill(right_color);
-              right=true;
-            } else {
-              fill(wrong_color);
-            }
-            text(one+" + "+sec+" - "+thi, xcord, (float)(y_mult*8)+y_add);
-            if ((double)one-sec+thi==current_random_numb) { //1-2+3=2, 3+2-1=4
-              fill(right_color);
-              right=true;
-            } else {
-              fill(wrong_color);
-            }
-            text(one+" + "+sec+" - "+thi, xcord, (float)(y_mult*9)+y_add);
-            if (thi!=0) {
-              if ((double)one*sec/thi==current_random_numb) { //1-2+3=2, 3+2-1=4
-                fill(right_color);
-                right=true;
-              } else {
-                fill(wrong_color);
-              }
-              text(one+" / "+sec+" * "+thi, xcord, (float)(y_mult*10)+y_add);
-            }
-            if (sec!=0) {
-              if ((double)one/sec*thi==current_random_numb) { //1-2+3=2, 3+2-1=4
-                fill(right_color);
-                right=true;
-              } else {
-                fill(wrong_color);
-              }
-              text(one+" / "+sec+" * "+thi, xcord, (float)(y_mult*11)+y_add);
+              text(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi, xcord, (float)(y_mult*o)+y_add);
             }
             if (right) {
               fill(right_color);
@@ -463,7 +402,11 @@ void draw() {
 
     //row+column numbers
     fill(255, 255, 255);
-    textSize((float)Math.floor((float)((column_height+column_width)/2)*0.2f));
+    if(minimalistic){
+          textSize((float)Math.floor((float)((column_height+column_width)/2)*0.5f));
+    }else{
+    textSize((float)Math.floor((float)((column_height+column_width)/2)*0.4f));
+    }
     if (labeled==2) {
       text("y", column_width*(columns+site_distance)+X_offset+column_width/2.5+column_width/3, column_height*(0+site_distance/2)+column_height/2); 
       text("x", column_width*(0+site_distance)+X_offset+column_width/2.5, column_height*site_distance/2-column_height/3-column_height/3);
