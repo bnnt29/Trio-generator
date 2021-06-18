@@ -184,50 +184,39 @@ class init_numbers {
 class possiblenumbs extends Thread {
   private init_numbers n;
   private boolean stop = false;
-  private ArrayList<Integer> randomnumbs;
-  private String[] calculationlist;
-  private long m;
 
   public void setstop() {
     this.stop=true;
   }
 
   public void run() {
-    m=System.currentTimeMillis();
+    long m=System.currentTimeMillis();
     this.n=r;
     n.setthreadfin(false);
-    randomnumbs = n.getrandomnumbs();
-    calculationlist=n.getcalculationlist();
-    gen_possible_numbs();
-    n.setthreadfin(true);
-    n.new_current_random_numb();
-    System.out.println("Thread finished in: "+(System.currentTimeMillis()-m)/1000+" sec");
-  }
-
-  public void gen_possible_numbs() {
     check();
+    n.new_current_random_numb();
+    n.setthreadfin(true);
     n.setprogress(100);
+    System.out.println("Thread finished in: "+((double)System.currentTimeMillis()-m)/1000+" sec");
   }
 
   public int possibilities(int one_, int sec_, int thi_) {
     if (stop) return -2;
-    double one=randomnumbs.get(one_);
-    double sec=randomnumbs.get(sec_);
-    double thi=randomnumbs.get(thi_);
-    for (int o=0; o<calculationlist.length; o++) {
-      String s=calculationlist[o];
-      if (s.charAt(0)=='/' && sec==0||s.charAt(1)=='/' && thi==0) {
+    double one=n.getrandomnumbs().get(one_);
+    double sec=n.getrandomnumbs().get(sec_);
+    double thi=n.getrandomnumbs().get(thi_);
+    for (String s : n.getcalculationlist()) {
+      if (s.charAt(0)=='/' && sec==0||s.charAt(0)=='/' && thi==0) {
         continue;
       }
       try {
         //never use eval if with user input
-        double e=(double)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(1)+"")+thi));
-        if (e>r.getmin() && e<r.getmax() && !n.getpossiblenumbs().contains((int)e))  return (int)e;
+        double e=(double)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(0)+"")+thi));
+        if (!n.getpossiblenumbs().contains((int)e) && e>r.getmin() && e<r.getmax())  return (int)e;
         continue;
       }
       catch(Exception q) {
-        System.out.println(q);
-        return -2;
+        continue;
       }
     }
     return -2;
@@ -235,12 +224,12 @@ class possiblenumbs extends Thread {
 
   public void check() {
     for (int i=0; i<rows; i++) {
+      n.setthreadfin(false);
       for (int e=0; e<columns; e++) {
-        if (stop) return;
-        n.setthreadfin(false);
         int index=i*columns+e;
-        n.setprogress((((double)((double)index/(double)(rows*columns)*100))));
+        n.setprogress((double)(((double)index/(rows*columns))*100));
         if (i>2 && i<rows-2 && e>2 && e<columns-2) {
+
           n.getpossiblenumbs().add(possibilities(index, index+1, index+2));
 
           n.getpossiblenumbs().add(possibilities(index, index-1, index-2));

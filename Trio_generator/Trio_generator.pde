@@ -329,17 +329,25 @@ void draw() {
             int sec=r.getrandomnumbs().get(clicked_box.get(1));
             int thi=r.getrandomnumbs().get(clicked_box.get(2));
             //(1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3)
-            if (r.getcurrent_random_numb()>-1) {
+            if (r.getcurrent_random_numb()>0) {
               for (int o=0; o<r.getcalculationlist().length; o++) {
-                double out=0;
+                double out=-1;
                 String s=r.getcalculationlist()[o];
                 r.calculations.add(s);
-                if (s.substring(0, 1).equals("/") && sec==0||s.substring(1, 2).equals("/") && thi==0) {
+                if (s.charAt(0)=='/' && sec==0||s.charAt(1)=='/' && thi==0) {
                   continue;
                 }
                 try {
-                  //never use eval if with user input
-                  out=(double)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(1)+"")+thi));
+                  try {
+                    //never use eval if with user input
+                    out=(double)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(1)+"")+thi));
+                  }
+                  catch(ClassCastException u) {
+                    //never use eval if with user input
+                    out=(int)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(1)+"")+thi));
+                  }
+                }
+                catch(ScriptException q) {
                 }
                 catch(Exception q) {
                   System.out.println(q);
@@ -350,7 +358,7 @@ void draw() {
                 } else {
                   fill(wrong_color);
                 }
-                text(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi, xcord, (float)(y_mult*o)+y_add);
+                text((one+(s.charAt(0)+"")+sec+(s.charAt(1)+"")+thi), xcord, (float)(y_mult*o)+y_add);
               }
             }
             if (right) {
@@ -416,13 +424,6 @@ void draw() {
   } else {
     draw=!draw;
   }
-  //if (!r.getthreadfin() && r.getprogress()>=100 && !minimalistic) {
-  //  button ref_one=buttons.get(7);
-  //  button ref_sec=buttons.get(10);
-  //  textSize((float)Math.floor((float)(((ref_one.getY()-(ref_sec.getY()+ref_sec.getH()))/2+(ref_sec.getW()*2))/2)*0.15f));
-  //  fill(#FF0000);
-  //  text((double)((int)(r.getprogress()*10))/10+"%", ref_sec.getX()+(float)((float)ref_sec.getW()/2), ref_one.getY()-(float)((float)(ref_one.getY()-(float)(ref_sec.getY()+ref_sec.getH()))/2f));
-  //}
 }
 
 public ArrayList<Character> init_abc_list() {
