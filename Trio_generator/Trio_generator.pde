@@ -23,9 +23,10 @@ public static color pending_color=#0000FF;
 public static int seed_green_fade = 255;
 
 //numbers
-private ArrayList<Integer> clicked_box=new ArrayList<Integer>();
+public static boolean extreme_calc=true;
+public static ArrayList<Integer> clicked_box=new ArrayList<Integer>();
 //seed
-private String Hex_r_seed="0000";
+public static String Hex_r_seed="0000";
 
 //grid_setup
 public static int rows = 10; //Zeilen
@@ -427,7 +428,7 @@ public ArrayList<Character> init_abc_list() {
 }
 
 /*
- 0.zero
+ 0. zeor
  1.-row
  2.+row
  3.-column
@@ -538,13 +539,14 @@ public void initButtons(boolean init) {
     buttons.get(6).update(fx, fy, fw, fh);
   }
 
-  if (r.getthreadfin())
+  
     //random number + field
     fx = (int)Math.round((float)column_width-(float)column_width/1.16+(float)X_offset/2);
   fy = (int)Math.round((float)column_height*2f);
   fw = (int)Math.round((float)column_width*1.5f);
   fh = (int)Math.round((float)column_height*1.3f);
   ts = (float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*3.6);
+  if (r.getthreadfin()){
   if (!r.getfound()) {
     tc = #000000;
   } else {
@@ -555,12 +557,15 @@ public void initButtons(boolean init) {
   } else {
     mc=#FFFFFF;
   }
+  }else{
+    mc=g.backgroundColor;
+    tc=g.backgroundColor;
+  }
   if (init) {
     buttons.add(new button(fx, fy, fw, fh, r.getrandom_numb()+"", tc, mc, ts));
   } else {
     buttons.get(7).update(fx, fy, fw, fh, r.getrandom_numb()+"", ts, tc, mc);
   }
-}
 
 //label
 fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
@@ -597,8 +602,13 @@ fh = (int)Math.round((float)column_height/2);
 if (init) {
   buttons.add(new button(fx, fy, fw, fh, "minimal"));
 } else {
-  buttons.get(10).update(fx, fy, fw, fh);
+  //buttons.get(10).update(fx, fy, fw, fh);
 }
 fill(255, 255, 255);
 stroke(255, 255, 255);
+if(init){
+ for (button b : buttons) {
+        b.lastPressed=System.currentTimeMillis()+5;
+      } 
+}
 }
