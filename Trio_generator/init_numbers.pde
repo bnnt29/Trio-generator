@@ -200,7 +200,7 @@ class possiblenumbs extends Thread {
     calculationlist=n.getcalculationlist();
     gen_possible_numbs();
     n.setthreadfin(true);
-    n.getrandom_numb();
+    n.new_current_random_numb();
     System.out.println("Thread finished in: "+(System.currentTimeMillis()-m)/1000+" sec");
   }
 
