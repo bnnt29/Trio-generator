@@ -21,7 +21,7 @@ class button {
     this(x, y, w, h);
     this.text = text;
   }
-  
+
   public button(int x, int y, int w, int h, float ts) {
     this(x, y, w, h);
     this.ts = ts;
@@ -69,7 +69,7 @@ class button {
     }
     return false;
   }
-   public void update(color mc) {
+  public void update(color mc) {
     this.mc = mc;
   }
   public void update(int x, int y, int w, int h) {
@@ -100,7 +100,7 @@ class button {
     this.ts = ts;
     this.tc = tc;
   }
-  
+
   public void update(int x, int y, int w, int h, String text, float ts, color tc, color mc) {
     update(x, y, w, h, text, ts, tc);
     update(mc);
@@ -120,8 +120,8 @@ class button {
   public int getH() {
     return h;
   }
-  
-  public void set_lastPressed(long lastPressed){
+
+  public void set_lastPressed(long lastPressed) {
     this.lastPressed=lastPressed;
   }
 }

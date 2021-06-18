@@ -16,7 +16,6 @@ public ArrayList<button> buttons = new ArrayList<button>();
 public static init_numbers r;
 
 //colors
-public static boolean wait=false;
 public static color right_color=#00FF00;
 public static color wrong_color=#FF0000;
 public static color pending_color=#0000FF;
@@ -25,6 +24,7 @@ public static int seed_green_fade = 255;
 //numbers
 public static boolean extreme_calc=true;
 public static ArrayList<Integer> clicked_box=new ArrayList<Integer>();
+public static int min_list_size=50;
 //seed
 public static String Hex_r_seed="0000";
 
@@ -86,11 +86,13 @@ void mousePressed() {
     }
 
     //reset_button
-    if (buttons.get(5).isPushed()&&!wait) {
+    if (buttons.get(5).isPushed()) {
       clicked_box.removeAll(clicked_box);
       rows=10;
       columns=10;
       r.setSeed(0);
+      r.setthreadfin(false);
+      r.setprogress(0);
       r.setfound(false);
       r.rand();
     }
@@ -113,14 +115,14 @@ void mousePressed() {
         break;
       }
     }
-    r.getSeed();
+
     //reroll-button
-    if (buttons.get(6).isPushed()&&!wait) {
+    if (buttons.get(6).isPushed()) {
       r.rerand();
     }
   } else {
     //reroll-field
-    if (buttons.get(7).isPushed()&&!wait) {
+    if (buttons.get(7).isPushed()) {
       r.rerand();
     }
   }
@@ -328,33 +330,29 @@ void draw() {
             int sec=r.getrandomnumbs().get(clicked_box.get(1));
             int thi=r.getrandomnumbs().get(clicked_box.get(2));
             //(1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3)
-            for (int o=0; o<r.getcalculationlist().length; o++) {
-              double out=0;
-              String s=r.getcalculationlist()[o];
-              r.calculations.add(s);
-              if (s.substring(0, 1).equals("/") && sec==0||s.substring(1, 2).equals("/") && thi==0) {
-                continue;
-              }
-              try {
-                //never use eval if with user input
-                if (engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi) instanceof Integer) {
-                  out=(double)((int)(engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi)));
-                } else if (engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi) instanceof Double) {
-                  out=(double)(engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi));
-                } else {
-                  System.out.println("unexpected class: "+engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi).getClass());
+            if (r.getcurrent_random_numb()>-1) {
+              for (int o=0; o<r.getcalculationlist().length; o++) {
+                double out=0;
+                String s=r.getcalculationlist()[o];
+                r.calculations.add(s);
+                if (s.substring(0, 1).equals("/") && sec==0||s.substring(1, 2).equals("/") && thi==0) {
+                  continue;
                 }
+                try {
+                  //never use eval if with user input
+                  out=(double)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(1)+"")+thi));
+                }
+                catch(Exception q) {
+                  System.out.println(q);
+                }
+                if (out==r.getcurrent_random_numb()) {
+                  fill(right_color);
+                  right=true;
+                } else {
+                  fill(wrong_color);
+                }
+                text(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi, xcord, (float)(y_mult*o)+y_add);
               }
-              catch(Exception q) {
-                System.out.println(q);
-              }
-              if (out==r.getrandom_numb()) {
-                fill(right_color);
-                right=true;
-              } else {
-                fill(wrong_color);
-              }
-              text(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi, xcord, (float)(y_mult*o)+y_add);
             }
             if (right) {
               fill(right_color);
@@ -381,6 +379,7 @@ void draw() {
       }
     }
 
+
     //row+column numbers
     fill(255, 255, 255);
     if (minimalistic) {
@@ -404,6 +403,8 @@ void draw() {
       text(i+1, column_width*(i+site_distance)+X_offset+column_width/2, column_height*site_distance/2-column_height/3);
     }
 
+
+
     if (!minimalistic) {
       for (button b : buttons) {
         b.drawMe();
@@ -415,6 +416,13 @@ void draw() {
     draw=!draw;
   } else {
     draw=!draw;
+  }
+  if (!r.getthreadfin() && r.getprogress()>=min_list_size && !minimalistic) {
+    button ref_one=buttons.get(7);
+    button ref_sec=buttons.get(10);
+    textSize((float)Math.floor((float)(((ref_one.getY()-(ref_sec.getY()+ref_sec.getH()))/2+(ref_sec.getW()*2))/2)*0.15f));
+    fill(#FF0000);
+    text((double)((int)(r.getprogress()*10))/10+"%", ref_sec.getX()+(float)((float)ref_sec.getW()/2), ref_one.getY()-(float)((float)(ref_one.getY()-(float)(ref_sec.getY()+ref_sec.getH()))/2f));
   }
 }
 
@@ -428,7 +436,7 @@ public ArrayList<Character> init_abc_list() {
 }
 
 /*
- 0. zeor
+ 0. zero
  1.-row
  2.+row
  3.-column
@@ -539,76 +547,100 @@ public void initButtons(boolean init) {
     buttons.get(6).update(fx, fy, fw, fh);
   }
 
-  
-    //random number + field
-    fx = (int)Math.round((float)column_width-(float)column_width/1.16+(float)X_offset/2);
+
+  //random number + field
+  fx = (int)Math.round((float)column_width-(float)column_width/1.16+(float)X_offset/2);
   fy = (int)Math.round((float)column_height*2f);
   fw = (int)Math.round((float)column_width*1.5f);
   fh = (int)Math.round((float)column_height*1.3f);
   ts = (float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*3.6);
-  if (r.getthreadfin()){
-  if (!r.getfound()) {
+  if (r.getcurrent_random_numb()>0) {
+    if (r.getthreadfin() || (double)((int)(r.getprogress()*10))/10>min_list_size) {
+      if ((double)((int)(r.getprogress()*10))/10>99) {
+        if (!r.getfound()) {
+          tc = #000000;
+          mc=#FFFFFF;
+        } else {
+          tc = #FFFFFF;
+          mc=#0000FF;
+        }
+      } else {
+        tc=#000000;
+        mc=#FFFFFF;
+      }
+      if (init) {
+        buttons.add(new button(fx, fy, fw, fh, r.getcurrent_random_numb()+"", tc, mc, ts));
+      } else {
+        buttons.get(7).update(fx, fy, fw, fh, r.getcurrent_random_numb()+"", ts, tc, mc);
+      }
+    } else {
+      tc = #000000;
+      mc = #FF0000;
+      ts =(float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*2.5);
+      if (init) {
+        buttons.add(new button(fx, fy, fw, fh, (double)((int)(r.getprogress()*10))/10+"%", tc, mc, ts));
+      } else {
+        buttons.get(7).update(fx, fy, fw, fh, (double)((int)(r.getprogress()*10))/10+"%", ts, tc, mc);
+      }
+    }
+  } else {
+    if ((double)((int)(r.getprogress()*10))/10>min_list_size-1) {
+      r.getrandom_numb();
+    }
     tc = #000000;
-  } else {
-    tc = #FF0000;
+    mc = #FF0000;
+    ts =(float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*2.5);
+    if (init) {
+      buttons.add(new button(fx, fy, fw, fh, (double)((int)(r.getprogress()*10))/10+"%", tc, mc, ts));
+    } else {
+      buttons.get(7).update(fx, fy, fw, fh, (double)((int)(r.getprogress()*10))/10+"%", ts, tc, mc);
+    }
   }
-  if (wait) {
-    mc=#FF0000;
-  } else {
-    mc=#FFFFFF;
-  }
-  }else{
-    mc=g.backgroundColor;
-    tc=g.backgroundColor;
-  }
+
+
+
+  //label
+  fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
+  fy = (int)Math.round((float)column_height/3);
+  fw = (int)Math.round((float)column_width*1.3f);
+  fh = (int)Math.round((float)column_height/2);
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, r.getrandom_numb()+"", tc, mc, ts));
+    buttons.add(new button(fx, fy, fw, fh, "label"));
   } else {
-    buttons.get(7).update(fx, fy, fw, fh, r.getrandom_numb()+"", ts, tc, mc);
+    buttons.get(8).update(fx, fy, fw, fh);
   }
 
-//label
-fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
-fy = (int)Math.round((float)column_height/3);
-fw = (int)Math.round((float)column_width*1.3f);
-fh = (int)Math.round((float)column_height/2);
-if (init) {
-  buttons.add(new button(fx, fy, fw, fh, "label"));
-} else {
-  buttons.get(8).update(fx, fy, fw, fh);
-}
-
-//seed
-fx = (int)Math.round(width/2);
-fy = (int)Math.round(height/100);
-fw = (int)Math.round((float)column_width*1.2f);
-fh = (int)Math.round((float)column_height/4);
-tc =color(seed_green_fade, 255, seed_green_fade);
-mc=#000000;
-if (init) {
-  buttons.add(new button(fx, fy, fw, fh, "seed: "+Integer.toHexString(r.getSeed()), tc, g.backgroundColor));
-} else {
-  buttons.get(9).update(fx, fy, fw, fh, tc, "seed: "+Integer.toHexString(r.getSeed()), g.backgroundColor);
-  if (seed_green_fade<255) {
-    seed_green_fade+=3;
+  //seed
+  fx = (int)Math.round(width/2);
+  fy = (int)Math.round(height/100);
+  fw = (int)Math.round((float)column_width*1.2f);
+  fh = (int)Math.round((float)column_height/4);
+  tc =color(seed_green_fade, 255, seed_green_fade);
+  mc=#000000;
+  if (init) {
+    buttons.add(new button(fx, fy, fw, fh, "seed: "+Integer.toHexString(r.getSeed()), tc, g.backgroundColor));
+  } else {
+    buttons.get(9).update(fx, fy, fw, fh, tc, "seed: "+Integer.toHexString(r.getSeed()), g.backgroundColor);
+    if (seed_green_fade<255) {
+      seed_green_fade+=3;
+    }
   }
-}
 
-//minimalistic
-fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
-fy = (int)Math.round((float)column_height);
-fw = (int)Math.round((float)column_width*1.3f);
-fh = (int)Math.round((float)column_height/2);
-if (init) {
-  buttons.add(new button(fx, fy, fw, fh, "minimal"));
-} else {
-  //buttons.get(10).update(fx, fy, fw, fh);
-}
-fill(255, 255, 255);
-stroke(255, 255, 255);
-if(init){
- for (button b : buttons) {
-        b.lastPressed=System.currentTimeMillis()+5;
-      } 
-}
+  //minimalistic
+  fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
+  fy = (int)Math.round((float)column_height);
+  fw = (int)Math.round((float)column_width*1.3f);
+  fh = (int)Math.round((float)column_height/2);
+  if (init) {
+    buttons.add(new button(fx, fy, fw, fh, "minimal"));
+  } else {
+    //buttons.get(10).update(fx, fy, fw, fh);
+  }
+  fill(255, 255, 255);
+  stroke(255, 255, 255);
+  if (init) {
+    for (button b : buttons) {
+      b.lastPressed=System.currentTimeMillis()+5;
+    }
+  }
 }
