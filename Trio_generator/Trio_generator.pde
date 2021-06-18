@@ -1,12 +1,8 @@
-import java.util.Random; //<>//
-import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.StringSelection; //<>// //<>//
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.util.Arrays;
 import java.util.Collections;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 
 public static boolean draw=true;
 import java.awt.Point;
@@ -17,6 +13,8 @@ public static boolean minimalistic=false;
 public static final int roundboxes = 10;
 public ArrayList<button> buttons = new ArrayList<button>();
 
+public static init_numbers r;
+
 //colors
 public static boolean wait=false;
 public static color right_color=#00FF00;
@@ -25,22 +23,9 @@ public static color pending_color=#0000FF;
 public static int seed_green_fade = 255;
 
 //numbers
-public static String[] calculations_list = {"*+", "+*", "/+", "+/", "*-", "-*", "/-", "-/", "*/", "/*", "+-", "-+"};
-public static ArrayList<String> calculations = new ArrayList<String>();
-public static ArrayList<Integer> random_numbs = new ArrayList<Integer>();
-public static ArrayList<Integer> used_random_numbs=new ArrayList<Integer>();
-public static ArrayList<Integer> clicked_box=new ArrayList<Integer>();
-public static int grid_min =0;
-public static int grid_max =10;
-public static int min=grid_min+1;
-public static int max=(grid_max-1)*(grid_max-1)+grid_max-1;
-public static int current_random_numb=0;
-public static boolean found_nothing=false;
-//random
-public static int r_seed=0;
-public static String Hex_r_seed="0000";
-public static Random gen;
-
+private ArrayList<Integer> clicked_box=new ArrayList<Integer>();
+//seed
+private String Hex_r_seed="0000";
 
 //grid_setup
 public static int rows = 10; //Zeilen
@@ -58,7 +43,8 @@ boolean buttons_init = false;
 
 void setup() {
   fullScreen();
-  rand();
+  r=new init_numbers(Integer.parseInt(Hex_r_seed, 16));
+  r.rand();
 }
 
 void mousePressed() {
@@ -70,7 +56,7 @@ void mousePressed() {
     if (rows>min_columns) {
       if (buttons.get(1).isPushed()) {
         rows-=1;
-        rand();
+        r.rand();
       }
     }
 
@@ -78,7 +64,7 @@ void mousePressed() {
     if (rows<max_columns) {
       if (buttons.get(2).isPushed()) {
         rows+=1;
-        rand();
+        r.rand();
       }
     }
 
@@ -86,7 +72,7 @@ void mousePressed() {
     if (columns>min_columns) {
       if (buttons.get(3).isPushed()) {
         columns-=1;
-        rand();
+        r.rand();
       }
     }
 
@@ -94,7 +80,7 @@ void mousePressed() {
     if (columns<max_columns) {
       if (buttons.get(4).isPushed()) {
         columns+=1;
-        rand();
+        r.rand();
       }
     }
 
@@ -103,9 +89,9 @@ void mousePressed() {
       clicked_box.removeAll(clicked_box);
       rows=10;
       columns=10;
-      r_seed=0;
-      found_nothing=false;
-      rand();
+      r.setSeed(0);
+      r.setfound(false);
+      r.rand();
     }
 
     //label
@@ -126,26 +112,26 @@ void mousePressed() {
         break;
       }
     }
-
+    r.getSeed();
     //reroll-button
     if (buttons.get(6).isPushed()&&!wait) {
-      rerand();
+      r.rerand();
     }
   } else {
     //reroll-field
     if (buttons.get(7).isPushed()&&!wait) {
-      rerand();
+      r.rerand();
     }
   }
 
 
   //seed-button
   if (buttons.get(9).isPushed()) {
-    String myString = r_seed+"";
+    String myString = r.getSeed()+"";
     StringSelection stringSelection = new StringSelection(myString);
     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
     clipboard.setContents(stringSelection, null);
-    System.out.println("SEED: "+r_seed);
+    System.out.println("SEED: "+r.getSeed());
     seed_green_fade=0;
     clicked_button=true;
   }
@@ -314,7 +300,7 @@ void draw() {
     for (int i=0; i< rows; i++) {
       for (int e=0; e< columns; e++) {
         boolean right=false;
-        int possibilities=calculations_list.length;
+        int possibilities=r.calculations_list.length;
         fill(#FFFFFF);
         if (clicked_box.contains(i*columns+e)) {
           textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(buttons.get(5).getX()-(buttons.get(0).getX()+buttons.get(0).getX())))/possibilities+(site_distance*column_width*2))/11)*0.5f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
@@ -337,14 +323,14 @@ void draw() {
               textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(ref_sec.getX()-(ref_one.getX()+ref_one.getX())))/8+(site_distance*column_width*2))/11)*0.8f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
             }
 
-            int one=random_numbs.get(clicked_box.get(0));
-            int sec=random_numbs.get(clicked_box.get(1));
-            int thi=random_numbs.get(clicked_box.get(2));
+            int one=r.getrandomnumbs().get(clicked_box.get(0));
+            int sec=r.getrandomnumbs().get(clicked_box.get(1));
+            int thi=r.getrandomnumbs().get(clicked_box.get(2));
             //(1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3)
-            for (int o=0; o<calculations_list.length; o++) {
+            for (int o=0; o<r.getcalculationlist().length; o++) {
               double out=0;
-              String s=calculations_list[o];
-              calculations.add(s);
+              String s=r.getcalculationlist()[o];
+              r.calculations.add(s);
               if (s.substring(0, 1).equals("/") && sec==0||s.substring(1, 2).equals("/") && thi==0) {
                 continue;
               }
@@ -361,7 +347,7 @@ void draw() {
               catch(Exception q) {
                 System.out.println(q);
               }
-              if (out==current_random_numb) {
+              if (out==r.getrandom_numb()) {
                 fill(right_color);
                 right=true;
               } else {
@@ -390,7 +376,7 @@ void draw() {
         }
         textAlign(CENTER, CENTER);
         textSize((float)Math.floor((float)((column_width+column_height)/2)*0.5f));
-        text(random_numbs.get(i*columns+e)+"", column_width*(e+site_distance)+X_offset+column_width/2, column_height*(i+site_distance/2)+column_height/2);
+        text(r.getrandomnumbs().get(i*columns+e)+"", column_width*(e+site_distance)+X_offset+column_width/2, column_height*(i+site_distance/2)+column_height/2);
       }
     }
 
@@ -429,164 +415,6 @@ void draw() {
   } else {
     draw=!draw;
   }
-}
-
-public void rerand() {
-  used_random_numbs.add(gen_current_random_numb(0));
-  clicked_box.removeAll(clicked_box);
-}
-
-public void rand() {
-  wait=true;
-  used_random_numbs.removeAll(used_random_numbs);
-  r_seed=Integer.parseInt(Hex_r_seed, 16);
-  Hex_r_seed="0000";
-  if (r_seed==0) {
-    r_seed=(int)((double)Math.random()*10000*Math.random());
-  }
-  gen=new Random(r_seed);
-  clicked_box.removeAll(clicked_box);
-  random_numbs = gen_random_numbs(rows, columns);
-  used_random_numbs.add(gen_current_random_numb(0));
-  wait=false;
-}
-
-public boolean check(int r) {
-  if (rows*columns>450) {
-    return true;
-  }
-  for (int i=0; i<rows-0; i++) {
-    for (int e=0; e<columns-0; e++) {
-      int index=i*columns+e;
-      if (i>2 && i<rows-2 && e>2 && e<columns-2) {
-        if (possibilities(index, index+1, index+2, r)) return true;
-
-        if (possibilities(index, index-1, index-2, r)) return true;
-
-        if (possibilities(index, index-columns, index-columns*2, r)) return true;
-
-        if (possibilities(index, index+columns, index+columns*2, r)) return true;
-
-        if (possibilities(index, index-columns+1, index-columns*2+2, r)) return true;
-
-        if (possibilities(index, index+columns+1, index+columns*2+2, r)) return true;
-
-        if (possibilities(index, index-columns-1, index-columns*2-2, r)) return true;
-
-        if (possibilities(index, index+columns-1, index+columns*2-2, r)) return true;
-      } else {
-        if (i<2) {
-          if (possibilities(index, index+columns, index+columns*2, r)) return true;
-          if (e>2&&e<columns-2) {
-            if (possibilities(index, index+1, index+2, r)) return true;
-
-            if (possibilities(index, index-1, index-2, r)) return true;
-
-            if (possibilities(index, index+columns+1, index+columns*2+2, r)) return true;
-
-            if (possibilities(index, index+columns-1, index+columns*2-2, r)) return true;
-          }
-        }
-        if (i>rows-2) {
-          if (possibilities(index, index-columns, index-columns*2, r)) return true;
-          if (e>2&&e<columns-2) {
-            if (possibilities(index, index+1, index+2, r)) return true;
-
-            if (possibilities(index, index-1, index-2, r)) return true;
-
-            if (possibilities(index, index-columns+1, index-columns*2+2, r)) return true;
-
-            if (possibilities(index, index-columns-1, index-columns*2-2, r)) return true;
-          }
-        }
-        if (e<2) {
-          if (possibilities(index, index+1, index+2, r)) return true;
-          if (i>2&&i<rows-2) {
-            if (possibilities(index, index-columns, index-columns*2, r)) return true;
-
-            if (possibilities(index, index+columns, index+columns*2, r)) return true;
-
-            if (possibilities(index, index-columns+1, index-columns*2+2, r)) return true;
-
-            if (possibilities(index, index+columns+1, index+columns*2+2, r)) return true;
-          }
-        }
-        if (e>columns-2) {
-          if (possibilities(index, index-1, index-2, r)) return true;
-          if (i>2&&i<rows-2) {
-            if (possibilities(index, index-columns, index-columns*2, r)) return true;
-
-            if (possibilities(index, index+columns, index+columns*2, r)) return true;
-
-            if (possibilities(index, index-columns-1, index-columns*2-2, r)) return true;
-
-            if (possibilities(index, index+columns-1, index+columns*2-2, r)) return true;
-          }
-        }
-      }
-    }
-  }
-  return false;
-}
-
-public boolean possibilities(int one_, int sec_, int thi_, int current_random_numb) {
-  double one=random_numbs.get(one_);
-  double sec=random_numbs.get(sec_);
-  double thi=random_numbs.get(thi_);
-  for (int o=0; o<calculations_list.length; o++) {
-    String s=calculations_list[o];
-    if (s.substring(0, 1).equals("/") && sec==0||s.substring(1, 2).equals("/") && thi==0) {
-      continue;
-    }
-    try {
-      //never use eval if with user input
-      if (engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi) instanceof Integer) {
-        if ((int)(engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi))==current_random_numb) return true;
-      } else if (engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi) instanceof Double) {
-        if ((double)(engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi))==(double)current_random_numb)return true;
-      } else {
-        System.out.println("unexpected class: "+engine.eval(one+s.substring(0, 1)+sec+s.substring(1, 2)+thi).getClass());
-      }
-    }
-    catch(Exception q) {
-      System.out.println(q);
-      return false;
-    }
-  }
-  return false;
-}
-
-public int gen_current_random_numb(int rec) {
-  //gen current random Number (unique)
-  rec+=1;
-  if (rec>=150) {
-    found_nothing=true;
-    current_random_numb=(int)(((double)Math.random()*max)+min);
-    return current_random_numb;
-  }
-  current_random_numb=(int)(((double)Math.random()*max)+min);
-  if (used_random_numbs.contains(current_random_numb)) {
-    gen_current_random_numb(rec);
-  } else if (check(current_random_numb)) {
-    used_random_numbs.add(current_random_numb);
-    return current_random_numb;
-  } else {
-    return gen_current_random_numb(rec);
-  }
-  return  current_random_numb;
-}
-
-
-public ArrayList<Integer> gen_random_numbs(int rows, int columns) {
-  //generates random Numbers
-  Random gen = new Random(r_seed);
-  ArrayList<Integer> save =new ArrayList<Integer>(rows*columns);
-  for (int i =0; i < rows; i++) {
-    for (int e =0; e < columns; e++) {
-      save.add((int)(((double)gen.nextDouble()*grid_max)+grid_min));
-    }
-  }
-  return save;
 }
 
 public ArrayList<Character> init_abc_list() {
@@ -710,13 +538,14 @@ public void initButtons(boolean init) {
     buttons.get(6).update(fx, fy, fw, fh);
   }
 
-  //random number + field
-  fx = (int)Math.round((float)column_width-(float)column_width/1.16+(float)X_offset/2);
+  if (r.getthreadfin())
+    //random number + field
+    fx = (int)Math.round((float)column_width-(float)column_width/1.16+(float)X_offset/2);
   fy = (int)Math.round((float)column_height*2f);
   fw = (int)Math.round((float)column_width*1.5f);
   fh = (int)Math.round((float)column_height*1.3f);
   ts = (float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*3.6);
-  if (!found_nothing) {
+  if (!r.getfound()) {
     tc = #000000;
   } else {
     tc = #FF0000;
@@ -727,49 +556,49 @@ public void initButtons(boolean init) {
     mc=#FFFFFF;
   }
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, current_random_numb+"", tc, mc, ts));
+    buttons.add(new button(fx, fy, fw, fh, r.getrandom_numb()+"", tc, mc, ts));
   } else {
-    buttons.get(7).update(fx, fy, fw, fh, current_random_numb+"", ts, tc, mc);
+    buttons.get(7).update(fx, fy, fw, fh, r.getrandom_numb()+"", ts, tc, mc);
   }
+}
 
+//label
+fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
+fy = (int)Math.round((float)column_height/3);
+fw = (int)Math.round((float)column_width*1.3f);
+fh = (int)Math.round((float)column_height/2);
+if (init) {
+  buttons.add(new button(fx, fy, fw, fh, "label"));
+} else {
+  buttons.get(8).update(fx, fy, fw, fh);
+}
 
-  //label
-  fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
-  fy = (int)Math.round((float)column_height/3);
-  fw = (int)Math.round((float)column_width*1.3f);
-  fh = (int)Math.round((float)column_height/2);
-  if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "label"));
-  } else {
-    buttons.get(8).update(fx, fy, fw, fh);
+//seed
+fx = (int)Math.round(width/2);
+fy = (int)Math.round(height/100);
+fw = (int)Math.round((float)column_width*1.2f);
+fh = (int)Math.round((float)column_height/4);
+tc =color(seed_green_fade, 255, seed_green_fade);
+mc=#000000;
+if (init) {
+  buttons.add(new button(fx, fy, fw, fh, "seed: "+Integer.toHexString(r.getSeed()), tc, g.backgroundColor));
+} else {
+  buttons.get(9).update(fx, fy, fw, fh, tc, "seed: "+Integer.toHexString(r.getSeed()), g.backgroundColor);
+  if (seed_green_fade<255) {
+    seed_green_fade+=3;
   }
+}
 
-  //seed
-  fx = (int)Math.round(width/2);
-  fy = (int)Math.round(height/100);
-  fw = (int)Math.round((float)column_width*1.2f);
-  fh = (int)Math.round((float)column_height/4);
-  tc =color(seed_green_fade, 255, seed_green_fade);
-  mc=#000000;
-  if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "seed: "+Integer.toHexString(r_seed), tc, g.backgroundColor));
-  } else {
-    buttons.get(9).update(fx, fy, fw, fh, tc, "seed: "+Integer.toHexString(r_seed), g.backgroundColor);
-    if (seed_green_fade<255) {
-      seed_green_fade+=3;
-    }
-  }
-
-  //minimalistic
-  fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
-  fy = (int)Math.round((float)column_height);
-  fw = (int)Math.round((float)column_width*1.3f);
-  fh = (int)Math.round((float)column_height/2);
-  if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "minimal"));
-  } else {
-    buttons.get(10).update(fx, fy, fw, fh);
-  }
-  fill(255, 255, 255);
-  stroke(255, 255, 255);
+//minimalistic
+fx = (int)Math.round((float)column_width-(float)column_width/1.5f+(float)X_offset/2);
+fy = (int)Math.round((float)column_height);
+fw = (int)Math.round((float)column_width*1.3f);
+fh = (int)Math.round((float)column_height/2);
+if (init) {
+  buttons.add(new button(fx, fy, fw, fh, "minimal"));
+} else {
+  buttons.get(10).update(fx, fy, fw, fh);
+}
+fill(255, 255, 255);
+stroke(255, 255, 255);
 }
