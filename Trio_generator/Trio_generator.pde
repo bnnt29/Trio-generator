@@ -24,7 +24,6 @@ public static int seed_green_fade = 255;
 //numbers
 public static boolean extreme_calc=true;
 public static ArrayList<Integer> clicked_box=new ArrayList<Integer>();
-public static int min_list_size=50;
 //seed
 public static String Hex_r_seed="0000";
 
@@ -417,13 +416,13 @@ void draw() {
   } else {
     draw=!draw;
   }
-  if (!r.getthreadfin() && r.getprogress()>=min_list_size && !minimalistic) {
-    button ref_one=buttons.get(7);
-    button ref_sec=buttons.get(10);
-    textSize((float)Math.floor((float)(((ref_one.getY()-(ref_sec.getY()+ref_sec.getH()))/2+(ref_sec.getW()*2))/2)*0.15f));
-    fill(#FF0000);
-    text((double)((int)(r.getprogress()*10))/10+"%", ref_sec.getX()+(float)((float)ref_sec.getW()/2), ref_one.getY()-(float)((float)(ref_one.getY()-(float)(ref_sec.getY()+ref_sec.getH()))/2f));
-  }
+  //if (!r.getthreadfin() && r.getprogress()>=100 && !minimalistic) {
+  //  button ref_one=buttons.get(7);
+  //  button ref_sec=buttons.get(10);
+  //  textSize((float)Math.floor((float)(((ref_one.getY()-(ref_sec.getY()+ref_sec.getH()))/2+(ref_sec.getW()*2))/2)*0.15f));
+  //  fill(#FF0000);
+  //  text((double)((int)(r.getprogress()*10))/10+"%", ref_sec.getX()+(float)((float)ref_sec.getW()/2), ref_one.getY()-(float)((float)(ref_one.getY()-(float)(ref_sec.getY()+ref_sec.getH()))/2f));
+  //}
 }
 
 public ArrayList<Character> init_abc_list() {
@@ -554,8 +553,9 @@ public void initButtons(boolean init) {
   fw = (int)Math.round((float)column_width*1.5f);
   fh = (int)Math.round((float)column_height*1.3f);
   ts = (float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*3.6);
+  // System.out.println("10: "+r.getcurrent_random_numb()+", "+r.getthreadfin()+", "+((double)((int)(r.getprogress()*10))/10)+", "+r.getpossiblenumbs().size());
   if (r.getcurrent_random_numb()>0) {
-    if (r.getthreadfin() || (double)((int)(r.getprogress()*10))/10>min_list_size) {
+    if (r.getthreadfin()) {
       if ((double)((int)(r.getprogress()*10))/10>99) {
         if (!r.getfound()) {
           tc = #000000;
@@ -584,9 +584,7 @@ public void initButtons(boolean init) {
       }
     }
   } else {
-    if ((double)((int)(r.getprogress()*10))/10>min_list_size-1) {
-      r.getrandom_numb();
-    }
+    r.getrandom_numb();
     tc = #000000;
     mc = #FF0000;
     ts =(float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*2.5);
