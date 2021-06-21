@@ -184,20 +184,20 @@ class init_numbers {
 class possiblenumbs extends Thread {
   private init_numbers n;
   private boolean stop = false;
+  private final long m=System.currentTimeMillis();
 
   public void setstop() {
     this.stop=true;
   }
 
   public void run() {
-    long m=System.currentTimeMillis();
     this.n=r;
     n.setthreadfin(false);
     check();
     n.new_current_random_numb();
     n.setthreadfin(true);
     n.setprogress(100);
-    System.out.println("Thread finished in: "+((double)System.currentTimeMillis()-m)/1000+" sec");
+    System.out.println("Thread finished in: "+((double)System.currentTimeMillis()-m)/1000+" sec and found: "+n.getpossiblenumbs().size()+" possibilities");
   }
 
   public int possibilities(int one_, int sec_, int thi_) {
@@ -206,13 +206,13 @@ class possiblenumbs extends Thread {
     double sec=n.getrandomnumbs().get(sec_);
     double thi=n.getrandomnumbs().get(thi_);
     for (String s : n.getcalculationlist()) {
-      if (s.charAt(0)=='/' && sec==0||s.charAt(0)=='/' && thi==0) {
+      if ((s.charAt(0)=='/' && sec==0)||(s.charAt(0)=='/' && thi==0)) {
         continue;
       }
       try {
         //never use eval if with user input
         double e=(double)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(0)+"")+thi));
-        if (!n.getpossiblenumbs().contains((int)e) && e>r.getmin() && e<r.getmax())  return (int)e;
+        if (!n.getpossiblenumbs().contains((int)e) && e>r.getmin() && e<r.getmax() && e>=0)  return (int)e;
         continue;
       }
       catch(Exception q) {
@@ -282,6 +282,12 @@ class possiblenumbs extends Thread {
               n.getpossiblenumbs().add(possibilities(index, index-columns+1, index-columns*2+2));
 
               n.getpossiblenumbs().add(possibilities(index, index+columns+1, index+columns*2+2));
+            } else {
+              if (i<2) {
+                n.getpossiblenumbs().add(possibilities(index, index+columns+1, index+columns*2+2));
+              } else if (i>rows-2) {
+                n.getpossiblenumbs().add(possibilities(index, index-columns+1, index-columns*2+2));
+              }
             }
           } else if (e>columns-2) {
             n.getpossiblenumbs().add(possibilities(index, index-1, index-2));
@@ -294,6 +300,12 @@ class possiblenumbs extends Thread {
               n.getpossiblenumbs().add(possibilities(index, index-columns-1, index-columns*2-2));
 
               n.getpossiblenumbs().add(possibilities(index, index+columns-1, index+columns*2-2));
+            } else {
+              if (i<2) {
+                n.getpossiblenumbs().add(possibilities(index, index+columns-1, index+columns*2-2));
+              } else if (i>rows-2) {
+                n.getpossiblenumbs().add(possibilities(index, index-columns-1, index-columns*2-2));
+              }
             }
           }
         }

@@ -4,7 +4,7 @@ import java.awt.datatransfer.Clipboard;
 import java.util.Arrays;
 import java.util.Collections;
 
-public static boolean draw=true;
+public static int draw=4;
 import java.awt.Point;
 
 public static int labeled=1;
@@ -28,8 +28,8 @@ public static ArrayList<Integer> clicked_box=new ArrayList<Integer>();
 public static String Hex_r_seed="0000";
 
 //grid_setup
-public static int rows = 10; //Zeilen
-public static int columns = 10; //Spalten
+public static int rows = 40; //Zeilen
+public static int columns = 40; //Spalten
 public static int column_width=0;
 public static int column_height=0;
 public static int X_offset=0;
@@ -283,7 +283,7 @@ int getIndexForPoint(Point p) {
 }
 
 void draw() { 
-  if (draw) {
+  if (draw<=0) {
     clear();
     background(50, 50, 50);
     fill(255, 255, 255);
@@ -420,9 +420,13 @@ void draw() {
       buttons.get(7).drawMe(); 
       buttons.get(10).drawMe();
     }
-    draw=!draw;
+    if (r.getthreadfin()) {
+      draw=3;
+    } else {
+      draw=5;
+    }
   } else {
-    draw=!draw;
+    draw-=1;
   }
 }
 
@@ -646,7 +650,7 @@ public void initButtons(boolean init) {
   if (init) {
     buttons.add(new button(fx, fy, fw, fh, "minimal", #FFFFFF, mc));
   } else {
-    //buttons.get(10).update(fx, fy, fw, fh);
+    buttons.get(10).update(fx, fy, fw, fh);
   }
   fill(255, 255, 255);
   stroke(255, 255, 255);
