@@ -395,8 +395,8 @@ void draw() {
       textSize((float)Math.floor((float)((column_height+column_width)/2)*0.4f));
     }
     if (labeled==2) {
-      text("y", column_width*(columns+site_distance)+X_offset+column_width/2.5+column_width/3, column_height*(0+site_distance/2)+column_height/2); 
-      text("x", column_width*(0+site_distance)+X_offset+column_width/2.5, column_height*site_distance/2-column_height/3-column_height/3);
+      text("y", column_width*(columns+site_distance+0.5)+X_offset+column_width/2.5, column_height*(0+site_distance/2)+column_height/2); 
+      text("x", column_width*(0+site_distance)+X_offset+column_width/2, column_height*site_distance/2-column_height/1.2);
     }
     for (int i=0; i<rows; i++) {
       ArrayList<Character> abc = init_abc_list();
@@ -456,6 +456,7 @@ public void initButtons(boolean init) {
   float ts=0;
   color mc;
   color tc;
+  PFont tf;
 
   fx = 0;
   fy = 0;
@@ -470,13 +471,15 @@ public void initButtons(boolean init) {
   fy = (int)Math.round((float)column_height*((float)rows+(float)site_distance/2)+column_height/2);
   fw = (int)Math.round((float)column_width);
   fh = (int)Math.round((float)column_height/2);
+  mc = #28B05C;
+  tf = createFont("Lucida Sans Typewriter Bold", 1);
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "-", #000000, #FFFFFF));
+    buttons.add(new button(fx, fy, fw, fh, "-", #FFFFFF, mc, tf));
   } else {
-    if (rows<=5) {
+    if (rows<=min_columns) {
       buttons.get(1).update(fx, fy, fw, fh, #FF0000);
     } else {
-      buttons.get(1).update(fx, fy, fw, fh, #FFFFFF);
+      buttons.get(1).update(fx, fy, fw, fh, mc);
     }
   }
 
@@ -485,13 +488,15 @@ public void initButtons(boolean init) {
   fy = (int)Math.round((float)column_height*((float)rows+(float)site_distance/2));
   fw = (int)Math.round((float)column_width);
   fh = (int)Math.round((float)column_height/2);
+  tf = createFont("Lucida Sans Typewriter Bold", 1);
+  mc = #28B05C;
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "+", #000000, #FFFFFF));
+    buttons.add(new button(fx, fy, fw, fh, "+", #FFFFFF, mc, tf));
   } else {
     if (rows>=max_columns) {
       buttons.get(2).update(fx, fy, fw, fh, #FF0000);
     } else {
-      buttons.get(2).update(fx, fy, fw, fh, #FFFFFF);
+      buttons.get(2).update(fx, fy, fw, fh, mc);
     }
   }
 
@@ -500,13 +505,15 @@ public void initButtons(boolean init) {
   fy = (int)Math.round(0);
   fw = (int)Math.round((float)column_width);
   fh = (int)Math.round((float)column_height/2);
+  tf = createFont("Lucida Sans Typewriter Bold", 1);
+  mc = #28B05C;
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "-", #000000, #FFFFFF));
+    buttons.add(new button(fx, fy, fw, fh, "-", #FFFFFF, mc, tf));
   } else {
     if (columns<=min_columns) {
       buttons.get(3).update(fx, fy, fw, fh, #FF0000);
     } else {
-      buttons.get(3).update(fx, fy, fw, fh, #FFFFFF);
+      buttons.get(3).update(fx, fy, fw, fh, mc);
     }
   }
 
@@ -514,14 +521,16 @@ public void initButtons(boolean init) {
   fx = (int)Math.round((float)column_width*((float)columns+(float)site_distance)+(float)X_offset+(float)10);
   fy = (int)Math.round((float)column_height/2);
   fw = (int)Math.round((float)column_width);
-  fh = (int)Math.round((float)column_height/2);
+  fh = (int)Math.round((float)column_height/2); 
+  tf = createFont("Lucida Sans Typewriter Bold", 1);
+  mc = #28B05C;
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "+", #000000, #FFFFFF));
+    buttons.add(new button(fx, fy, fw, fh, "+", #FFFFFF, mc, tf));
   } else {
     if (columns>=max_columns) {
       buttons.get(4).update(fx, fy, fw, fh, #FF0000);
     } else {
-      buttons.get(4).update(fx, fy, fw, fh, #FFFFFF);
+      buttons.get(4).update(fx, fy, fw, fh, mc);
     }
   }
 
@@ -530,8 +539,9 @@ public void initButtons(boolean init) {
   fy = (int)Math.round((float)height-(float)column_height/1.5);
   fw = (int)Math.round((float)column_width*1.3f);
   fh = (int)Math.round((float)column_height/2);
+  mc = #7d2835;
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "reset"));
+    buttons.add(new button(fx, fy, fw, fh, "reset", #FFFFFF, mc));
   } else {
     buttons.get(5).update(fx, fy, fw, fh);
   }
@@ -541,8 +551,9 @@ public void initButtons(boolean init) {
   fy = (int)Math.round((float)column_height*3.5f);
   fw = (int)Math.round((float)column_width*1.3f);
   fh = (int)Math.round((float)column_height/2);
+  mc = #7d2835;
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "reroll"));
+    buttons.add(new button(fx, fy, fw, fh, "reroll", #FFFFFF, mc));
   } else {
     buttons.get(6).update(fx, fy, fw, fh);
   }
@@ -603,8 +614,9 @@ public void initButtons(boolean init) {
   fy = (int)Math.round((float)column_height/3);
   fw = (int)Math.round((float)column_width*1.3f);
   fh = (int)Math.round((float)column_height/2);
+  mc = #464f75;
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "label"));
+    buttons.add(new button(fx, fy, fw, fh, "label", #FFFFFF, mc));
   } else {
     buttons.get(8).update(fx, fy, fw, fh);
   }
@@ -630,8 +642,9 @@ public void initButtons(boolean init) {
   fy = (int)Math.round((float)column_height);
   fw = (int)Math.round((float)column_width*1.3f);
   fh = (int)Math.round((float)column_height/2);
+  mc = #464f75;
   if (init) {
-    buttons.add(new button(fx, fy, fw, fh, "minimal"));
+    buttons.add(new button(fx, fy, fw, fh, "minimal", #FFFFFF, mc));
   } else {
     //buttons.get(10).update(fx, fy, fw, fh);
   }

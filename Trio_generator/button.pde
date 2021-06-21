@@ -9,6 +9,7 @@ class button {
   private float ts = -1;
   private long lastPressed;
   private static final long DELAY_TIME = 150;
+  private PFont tf; //tf = textFont
 
   public button(int x, int y, int w, int h) {
     this.x = x;
@@ -32,6 +33,10 @@ class button {
     this.tc = tc;
     this.mc = mc;
   }
+  public button(int x, int y, int w, int h, String text, color tc, color mc, PFont tf) {
+    this(x, y, w, h, text, tc, mc);
+    this.tf=tf;
+  }
 
   public button(int x, int y, int w, int h, String text, color mc) {
     this(x, y, w, h, text);
@@ -50,6 +55,13 @@ class button {
     rect(x, y, w, h, roundboxes);
 
     textAlign(CENTER, CENTER);
+
+    if (tf==null)
+      textFont(createFont("Lucida Sans Typewriter", 20));
+    else {
+      textFont(tf);
+    }
+
     if (ts == -1)
       textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
     else
