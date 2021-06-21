@@ -212,7 +212,6 @@ class possiblenumbs extends Thread {
         continue;
       }
       catch(Exception q) {
-        continue;
       }
     }
   }
