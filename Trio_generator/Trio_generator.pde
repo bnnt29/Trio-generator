@@ -4,7 +4,7 @@ import java.awt.datatransfer.Clipboard;
 import java.util.Arrays;
 import java.util.Collections;
 
-public static int draw=4;
+public static int draw=8;
 import java.awt.Point;
 
 public static int labeled=1;
@@ -42,9 +42,9 @@ public static ScriptEngine engine = mgr.getEngineByName("JavaScript");
 boolean buttons_init = false;
 
 void setup() {
-  fullScreen();
   r=new init_numbers(Integer.parseInt(Hex_r_seed, 16));
   r.rand();
+  fullScreen();
 }
 
 void mousePressed() {

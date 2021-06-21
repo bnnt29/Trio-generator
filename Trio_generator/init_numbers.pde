@@ -1,9 +1,7 @@
-import java.util.Random;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.*;
 
 class init_numbers {
   private Thread t;
@@ -51,9 +49,7 @@ class init_numbers {
       seed=(int)((double)Math.random()*10000*Math.random());
     }
     gen=new Random(seed);
-    clicked_box.removeAll(clicked_box);
     possible_numbs.removeAll(possible_numbs);
-    possible_numbs.add(-1);
     random_numbs = gen_random_numbs(rows, columns);
     if (extreme_calc) {
       p= new possiblenumbs();
@@ -63,7 +59,7 @@ class init_numbers {
       for (int i=min; i<max; i++) {
         possible_numbs.add(i);
       }
-      threadfin=true;
+      clicked_box.removeAll(clicked_box);
     }
     current_random_numb=new_current_random_numb();
   }
@@ -201,7 +197,7 @@ class possiblenumbs extends Thread {
     System.out.println("Thread finished in: "+((double)System.currentTimeMillis()-m)/1000+" sec and found: "+n.getpossiblenumbs().size()+" possibilities");
   }
 
-  public int possibilities(int one_, int sec_, int thi_) {
+  public void possibilities(int one_, int sec_, int thi_) {
     double one=n.getrandomnumbs().get(one_);
     double sec=n.getrandomnumbs().get(sec_);
     double thi=n.getrandomnumbs().get(thi_);
@@ -212,85 +208,84 @@ class possiblenumbs extends Thread {
       try {
         //never use eval if with user input
         double e=(double)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(1)+"")+thi));
-        if (!n.getpossiblenumbs().contains((int)e) && e>r.getmin() && e<r.getmax() && e>=0) {
-          n.getpossiblenumbs().add((int)e);
-          continue;
-        } else {
-          continue;
-        }
+        if (e>r.getmin() && e<r.getmax()) n.getpossiblenumbs().add((int)e);
+        continue;
       }
       catch(Exception q) {
         continue;
       }
     }
-    return -2;
   }
 
   public void check() {
+    int clomuns_t2 =columns<< 1;
     for (int i=0; i<rows; i++) {
+      int index_=i*columns;
       n.setthreadfin(false);
       for (int e=0; e<columns; e++) {
         if (stop) return;
-        int index=i*columns+e;
-        n.setprogress((double)(((double)index/(rows*columns))*100));
+        int index=index_+e;
+        n.setprogress(((double)index/(rows*columns))*100);
 
         if (i>2 && i<rows-2 && e>2 && e<columns-2) {
           possibilities(index, index+1, index+2);
           possibilities(index, index-1, index-2);
-          possibilities(index, index-columns, index-columns*2);
-          possibilities(index, index+columns, index+columns*2);
-          possibilities(index, index-columns+1, index-columns*2+2);
-          possibilities(index, index+columns+1, index+columns*2+2);
-          possibilities(index, index-columns-1, index-columns*2-2);
-          possibilities(index, index+columns-1, index+columns*2-2);
+          possibilities(index, index-columns, index-clomuns_t2);
+          possibilities(index, index+columns, index+clomuns_t2);
+          possibilities(index, index-columns+1, index-clomuns_t2+2);
+          possibilities(index, index+columns+1, index+clomuns_t2+2);
+          possibilities(index, index-columns-1, index-clomuns_t2-2);
+          possibilities(index, index+columns-1, index+clomuns_t2-2);
         } else {
           if (i<2) {
-            possibilities(index, index+columns, index+columns*2);
+            possibilities(index, index+columns, index+clomuns_t2);
             if (e>2&&e<columns-2) {
               possibilities(index, index+1, index+2);
               possibilities(index, index-1, index-2);
-              possibilities(index, index+columns+1, index+columns*2+2);
-              possibilities(index, index+columns-1, index+columns*2-2);
+              possibilities(index, index+columns+1, index+clomuns_t2+2);
+              possibilities(index, index+columns-1, index+clomuns_t2-2);
             }
           } else if (i>rows-2) {
-            possibilities(index, index-columns, index-columns*2);
+            possibilities(index, index-columns, index-clomuns_t2);
             if (e>2&&e<columns-2) {
               possibilities(index, index+1, index+2);
               possibilities(index, index-1, index-2);
-              possibilities(index, index-columns+1, index-columns*2+2);
-              possibilities(index, index-columns-1, index-columns*2-2);
+              possibilities(index, index-columns+1, index-clomuns_t2+2);
+              possibilities(index, index-columns-1, index-clomuns_t2-2);
             }
           }
           if (e<2) {
             possibilities(index, index+1, index+2);
             if (i>2&&i<rows-2) {
-              possibilities(index, index-columns, index-columns*2);
-              possibilities(index, index+columns, index+columns*2);
-              possibilities(index, index-columns+1, index-columns*2+2);
-              possibilities(index, index+columns+1, index+columns*2+2);
-            } else if (i<2) {
-              possibilities(index, index+columns+1, index+columns*2+2);
-            } else if (i>rows-2) {
-              possibilities(index, index-columns+1, index-columns*2+2);
+              possibilities(index, index-columns, index-clomuns_t2);
+              possibilities(index, index+columns, index+clomuns_t2);
+              possibilities(index, index-columns+1, index-clomuns_t2+2);
+              possibilities(index, index+columns+1, index+clomuns_t2+2);
             }
           } else if (e>columns-2) {
             possibilities(index, index-1, index-2);
             if (i>2&&i<rows-2) {
-              possibilities(index, index-columns, index-columns*2);
-              possibilities(index, index+columns, index+columns*2);
-              possibilities(index, index-columns-1, index-columns*2-2);
-              possibilities(index, index+columns-1, index+columns*2-2);
-            } else  if (i<2) {
-              possibilities(index, index+columns-1, index+columns*2-2);
-            } else  if (i>rows-2) {
-              possibilities(index, index-columns-1, index-columns*2-2);
+              possibilities(index, index-columns, index-clomuns_t2);
+              possibilities(index, index+columns, index+clomuns_t2);
+              possibilities(index, index-columns-1, index-clomuns_t2-2);
+              possibilities(index, index+columns-1, index+clomuns_t2-2);
             }
           }
         }
       }
     }
-    while (n.getpossiblenumbs().contains(new Integer(-2))) {
-      n.getpossiblenumbs().remove(new Integer(-2));
-    }
+    n.setpossiblenumbs(removeDuplicates(n.getpossiblenumbs()));
   }
+}
+
+public ArrayList removeDuplicates(ArrayList list) 
+{
+  if (list == null || list.size() == 0)
+  {
+    return list;
+  }
+  Set set = new HashSet(list);
+  list.clear();
+  list.addAll(set);
+  return list;
 }
