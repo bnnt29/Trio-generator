@@ -182,6 +182,7 @@ class init_numbers {
 
 
 class possiblenumbs extends Thread {
+
   private init_numbers n;
   private boolean stop = false;
   private final long m=System.currentTimeMillis();
@@ -201,19 +202,22 @@ class possiblenumbs extends Thread {
   }
 
   public int possibilities(int one_, int sec_, int thi_) {
-    if (stop) return -2;
     double one=n.getrandomnumbs().get(one_);
     double sec=n.getrandomnumbs().get(sec_);
     double thi=n.getrandomnumbs().get(thi_);
     for (String s : n.getcalculationlist()) {
-      if ((s.charAt(0)=='/' && sec==0)||(s.charAt(0)=='/' && thi==0)) {
+      if ((s.charAt(0)=='/' && sec==0)||(s.charAt(1)=='/' && thi==0)) {
         continue;
       }
       try {
         //never use eval if with user input
-        double e=(double)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(0)+"")+thi));
-        if (!n.getpossiblenumbs().contains((int)e) && e>r.getmin() && e<r.getmax() && e>=0)  return (int)e;
-        continue;
+        double e=(double)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(1)+"")+thi));
+        if (!n.getpossiblenumbs().contains((int)e) && e>r.getmin() && e<r.getmax() && e>=0) {
+          n.getpossiblenumbs().add((int)e);
+          continue;
+        } else {
+          continue;
+        }
       }
       catch(Exception q) {
         continue;
@@ -226,86 +230,60 @@ class possiblenumbs extends Thread {
     for (int i=0; i<rows; i++) {
       n.setthreadfin(false);
       for (int e=0; e<columns; e++) {
+        if (stop) return;
         int index=i*columns+e;
         n.setprogress((double)(((double)index/(rows*columns))*100));
+
         if (i>2 && i<rows-2 && e>2 && e<columns-2) {
-
-          n.getpossiblenumbs().add(possibilities(index, index+1, index+2));
-
-          n.getpossiblenumbs().add(possibilities(index, index-1, index-2));
-
-          n.getpossiblenumbs().add(possibilities(index, index-columns, index-columns*2));
-
-          n.getpossiblenumbs().add(possibilities(index, index+columns, index+columns*2));
-
-          n.getpossiblenumbs().add(possibilities(index, index-columns+1, index-columns*2+2));
-
-          n.getpossiblenumbs().add(possibilities(index, index+columns+1, index+columns*2+2));
-
-          n.getpossiblenumbs().add(possibilities(index, index-columns-1, index-columns*2-2));
-
-          n.getpossiblenumbs().add(possibilities(index, index+columns-1, index+columns*2-2));
+          possibilities(index, index+1, index+2);
+          possibilities(index, index-1, index-2);
+          possibilities(index, index-columns, index-columns*2);
+          possibilities(index, index+columns, index+columns*2);
+          possibilities(index, index-columns+1, index-columns*2+2);
+          possibilities(index, index+columns+1, index+columns*2+2);
+          possibilities(index, index-columns-1, index-columns*2-2);
+          possibilities(index, index+columns-1, index+columns*2-2);
         } else {
           if (i<2) {
-            n.getpossiblenumbs().add(possibilities(index, index+columns, index+columns*2));
-
+            possibilities(index, index+columns, index+columns*2);
             if (e>2&&e<columns-2) {
-              n.getpossiblenumbs().add(possibilities(index, index+1, index+2));
-
-              n.getpossiblenumbs().add(possibilities(index, index-1, index-2));
-
-              n.getpossiblenumbs().add(possibilities(index, index+columns+1, index+columns*2+2));
-
-              n.getpossiblenumbs().add(possibilities(index, index+columns-1, index+columns*2-2));
+              possibilities(index, index+1, index+2);
+              possibilities(index, index-1, index-2);
+              possibilities(index, index+columns+1, index+columns*2+2);
+              possibilities(index, index+columns-1, index+columns*2-2);
             }
           } else if (i>rows-2) {
-            n.getpossiblenumbs().add(possibilities(index, index-columns, index-columns*2));
-
+            possibilities(index, index-columns, index-columns*2);
             if (e>2&&e<columns-2) {
-              n.getpossiblenumbs().add(possibilities(index, index+1, index+2));
-
-              n.getpossiblenumbs().add(possibilities(index, index-1, index-2));
-
-              n.getpossiblenumbs().add(possibilities(index, index-columns+1, index-columns*2+2));
-
-              n.getpossiblenumbs().add(possibilities(index, index-columns-1, index-columns*2-2));
+              possibilities(index, index+1, index+2);
+              possibilities(index, index-1, index-2);
+              possibilities(index, index-columns+1, index-columns*2+2);
+              possibilities(index, index-columns-1, index-columns*2-2);
             }
           }
           if (e<2) {
-            n.getpossiblenumbs().add(possibilities(index, index+1, index+2));
-
+            possibilities(index, index+1, index+2);
             if (i>2&&i<rows-2) {
-              n.getpossiblenumbs().add(possibilities(index, index-columns, index-columns*2));
-
-              n.getpossiblenumbs().add(possibilities(index, index+columns, index+columns*2));
-
-              n.getpossiblenumbs().add(possibilities(index, index-columns+1, index-columns*2+2));
-
-              n.getpossiblenumbs().add(possibilities(index, index+columns+1, index+columns*2+2));
-            } else {
-              if (i<2) {
-                n.getpossiblenumbs().add(possibilities(index, index+columns+1, index+columns*2+2));
-              } else if (i>rows-2) {
-                n.getpossiblenumbs().add(possibilities(index, index-columns+1, index-columns*2+2));
-              }
+              possibilities(index, index-columns, index-columns*2);
+              possibilities(index, index+columns, index+columns*2);
+              possibilities(index, index-columns+1, index-columns*2+2);
+              possibilities(index, index+columns+1, index+columns*2+2);
+            } else if (i<2) {
+              possibilities(index, index+columns+1, index+columns*2+2);
+            } else if (i>rows-2) {
+              possibilities(index, index-columns+1, index-columns*2+2);
             }
           } else if (e>columns-2) {
-            n.getpossiblenumbs().add(possibilities(index, index-1, index-2));
-
+            possibilities(index, index-1, index-2);
             if (i>2&&i<rows-2) {
-              n.getpossiblenumbs().add(possibilities(index, index-columns, index-columns*2));
-
-              n.getpossiblenumbs().add(possibilities(index, index+columns, index+columns*2));
-
-              n.getpossiblenumbs().add(possibilities(index, index-columns-1, index-columns*2-2));
-
-              n.getpossiblenumbs().add(possibilities(index, index+columns-1, index+columns*2-2));
-            } else {
-              if (i<2) {
-                n.getpossiblenumbs().add(possibilities(index, index+columns-1, index+columns*2-2));
-              } else if (i>rows-2) {
-                n.getpossiblenumbs().add(possibilities(index, index-columns-1, index-columns*2-2));
-              }
+              possibilities(index, index-columns, index-columns*2);
+              possibilities(index, index+columns, index+columns*2);
+              possibilities(index, index-columns-1, index-columns*2-2);
+              possibilities(index, index+columns-1, index+columns*2-2);
+            } else  if (i<2) {
+              possibilities(index, index+columns-1, index+columns*2-2);
+            } else  if (i>rows-2) {
+              possibilities(index, index-columns-1, index-columns*2-2);
             }
           }
         }

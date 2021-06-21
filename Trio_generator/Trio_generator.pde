@@ -28,8 +28,8 @@ public static ArrayList<Integer> clicked_box=new ArrayList<Integer>();
 public static String Hex_r_seed="0000";
 
 //grid_setup
-public static int rows = 40; //Zeilen
-public static int columns = 40; //Spalten
+public static int rows = 10; //Zeilen
+public static int columns = 10; //Spalten
 public static int column_width=0;
 public static int column_height=0;
 public static int X_offset=0;
