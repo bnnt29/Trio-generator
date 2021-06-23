@@ -3,17 +3,23 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.util.Arrays;
 import java.util.Collections;
-
-public static int draw=8;
 import java.awt.Point;
 
-public static int labeled=1;
+public static int draw=8;
+
+//label
+public static int labeledint=1;
+public static boolean labeledbool=true;
+public static ArrayList<ArrayList<button>> labelbuttons = new ArrayList<ArrayList<button>>();
+public static boolean label_init=true;
+
 public static boolean minimalistic=false;
 
 public static final int roundboxes = 10;
 public ArrayList<button> buttons = new ArrayList<button>();
 
 public static init_numbers r;
+public static init_numbers r2;
 
 //colors
 public static color right_color=#00FF00;
@@ -55,62 +61,90 @@ void mousePressed() {
     //rem row
     if (rows>min_columns) {
       if (buttons.get(1).isPushed()) {
+        if (r!=null) {
+          r.stopthread();
+        }
+        if (r2!=null) {
+          r2.stopthread();
+        }
         rows-=1;
-        r.rand();
+        reset_action();
+        labelbuttons.clear();
+        label_init=true;
       }
     }
 
     //add row
     if (rows<max_columns) {
       if (buttons.get(2).isPushed()) {
+        if (r!=null) {
+          r.stopthread();
+        }
+        if (r2!=null) {
+          r2.stopthread();
+        }
         rows+=1;
-        r.rand();
+        reset_action();
+        labelbuttons.clear();
+        label_init=true;
       }
     }
 
     //rem column
     if (columns>min_columns) {
       if (buttons.get(3).isPushed()) {
+        if (r!=null) {
+          r.stopthread();
+        }
+        if (r2!=null) {
+          r2.stopthread();
+        }
         columns-=1;
-        r.rand();
+        reset_action();
+        labelbuttons.clear();
+        label_init=true;
       }
     }
 
     //add column
     if (columns<max_columns) {
       if (buttons.get(4).isPushed()) {
+        if (r!=null) {
+          r.stopthread();
+        }
+        if (r2!=null) {
+          r2.stopthread();
+        }
         columns+=1;
-        r.rand();
+        reset_action();
+        labelbuttons.clear();
+        label_init=true;
       }
     }
 
     //reset_button
     if (buttons.get(5).isPushed()) {
-      clicked_box.removeAll(clicked_box);
       rows=10;
       columns=10;
-      r.setSeed(0);
-      r.setthreadfin(false);
-      r.setprogress(0);
-      r.setfound(false);
-      r.rand();
+      reset_action();
     }
 
     //label
     if (buttons.get(8).isPushed()) {
       clicked_button=true;
-      switch(labeled) {
+      switch(labeledint) {
       case 0:
-        labeled=1;
+        labeledint=1;
         break;
       case 1:
-        labeled=2;
+        labeledint=2;
         break;
       case 2:
-        labeled=0;
+        labeledbool = !labeledbool;
+        labeledint=0;
         break;
       default:
-        labeled=0;
+        labeledint=0;
         break;
       }
     }
@@ -297,7 +331,6 @@ void draw() {
       initButtons(buttons_init);
     }
     initButtons(false);
-
     //grid
     for (int i=0; i< rows; i++) {
       for (int e=0; e< columns; e++) {
@@ -370,7 +403,13 @@ void draw() {
             fill(pending_color);
           }
         }
-        rect(column_width*(e+site_distance)+X_offset, column_height*(i+site_distance/2), column_width, column_height, roundboxes);
+        int x=0;
+        if (labeledbool) {
+          x=column_width/2;
+        } else {
+          x=0;
+        }
+        rect(column_width*(e+site_distance)+X_offset+x, column_height*(i+site_distance/2), column_width, column_height, roundboxes);
         if (clicked_box.size()>0&&clicked_box.size()<2) {
           if (clicked_box.get(0)==i*columns+e) {
             fill(#FFFFFF);
@@ -382,35 +421,87 @@ void draw() {
         }
         textAlign(CENTER, CENTER);
         textSize((float)Math.floor((float)((column_width+column_height)/2)*0.5f));
-        text(r.getrandomnumbs().get(i*columns+e)+"", column_width*(e+site_distance)+X_offset+column_width/2, column_height*(i+site_distance/2)+column_height/2);
+        text(r.getrandomnumbs().get(i*columns+e)+"", column_width*(e+site_distance)+X_offset+column_width/2+x, column_height*(i+site_distance/2)+column_height/2);
       }
     }
-
 
     //row+column numbers
-    fill(255, 255, 255);
+
+    fill(#FFFFFF);
+    float ts=0;
     if (minimalistic) {
-      textSize((float)Math.floor((float)((column_height+column_width)/2)*0.5f));
+      ts=(float)Math.floor((float)((column_height+column_width)/2)*0.5f);
     } else {
-      textSize((float)Math.floor((float)((column_height+column_width)/2)*0.4f));
+      ts=(float)Math.floor((float)((column_height+column_width)/2)*0.4f);
     }
-    if (labeled==2) {
-      text("y", column_width*(columns+site_distance+0.5)+X_offset+column_width/2.5, column_height*(0+site_distance/2)+column_height/2); 
-      text("x", column_width*(0+site_distance)+X_offset+column_width/2, column_height*site_distance/2-column_height/1.2);
+    ArrayList<String> abc = new ArrayList<String>();
+    int x=0;
+
+    //x-buttons
+    ArrayList<button> xb;
+    if (labelbuttons.size()>0) {
+      xb = labelbuttons.get(0);
+    } else {
+      xb = new ArrayList<button>();
     }
-    for (int i=0; i<rows; i++) {
-      ArrayList<Character> abc = init_abc_list();
-      if (labeled==1 && rows<=abc.size()) {
-        text(abc.get(i), column_width*(columns+site_distance)+X_offset+column_width/2.5, column_height*(i+site_distance/2)+column_height/2);
+    abc = init_label_list(false);
+    for (int i=0; i<columns; i++) {
+      if (labeledbool) {
+        x= (int)(column_width*(i+0.5+site_distance)+X_offset);
       } else {
-        text(i+1, column_width*(columns+site_distance)+X_offset+column_width/2.5, column_height*(i+site_distance/2)+column_height/2);
+        x= column_width*(i+site_distance)+X_offset;
+      }
+      if (label_init) {
+        xb.add(new button(x, column_height*(site_distance/4), column_width, column_height, abc.get(i)+"", #FFFFFF, g.backgroundColor, ts));
+      } else {
+        xb.get(i).update(x, column_height*(site_distance/4), column_width, column_height, abc.get(i)+"", ts);
       }
     }
-    for (int i=0; i<columns; i++) {
-      text(i+1, column_width*(i+site_distance)+X_offset+column_width/2, column_height*site_distance/2-column_height/3);
+    labelbuttons.add(xb);
+    //y-buttons
+    ArrayList<button> yb;
+    if (labelbuttons.size()>1) {
+      yb = labelbuttons.get(1);
+    } else {
+      yb = new ArrayList<button>();
+    }
+    if (labeledint==1 && rows<=24) {
+      abc = init_label_list(true);
+    } else {
+      abc = init_label_list(false);
+    } 
+    for (int i=0; i<rows; i++) {
+      if (labeledbool) {
+        x=(int)(column_width*(site_distance)+X_offset);
+      } else {
+        x=(int)(column_width*((double)(columns+0.2+site_distance))+X_offset);
+      }
+      if (label_init) {
+        yb.add(new button(x, column_height*(i+site_distance/2), column_width/2, column_height, abc.get(i)+"", #FFFFFF, g.backgroundColor, ts));
+      } else {
+        yb.get(i).update(x, column_height*(i+site_distance/2), column_width/2, column_height, abc.get(i)+"", ts);
+      }
+    }
+    if (label_init) {
+      label_init=false;
+      labelbuttons.add(yb);
     }
 
+    for (ArrayList<button> ab : labelbuttons) {
+      for (button b : ab) {
+        b.drawMe();
+      }
+    }
 
+    if (labeledint==2) {
+      if (labeledbool) {
+        text("y", column_width*(site_distance*0.963)+X_offset, column_height*(0+site_distance/2)+column_height/2); 
+        text("x", column_width*(0.5+site_distance)+X_offset+column_width/2, column_height*site_distance/2-column_height/1.1);
+      } else {
+        text("y", column_width*(columns+site_distance+0.4)+X_offset+column_width/2.5, column_height*(0+site_distance/2)+column_height/2); 
+        text("x", column_width*(0+site_distance)+X_offset+column_width/2, column_height*site_distance/2-column_height/1.1);
+      }
+    }
 
     if (!minimalistic) {
       for (button b : buttons) {
@@ -430,13 +521,43 @@ void draw() {
   }
 }
 
-public ArrayList<Character> init_abc_list() {
-  Character[] alphabet = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
-  ArrayList<Character> abc = new ArrayList<Character>();
-  for (Character c : alphabet) {
-    abc.add(c);
+public ArrayList<String> init_label_list(boolean b) {
+  ArrayList<String> abc = new ArrayList<String>();
+  if (b) {
+    Character[] alphabet = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+    for (Character c : alphabet) {
+      abc.add(c+"");
+    }
+  } else {
+    for (int i=0; i<rows; i++) {
+      abc.add((i+""));
+    }
   }
   return abc;
+}
+
+public void reset_action() {
+  clicked_box.removeAll(clicked_box);
+  if (r!=null) {
+    r.stopthread();
+  }
+  if (r2!=null) {
+    r=r2;
+    r2=null;
+    initpregen();
+  } else {
+    initpregen();
+    r=r2;
+    r2=null;
+    initpregen();
+  }
+}
+
+public void initpregen() {
+  if (r2==null || r2 == r) {
+    r2=new init_numbers(0);
+    r2.rand();
+  }
 }
 
 /*
@@ -461,6 +582,7 @@ public void initButtons(boolean init) {
   color mc;
   color tc;
   PFont tf;
+  String t;
 
   fx = 0;
   fy = 0;
@@ -471,7 +593,13 @@ public void initButtons(boolean init) {
   }
 
   //rem_row_button
-  fx = (int)Math.round((float)column_width*((float)columns+(float)site_distance)+(float)X_offset+(float)10);
+  int x=0;
+  if (labeledbool) {
+    x=column_width/2;
+  } else {
+    x=0;
+  }
+  fx = (int)Math.round((float)column_width*((float)columns+(float)site_distance)+(float)X_offset+(float)10+x);
   fy = (int)Math.round((float)column_height*((float)rows+(float)site_distance/2)+column_height/2);
   fw = (int)Math.round((float)column_width);
   fh = (int)Math.round((float)column_height/2);
@@ -488,7 +616,6 @@ public void initButtons(boolean init) {
   }
 
   //add_row_button
-  fx = (int)Math.round((float)column_width*((float)columns+(float)site_distance)+(float)X_offset+(float)10);
   fy = (int)Math.round((float)column_height*((float)rows+(float)site_distance/2));
   fw = (int)Math.round((float)column_width);
   fh = (int)Math.round((float)column_height/2);
@@ -505,7 +632,6 @@ public void initButtons(boolean init) {
   }
 
   //rem_column_button
-  fx = (int)Math.round((float)column_width*((float)columns+(float)site_distance)+(float)X_offset+(float)10);
   fy = (int)Math.round(0);
   fw = (int)Math.round((float)column_width);
   fh = (int)Math.round((float)column_height/2);
@@ -522,7 +648,6 @@ public void initButtons(boolean init) {
   }
 
   //add_column_button
-  fx = (int)Math.round((float)column_width*((float)columns+(float)site_distance)+(float)X_offset+(float)10);
   fy = (int)Math.round((float)column_height/2);
   fw = (int)Math.round((float)column_width);
   fh = (int)Math.round((float)column_height/2); 
@@ -570,45 +695,30 @@ public void initButtons(boolean init) {
   fh = (int)Math.round((float)column_height*1.3f);
   ts = (float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*3.6);
   // System.out.println("10: "+r.getcurrent_random_numb()+", "+r.getthreadfin()+", "+((double)((int)(r.getprogress()*10))/10)+", "+r.getpossiblenumbs().size());
-  if (r.getcurrent_random_numb()>0) {
-    if (r.getthreadfin()) {
-      if ((double)((int)(r.getprogress()*10))/10>99) {
-        if (!r.getfound()) {
-          tc = #000000;
-          mc=#FFFFFF;
-        } else {
-          tc = #FFFFFF;
-          mc=#0000FF;
-        }
-      } else {
-        tc=#000000;
+  if (r.getthreadfin() && r.getcurrent_random_numb()>r.getmin() && r.getcurrent_random_numb()<r.getmax()) {
+    if ((double)((int)(r.getprogress()*10))/10>99) {
+      if (!r.getfound()) {
+        tc = #000000;
         mc=#FFFFFF;
-      }
-      if (init) {
-        buttons.add(new button(fx, fy, fw, fh, r.getcurrent_random_numb()+"", tc, mc, ts));
       } else {
-        buttons.get(7).update(fx, fy, fw, fh, r.getcurrent_random_numb()+"", ts, tc, mc);
+        tc = #FFFFFF;
+        mc=#0000FF;
       }
     } else {
-      tc = #000000;
-      mc = #FF0000;
-      ts =(float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*2.5);
-      if (init) {
-        buttons.add(new button(fx, fy, fw, fh, (double)((int)(r.getprogress()*10))/10+"%", tc, mc, ts));
-      } else {
-        buttons.get(7).update(fx, fy, fw, fh, (double)((int)(r.getprogress()*10))/10+"%", ts, tc, mc);
-      }
+      tc=#000000;
+      mc=#FFFFFF;
     }
+    t=r.getcurrent_random_numb()+"";
   } else {
-    r.getrandom_numb();
     tc = #000000;
     mc = #FF0000;
     ts =(float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*2.5);
-    if (init) {
-      buttons.add(new button(fx, fy, fw, fh, (double)((int)(r.getprogress()*10))/10+"%", tc, mc, ts));
-    } else {
-      buttons.get(7).update(fx, fy, fw, fh, (double)((int)(r.getprogress()*10))/10+"%", ts, tc, mc);
-    }
+    t=(double)((int)(r.getprogress()*10))/10+"%";
+  }
+  if (init) {
+    buttons.add(new button(fx, fy, fw, fh, t, tc, mc, ts));
+  } else {
+    buttons.get(7).update(fx, fy, fw, fh, t, ts, tc, mc);
   }
 
 

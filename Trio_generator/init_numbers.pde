@@ -33,6 +33,14 @@ class init_numbers {
     this.seed=seed;
   }
 
+  //public void reset() {
+  //  setSeed(0);
+  //  setthreadfin(false);
+  //  setprogress(0);
+  //  setfound(false);
+  //  rand();
+  //}
+
   public void add_usedrandnumbs(int i) {
     add_usedrandnumbs(i);
     if (possible_numbs.contains(i)) possible_numbs.remove(new Integer(i));
@@ -52,13 +60,17 @@ class init_numbers {
     possible_numbs.removeAll(possible_numbs);
     random_numbs = gen_random_numbs(rows, columns);
     if (extreme_calc) {
-      p= new possiblenumbs();
-      t=new Thread(p);
+      p = new possiblenumbs().set_init_numbers(this);
+      t = new Thread(p);
       t.start();
     } else {
       for (int i=min; i<max; i++) {
         possible_numbs.add(i);
+        setprogress((double)i/max);
       }
+      setprogress(100);
+      getrandom_numb();
+      setthreadfin(true);
       clicked_box.removeAll(clicked_box);
     }
     current_random_numb=new_current_random_numb();
@@ -174,11 +186,17 @@ class init_numbers {
   public double getprogress() {
     return progress;
   }
+
+  public init_numbers getreference() {
+
+    return this;
+  }
 }
 
 
 class possiblenumbs extends Thread {
 
+  private ArrayList<Integer> possible = new ArrayList<Integer>();
   private init_numbers n;
   private boolean stop = false;
   private final long m=System.currentTimeMillis();
@@ -187,14 +205,25 @@ class possiblenumbs extends Thread {
     this.stop=true;
   }
 
+  public possiblenumbs set_init_numbers(init_numbers r) {
+    n=r; 
+    return this;
+  }
+
   public void run() {
-    this.n=r;
     n.setthreadfin(false);
     check();
-    n.new_current_random_numb();
-    n.setthreadfin(true);
-    n.setprogress(100);
-    System.out.println("Thread finished in: "+((double)System.currentTimeMillis()-m)/1000+" sec and found: "+n.getpossiblenumbs().size()+" possibilities");
+    if (possible.size()>n.getmax()-n.getmin()) {
+      n.setpossiblenumbs(new ArrayList<Integer>()); 
+      initpregen();
+    } else {
+      n.setpossiblenumbs(possible);
+      n.getrandom_numb();
+      n.setthreadfin(true);
+      n.setprogress(100);
+      initpregen();
+      System.out.println("Thread finished in: "+((double)System.currentTimeMillis()-m)/1000+" sec and found: "+n.getpossiblenumbs().size()+" possibilities");
+    }
   }
 
   public void possibilities(int one_, int sec_, int thi_) {
@@ -208,7 +237,7 @@ class possiblenumbs extends Thread {
       try {
         //never use eval if with user input
         double e=(double)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(1)+"")+thi));
-        if (e>r.getmin() && e<r.getmax()) n.getpossiblenumbs().add((int)e);
+        if (e>r.getmin() && e<r.getmax()) possible.add((int)e);
         continue;
       }
       catch(Exception q) {
@@ -273,7 +302,7 @@ class possiblenumbs extends Thread {
         }
       }
     }
-    n.setpossiblenumbs(removeDuplicates(n.getpossiblenumbs()));
+    possible = (removeDuplicates(possible));
   }
 }
 

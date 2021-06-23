@@ -117,6 +117,12 @@ class button {
     update(x, y, w, h, text, ts, tc);
     update(mc);
   }
+  
+  public void update(int x, int y, int w, int h, String text, float ts) {
+    update(x, y, w, h);
+    this.text=text;
+    this.ts=ts;
+  }
 
   public int getX() {
     return x;
