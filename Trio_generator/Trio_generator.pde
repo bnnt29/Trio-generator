@@ -28,7 +28,7 @@ public static color pending_color=#0000FF;
 public static int seed_green_fade = 255;
 
 //numbers
-public static boolean extreme_calc=true;
+public static boolean extreme_calc=false;
 public static ArrayList<Integer> clicked_box=new ArrayList<Integer>();
 //seed
 public static String Hex_r_seed="0000";
@@ -61,12 +61,6 @@ void mousePressed() {
     //rem row
     if (rows>min_columns) {
       if (buttons.get(1).isPushed()) {
-        if (r!=null) {
-          r.stopthread();
-        }
-        if (r2!=null) {
-          r2.stopthread();
-        }
         rows-=1;
         reset_action();
         labelbuttons.clear();
@@ -77,12 +71,6 @@ void mousePressed() {
     //add row
     if (rows<max_columns) {
       if (buttons.get(2).isPushed()) {
-        if (r!=null) {
-          r.stopthread();
-        }
-        if (r2!=null) {
-          r2.stopthread();
-        }
         rows+=1;
         reset_action();
         labelbuttons.clear();
@@ -93,12 +81,6 @@ void mousePressed() {
     //rem column
     if (columns>min_columns) {
       if (buttons.get(3).isPushed()) {
-        if (r!=null) {
-          r.stopthread();
-        }
-        if (r2!=null) {
-          r2.stopthread();
-        }
         columns-=1;
         reset_action();
         labelbuttons.clear();
@@ -109,12 +91,6 @@ void mousePressed() {
     //add column
     if (columns<max_columns) {
       if (buttons.get(4).isPushed()) {
-        if (r!=null) {
-          r.stopthread();
-        }
-        if (r2!=null) {
-          r2.stopthread();
-        }
         columns+=1;
         reset_action();
         labelbuttons.clear();
@@ -318,10 +294,11 @@ int getIndexForPoint(Point p) {
 
 void draw() { 
   if (draw<=0) {
+    System.out.println(0);
     clear();
     background(50, 50, 50);
     fill(255, 255, 255);
-
+    System.out.println(1);
     //grid setup
     column_height=height/(rows+site_distance);
     X_offset=0;
@@ -332,7 +309,9 @@ void draw() {
     }
     initButtons(false);
     //grid
+    System.out.println(2);
     for (int i=0; i< rows; i++) {
+      System.out.println(3);
       for (int e=0; e< columns; e++) {
         boolean right=false;
         int possibilities=r.calculations_list.length;
@@ -419,11 +398,20 @@ void draw() {
         } else {
           fill(0, 0, 0);
         }
+        System.out.println(5);
         textAlign(CENTER, CENTER);
         textSize((float)Math.floor((float)((column_width+column_height)/2)*0.5f));
-        text(r.getrandomnumbs().get(i*columns+e)+"", column_width*(e+site_distance)+X_offset+column_width/2+x, column_height*(i+site_distance/2)+column_height/2);
+        System.out.println(6);
+        try {
+          text(r.getrandomnumbs().get(i*columns+e)+"", column_width*(e+site_distance)+X_offset+column_width/2+x, column_height*(i+site_distance/2)+column_height/2);
+        }
+        catch(IndexOutOfBoundsException a) {
+          return;
+        }
+        System.out.println(7);
       }
     }
+    System.out.println(4);
 
     //row+column numbers
 
@@ -436,16 +424,19 @@ void draw() {
     }
     ArrayList<String> abc = new ArrayList<String>();
     int x=0;
-
+    System.out.println(5);
     //x-buttons
+    int maxx=0;
     ArrayList<button> xb;
     if (labelbuttons.size()>0) {
       xb = labelbuttons.get(0);
+      maxx=xb.size();
     } else {
       xb = new ArrayList<button>();
+      maxx=columns;
     }
     abc = init_label_list(false);
-    for (int i=0; i<columns; i++) {
+    for (int i=0; i<maxx; i++) {
       if (labeledbool) {
         x= (int)(column_width*(i+0.5+site_distance)+X_offset);
       } else {
@@ -457,20 +448,26 @@ void draw() {
         xb.get(i).update(x, column_height*(site_distance/4), column_width, column_height, abc.get(i)+"", ts);
       }
     }
-    labelbuttons.add(xb);
+    if (label_init) {
+      labelbuttons.add(xb);
+    }
+    System.out.println(6);
     //y-buttons
+    int maxy=0;
     ArrayList<button> yb;
     if (labelbuttons.size()>1) {
       yb = labelbuttons.get(1);
+      maxy=yb.size();
     } else {
       yb = new ArrayList<button>();
+      maxy=rows;
     }
     if (labeledint==1 && rows<=24) {
       abc = init_label_list(true);
     } else {
       abc = init_label_list(false);
     } 
-    for (int i=0; i<rows; i++) {
+    for (int i=0; i<maxy; i++) {
       if (labeledbool) {
         x=(int)(column_width*(site_distance)+X_offset);
       } else {
@@ -486,13 +483,14 @@ void draw() {
       label_init=false;
       labelbuttons.add(yb);
     }
+    System.out.println(7);
 
     for (ArrayList<button> ab : labelbuttons) {
       for (button b : ab) {
         b.drawMe();
       }
     }
-
+    System.out.println(8);
     if (labeledint==2) {
       if (labeledbool) {
         text("y", column_width*(site_distance*0.963)+X_offset, column_height*(0+site_distance/2)+column_height/2); 
@@ -511,6 +509,7 @@ void draw() {
       buttons.get(7).drawMe(); 
       buttons.get(10).drawMe();
     }
+    System.out.println(9);
     if (r.getthreadfin()) {
       draw=3;
     } else {

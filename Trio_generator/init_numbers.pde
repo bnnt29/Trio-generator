@@ -56,7 +56,6 @@ class init_numbers {
     if (seed==0) {
       seed=(int)((double)Math.random()*10000*Math.random());
     }
-    gen=new Random(seed);
     possible_numbs.removeAll(possible_numbs);
     random_numbs = gen_random_numbs(rows, columns);
     if (extreme_calc) {
@@ -104,7 +103,7 @@ class init_numbers {
     ArrayList<Integer> save =new ArrayList<Integer>(rows*columns);
     for (int i =0; i < rows; i++) {
       for (int e =0; e < columns; e++) {
-        save.add((int)(((double)gen.nextDouble()*grid_max)+grid_min));
+        save.add((int)(((double)gen.nextDouble()*(grid_max-grid_min))+grid_min));
       }
     }
     return save;
