@@ -159,6 +159,8 @@ void mousePressed() {
   if (mouseX>=column_width*(site_distance)+X_offset && mouseX<=column_width*(columns+site_distance)+X_offset && mouseY>=column_height*(site_distance/2) && mouseY<=column_height*(rows+site_distance/2)+column_height) {
     clicked_button=true;
     int column = ((mouseX-X_offset)/column_width)-site_distance;
+    if(labeledbool)
+      column = (((mouseX-column_width/2)-X_offset)/column_width)-site_distance;
     int row = ((mouseY)/column_height)-(site_distance/2);
     int index = row*columns+column;
     if (clicked_box.contains(index)) {
@@ -182,7 +184,7 @@ void mousePressed() {
           if (newPoint.equals(new Point()))
             break;
           if (newPoint.equals(new Point())) {
-            System.out.println("Second point is not valid");
+            System.err.println("Second point is not valid");
             break;
           }
           //Auf x daneben
@@ -243,7 +245,7 @@ void mousePressed() {
           }
 
           if (newNewPoint.equals(new Point())) {
-            System.out.println("No valid third point");
+            System.err.println("No valid third point");
             break;
           }
           if (getIndexForPoint(newPoint) == -1 || getIndexForPoint(newNewPoint) == -1) {
@@ -279,7 +281,7 @@ Point getCoordinatesForIndex(int i) {
       result.setLocation(columns, result.getY()-1);
     }
   if (result.getX()<1 || result.getX()>(columns) || result.getY()<1 || result.getY()>(rows)) {
-    System.out.println("Point not existent");
+    System.err.println("Point not existent");
     return new Point();
   }
   return result;
@@ -357,12 +359,15 @@ void draw() {
                   catch(ClassCastException u) {
                     //never use eval if with user input
                     out=(int)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(1)+"")+thi));
+                    u.printStackTrace();
                   }
                 }
                 catch(ScriptException q) {
+                  q.printStackTrace();
                 }
                 catch(Exception q) {
-                  System.out.println(q);
+                  //System.out.println(q);
+                  q.printStackTrace();
                 }
                 if (out==r.getcurrent_random_numb()) {
                   fill(right_color);
@@ -406,6 +411,7 @@ void draw() {
           text(r.getrandomnumbs().get(i*columns+e)+"", column_width*(e+site_distance)+X_offset+column_width/2+x, column_height*(i+site_distance/2)+column_height/2);
         }
         catch(IndexOutOfBoundsException a) {
+          a.printStackTrace();
           return;
         }
         System.out.println(7);
@@ -436,6 +442,11 @@ void draw() {
       maxx=columns;
     }
     abc = init_label_list(false);
+    System.out.println("hi");
+    for(String s : abc){
+     System.out.println(s); 
+    }
+    System.out.println("maxx: " + maxx);
     for (int i=0; i<maxx; i++) {
       if (labeledbool) {
         x= (int)(column_width*(i+0.5+site_distance)+X_offset);
@@ -443,6 +454,7 @@ void draw() {
         x= column_width*(i+site_distance)+X_offset;
       }
       if (label_init) {
+        System.out.println("i: " + i);
         xb.add(new button(x, column_height*(site_distance/4), column_width, column_height, abc.get(i)+"", #FFFFFF, g.backgroundColor, ts));
       } else {
         xb.get(i).update(x, column_height*(site_distance/4), column_width, column_height, abc.get(i)+"", ts);
@@ -528,7 +540,7 @@ public ArrayList<String> init_label_list(boolean b) {
       abc.add(c+"");
     }
   } else {
-    for (int i=0; i<rows; i++) {
+    for (int i=0; i<((rows<columns)?columns:rows); i++) {
       abc.add((i+""));
     }
   }
