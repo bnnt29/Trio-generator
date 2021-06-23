@@ -1,4 +1,4 @@
-import java.awt.datatransfer.StringSelection; //<>// //<>//
+import java.awt.datatransfer.StringSelection;  //<>//
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.util.Arrays;
@@ -28,7 +28,7 @@ public static color pending_color = #0000FF;
 public static int seed_green_fade = 255;
 
 //numbers
-public static boolean extreme_calc = false;
+public static boolean extreme_calc = true;
 public static ArrayList<Integer> clicked_box = new ArrayList<Integer>();
 //seed
 public static String Hex_r_seed = "0000";
@@ -62,7 +62,7 @@ void mousePressed() {
     if (rows>min_columns) {
       if (buttons.get(1).isPushed()) {
         rows -= 1;
-        reset_action();
+        reset_action(true);
         labelbuttons.clear();
         label_init = true;
       }
@@ -72,7 +72,7 @@ void mousePressed() {
     if (rows<max_columns) {
       if (buttons.get(2).isPushed()) {
         rows += 1;
-        reset_action();
+        reset_action(true);
         labelbuttons.clear();
         label_init = true;
       }
@@ -82,7 +82,7 @@ void mousePressed() {
     if (columns>min_columns) {
       if (buttons.get(3).isPushed()) {
         columns -= 1;
-        reset_action();
+        reset_action(true);
         labelbuttons.clear();
         label_init = true;
       }
@@ -92,7 +92,7 @@ void mousePressed() {
     if (columns<max_columns) {
       if (buttons.get(4).isPushed()) {
         columns += 1;
-        reset_action();
+        reset_action(true);
         labelbuttons.clear();
         label_init = true;
       }
@@ -100,9 +100,14 @@ void mousePressed() {
 
     //reset_button
     if (buttons.get(5).isPushed()) {
-      rows = 10;
-      columns = 10;
-      reset_action();
+      if (rows!=10 || columns!=10) {
+        rows = 10;
+        columns = 10;
+        reset_action(true);
+      }
+      reset_action(false);
+      labelbuttons.clear();
+      label_init = true;
     }
 
     //label
@@ -154,6 +159,35 @@ void mousePressed() {
     buttons.get(0).set_lastPressed(System.currentTimeMillis()+5);
     clicked_button = true;
   }
+
+  //labes-buttons
+  //ArrayList<button> ab;
+  //if (labelbuttons.size()>1) {
+  //  ab = labelbuttons.get(0);
+  //  ArrayList<button> lonelyx = new ArrayList<button>();
+  //  for (button b : ab) {
+  //    if (b.isPushed()) {
+  //      lonelyx.add(b);
+  //    }
+  //  }
+  //  if (lonelyx.size()>1) {
+  //  } else if (lonelyx.size()==1) {
+  //    ab = labelbuttons.get(1);
+  //    ArrayList<button> lonelyy = new ArrayList<button>();
+  //    for (button b : ab) {
+  //      if (b.isPushed()) {
+  //        lonelyy.add(b);
+  //      }
+  //    }
+  //    if (lonelyy.size()>1) {
+  //    } else if (lonelyy.size()==1) {
+  //      clicked_box.clear();
+  //      Point h = new Point();
+  //      h.setLocation(labelbuttons.get(0).indexOf(lonelyx.get(0)), labelbuttons.get(1).indexOf(lonelyy.get(0)));
+  //      clicked_box.add(getIndexForPoint(h));
+  //    }
+  //  }
+  //}
 
   //clickable boxes
   if (mouseX >= column_width*(site_distance)+X_offset && mouseX <= column_width*(columns+site_distance)+X_offset && mouseY >= column_height*(site_distance/2) && mouseY <= column_height*(rows+site_distance/2)+column_height) {
@@ -401,15 +435,7 @@ void draw() {
         }
         textAlign(CENTER, CENTER);
         textSize((float)Math.floor((float)((column_width+column_height)/2)*0.5f));
-        try {
-          text(r.getrandomnumbs().get(i*columns+e)+"", column_width*(e+site_distance)+X_offset+column_width/2+x, column_height*(i+site_distance/2)+column_height/2);
-        }
-        catch(IndexOutOfBoundsException a) {
-          System.out.println(r.getrandomnumbs().size());
-          a.printStackTrace();
-          System.exit(0);
-          return;
-        }      
+        text(r.getrandomnumbs().get(i*columns+e)+"", column_width*(e+site_distance)+X_offset+column_width/2+x, column_height*(i+site_distance/2)+column_height/2);
       }
     }
 
@@ -527,12 +553,22 @@ public ArrayList<String> init_label_list(boolean b) {
       abc.add((i+""));
     }
   }
-  
-  System.out.println("hi");
   return abc;
 }
 
-public void reset_action() {
+public void reset_action(boolean b) {
+  if (b) {  
+    if (r2!=null) {
+      r2.stopthread();  
+      r2=null;
+    }
+    if (r!=null) {
+      r.stopthread();  
+
+      initpregen();     
+      r=null;
+    }
+  }
   clicked_box.removeAll(clicked_box);
   if (r != null) {
     r.stopthread();
@@ -545,7 +581,6 @@ public void reset_action() {
     initpregen();
     r = r2;
     r2 = null;
-    initpregen();
   }
 }
 
