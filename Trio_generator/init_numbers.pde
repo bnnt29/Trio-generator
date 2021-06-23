@@ -61,7 +61,7 @@ class init_numbers {
     random_numbs = gen_random_numbs(rows, columns);
     if (extreme_calc) {
       p = new possiblenumbs().set_init_numbers(this);
-      t = new Thread();
+      t = new Thread(p);
       t.start();
     } else {
       for (int i = min; i<max; i++) {
@@ -103,7 +103,7 @@ class init_numbers {
     gen = new Random(seed);
     ArrayList<Integer> save  = new ArrayList<Integer>(rows*columns);
     for (int i  = 0; i < rows; i++) {
-      for (int e  = 0; e < columns; i++) {
+      for (int e  = 0; e < columns; e++) {
         save.add((int)(((double)gen.nextDouble()*(grid_max-grid_min))+grid_min));
       }
     }
