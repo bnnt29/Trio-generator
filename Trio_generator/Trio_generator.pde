@@ -134,6 +134,17 @@ void mousePressed() {
     if (buttons.get(6).isPushed()) {
       r.rerand();
     }
+
+    //seed-button
+    if (buttons.get(9).isPushed()) {
+      String myString = r.getSeed()+"";
+      StringSelection stringSelection = new StringSelection(myString);
+      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+      clipboard.setContents(stringSelection, null);
+      System.out.println("SEED: "+r.getSeed());
+      seed_green_fade = 0;
+      clicked_button = true;
+    }
   } else {
     //reroll-field
     if (buttons.get(7).isPushed()) {
@@ -142,16 +153,7 @@ void mousePressed() {
   }
 
 
-  //seed-button
-  if (buttons.get(9).isPushed()) {
-    String myString = r.getSeed()+"";
-    StringSelection stringSelection = new StringSelection(myString);
-    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-    clipboard.setContents(stringSelection, null);
-    System.out.println("SEED: "+r.getSeed());
-    seed_green_fade = 0;
-    clicked_button = true;
-  }
+
 
   //minimalistic
   if (buttons.get(10).isPushed()) {
@@ -444,7 +446,7 @@ void draw() {
     fill(#FFFFFF);
     float ts = 0;
     if (minimalistic) {
-      ts = (float)Math.floor((float)((column_height+column_width)/2)*0.5f);
+      ts = (float)Math.floor((float)((column_height+column_width)/2)*0.6f);
     } else {
       ts = (float)Math.floor((float)((column_height+column_width)/2)*0.4f);
     }
