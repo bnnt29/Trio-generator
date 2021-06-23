@@ -5,15 +5,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.awt.Point;
 
-public static int draw=8;
+public static int draw = 8;
 
 //label
-public static int labeledint=1;
-public static boolean labeledbool=true;
+public static int labeledint = 1;
+public static boolean labeledbool = true;
 public static ArrayList<ArrayList<button>> labelbuttons = new ArrayList<ArrayList<button>>();
-public static boolean label_init=true;
+public static boolean label_init = true;
 
-public static boolean minimalistic=false;
+public static boolean minimalistic = false;
 
 public static final int roundboxes = 10;
 public ArrayList<button> buttons = new ArrayList<button>();
@@ -22,105 +22,105 @@ public static init_numbers r;
 public static init_numbers r2;
 
 //colors
-public static color right_color=#00FF00;
-public static color wrong_color=#FF0000;
-public static color pending_color=#0000FF;
+public static color right_color = #00FF00;
+public static color wrong_color = #FF0000;
+public static color pending_color = #0000FF;
 public static int seed_green_fade = 255;
 
 //numbers
-public static boolean extreme_calc=false;
-public static ArrayList<Integer> clicked_box=new ArrayList<Integer>();
+public static boolean extreme_calc = false;
+public static ArrayList<Integer> clicked_box = new ArrayList<Integer>();
 //seed
-public static String Hex_r_seed="0000";
+public static String Hex_r_seed = "0000";
 
 //grid_setup
 public static int rows = 10; //Zeilen
 public static int columns = 10; //Spalten
-public static int column_width=0;
-public static int column_height=0;
-public static int X_offset=0;
-public static int site_distance=2;
-public static int max_columns=40;
-public static int min_columns=5;
+public static int column_width = 0;
+public static int column_height = 0;
+public static int X_offset = 0;
+public static int site_distance = 2;
+public static int max_columns = 40;
+public static int min_columns = 5;
 
 public static ScriptEngineManager mgr = new ScriptEngineManager();
 public static ScriptEngine engine = mgr.getEngineByName("JavaScript");
 boolean buttons_init = false;
 
 void setup() {
-  r=new init_numbers(Integer.parseInt(Hex_r_seed, 16));
+  r = new init_numbers(Integer.parseInt(Hex_r_seed, 16));
   r.rand();
   fullScreen();
 }
 
 void mousePressed() {
   //disselect selected boxes
-  boolean clicked_button=false;
+  boolean clicked_button = false;
 
   if (!minimalistic) {
     //rem row
     if (rows>min_columns) {
       if (buttons.get(1).isPushed()) {
-        rows-=1;
+        rows -= 1;
         reset_action();
         labelbuttons.clear();
-        label_init=true;
+        label_init = true;
       }
     }
 
     //add row
     if (rows<max_columns) {
       if (buttons.get(2).isPushed()) {
-        rows+=1;
+        rows += 1;
         reset_action();
         labelbuttons.clear();
-        label_init=true;
+        label_init = true;
       }
     }
 
     //rem column
     if (columns>min_columns) {
       if (buttons.get(3).isPushed()) {
-        columns-=1;
+        columns -= 1;
         reset_action();
         labelbuttons.clear();
-        label_init=true;
+        label_init = true;
       }
     }
 
     //add column
     if (columns<max_columns) {
       if (buttons.get(4).isPushed()) {
-        columns+=1;
+        columns += 1;
         reset_action();
         labelbuttons.clear();
-        label_init=true;
+        label_init = true;
       }
     }
 
     //reset_button
     if (buttons.get(5).isPushed()) {
-      rows=10;
-      columns=10;
+      rows = 10;
+      columns = 10;
       reset_action();
     }
 
     //label
     if (buttons.get(8).isPushed()) {
-      clicked_button=true;
+      clicked_button = true;
       switch(labeledint) {
       case 0:
-        labeledint=1;
+        labeledint = 1;
         break;
       case 1:
-        labeledint=2;
+        labeledint = 2;
         break;
       case 2:
         labeledbool = !labeledbool;
-        labeledint=0;
+        labeledint = 0;
         break;
       default:
-        labeledint=0;
+        labeledint = 0;
         break;
       }
     }
@@ -144,27 +144,27 @@ void mousePressed() {
     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
     clipboard.setContents(stringSelection, null);
     System.out.println("SEED: "+r.getSeed());
-    seed_green_fade=0;
-    clicked_button=true;
+    seed_green_fade = 0;
+    clicked_button = true;
   }
 
   //minimalistic
   if (buttons.get(10).isPushed()) {
-    minimalistic=!minimalistic;
+    minimalistic = !minimalistic;
     buttons.get(0).set_lastPressed(System.currentTimeMillis()+5);
-    clicked_button=true;
+    clicked_button = true;
   }
 
   //clickable boxes
-  if (mouseX>=column_width*(site_distance)+X_offset && mouseX<=column_width*(columns+site_distance)+X_offset && mouseY>=column_height*(site_distance/2) && mouseY<=column_height*(rows+site_distance/2)+column_height) {
-    clicked_button=true;
+  if (mouseX >= column_width*(site_distance)+X_offset && mouseX <= column_width*(columns+site_distance)+X_offset && mouseY >= column_height*(site_distance/2) && mouseY <= column_height*(rows+site_distance/2)+column_height) {
+    clicked_button = true;
     int column = ((mouseX-X_offset)/column_width)-site_distance;
-    if(labeledbool)
+    if (labeledbool)
       column = (((mouseX-column_width/2)-X_offset)/column_width)-site_distance;
     int row = ((mouseY)/column_height)-(site_distance/2);
     int index = row*columns+column;
     if (clicked_box.contains(index)) {
-      if (clicked_box.indexOf(index)==0) {
+      if (clicked_box.indexOf(index) == 0) {
         clicked_box.removeAll(clicked_box);
       } else {
         clicked_box.remove(2);
@@ -188,55 +188,55 @@ void mousePressed() {
             break;
           }
           //Auf x daneben
-          if (newPoint.getX() == origin.getX()+1 && newPoint.getY() == origin.getY()) {
+          if (newPoint.getX() ==  origin.getX()+1 && newPoint.getY() ==  origin.getY()) {
             newNewPoint.setLocation(origin.getX()+2, origin.getY());
             newnewIstAussen = true;
-          } else if (newPoint.getX() == origin.getX()+2 && newPoint.getY() == origin.getY()) {
+          } else if (newPoint.getX() ==  origin.getX()+2 && newPoint.getY() ==  origin.getY()) {
             newNewPoint.setLocation(origin.getX()+1, origin.getY());
-          } else if (newPoint.getX() == origin.getX()-1 && newPoint.getY() == origin.getY()) {
+          } else if (newPoint.getX() ==  origin.getX()-1 && newPoint.getY() ==  origin.getY()) {
             newNewPoint.setLocation(origin.getX()-2, origin.getY());  
             newnewIstAussen = true;
-          } else if (newPoint.getX() == origin.getX()-2 && newPoint.getY() == origin.getY()) {
+          } else if (newPoint.getX() ==  origin.getX()-2 && newPoint.getY() ==  origin.getY()) {
             newNewPoint.setLocation(origin.getX()-1, origin.getY());
 
             //Auf y daneben
-          } else if (newPoint.getY() == origin.getY()+1 && newPoint.getX() == origin.getX()) {
+          } else if (newPoint.getY() ==  origin.getY()+1 && newPoint.getX() ==  origin.getX()) {
             newNewPoint.setLocation(origin.getX(), origin.getY()+2);
             newnewIstAussen = true;
-          } else if (newPoint.getY() == origin.getY()+2 && newPoint.getX() == origin.getX()) {
+          } else if (newPoint.getY() ==  origin.getY()+2 && newPoint.getX() ==  origin.getX()) {
             newNewPoint.setLocation(origin.getX(), origin.getY()+1);
-          } else if (newPoint.getY() == origin.getY()-1 && newPoint.getX() == origin.getX()) {
+          } else if (newPoint.getY() ==  origin.getY()-1 && newPoint.getX() ==  origin.getX()) {
             newNewPoint.setLocation(origin.getX(), origin.getY()-2);
             newnewIstAussen = true;
-          } else if (newPoint.getY() == origin.getY()-2 && newPoint.getX() == origin.getX()) {
+          } else if (newPoint.getY() ==  origin.getY()-2 && newPoint.getX() ==  origin.getX()) {
             newNewPoint.setLocation(origin.getX(), origin.getY()-1);
 
             //Diagonal positiv
-          } else if (newPoint.getY() == origin.getY()+1 && newPoint.getX() == origin.getX()+1) {
+          } else if (newPoint.getY() ==  origin.getY()+1 && newPoint.getX() ==  origin.getX()+1) {
             newNewPoint.setLocation(origin.getX()+2, origin.getY()+2);
             newnewIstAussen = true;
-          } else if (newPoint.getY() == origin.getY()+2 && newPoint.getX() == origin.getX()+2) {
+          } else if (newPoint.getY() ==  origin.getY()+2 && newPoint.getX() ==  origin.getX()+2) {
             newNewPoint.setLocation(origin.getX()+1, origin.getY()+1);
 
             //Diagonal negativ
-          } else if (newPoint.getY() == origin.getY()-1 && newPoint.getX() == origin.getX()-1) {
+          } else if (newPoint.getY() ==  origin.getY()-1 && newPoint.getX() ==  origin.getX()-1) {
             newNewPoint.setLocation(origin.getX()-2, origin.getY()-2);
             newnewIstAussen = true;
-          } else if (newPoint.getY() == origin.getY()-2 && newPoint.getX() == origin.getX()-2) {
+          } else if (newPoint.getY() ==  origin.getY()-2 && newPoint.getX() ==  origin.getX()-2) {
             newNewPoint.setLocation(origin.getX()-1, origin.getY()-1);
 
             //Diagonal positiv negativ
-          } else if (newPoint.getY() == origin.getY()+1 && newPoint.getX() == origin.getX()-1) {
+          } else if (newPoint.getY() ==  origin.getY()+1 && newPoint.getX() ==  origin.getX()-1) {
             newNewPoint.setLocation(origin.getX()-2, origin.getY()+2);
             newnewIstAussen = true;
-          } else if (newPoint.getY() == origin.getY()+2 && newPoint.getX() == origin.getX()-2) {
+          } else if (newPoint.getY() ==  origin.getY()+2 && newPoint.getX() ==  origin.getX()-2) {
             newNewPoint.setLocation(origin.getX()-1, origin.getY()+1);
 
             //Diagonal negativ positiv
-          } else if (newPoint.getY() == origin.getY()-1 && newPoint.getX() == origin.getX()+1) {
+          } else if (newPoint.getY() ==  origin.getY()-1 && newPoint.getX() ==  origin.getX()+1) {
             newNewPoint.setLocation(origin.getX()+2, origin.getY()-2);
             newnewIstAussen = true;
-          } else if (newPoint.getY() == origin.getY()-2 && newPoint.getX() == origin.getX()+2) {
+          } else if (newPoint.getY() ==  origin.getY()-2 && newPoint.getX() ==  origin.getX()+2) {
             newNewPoint.setLocation(origin.getX()+1, origin.getY()-1);
           } else {
             clicked_box.removeAll(clicked_box);
@@ -248,7 +248,7 @@ void mousePressed() {
             System.err.println("No valid third point");
             break;
           }
-          if (getIndexForPoint(newPoint) == -1 || getIndexForPoint(newNewPoint) == -1) {
+          if (getIndexForPoint(newPoint) ==  -1 || getIndexForPoint(newNewPoint) ==  -1) {
             break;
           }
           if (newnewIstAussen) {
@@ -277,7 +277,7 @@ Point getCoordinatesForIndex(int i) {
   int y = (int)(Math.floor((float)index/columns))+1;
   result.setLocation(x, y);
   if (x<1 || x>(columns) || y<1 || y>(rows))
-    if (result.getX() == 0) {
+    if (result.getX() ==  0) {
       result.setLocation(columns, result.getY()-1);
     }
   if (result.getX()<1 || result.getX()>(columns) || result.getY()<1 || result.getY()>(rows)) {
@@ -295,70 +295,66 @@ int getIndexForPoint(Point p) {
 }
 
 void draw() { 
-  if (draw<=0) {
-    System.out.println(0);
+  if (draw<= 0) {
     clear();
     background(50, 50, 50);
     fill(255, 255, 255);
-    System.out.println(1);
     //grid setup
-    column_height=height/(rows+site_distance);
-    X_offset=0;
-    column_width=width/(columns+site_distance*2);
+    column_height = height/(rows+site_distance);
+    X_offset = 0;
+    column_width = width/(columns+site_distance*2);
     if (!buttons_init) {
       buttons_init = true;
       initButtons(buttons_init);
     }
     initButtons(false);
     //grid
-    System.out.println(2);
-    for (int i=0; i< rows; i++) {
-      System.out.println(3);
-      for (int e=0; e< columns; e++) {
-        boolean right=false;
-        int possibilities=r.calculations_list.length;
+    for (int i = 0; i< rows; i++) {
+      for (int e = 0; e< columns; e++) {
+        boolean right = false;
+        int possibilities = r.calculations_list.length;
         fill(#FFFFFF);
         if (clicked_box.contains(i*columns+e)) {
           textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(buttons.get(5).getX()-(buttons.get(0).getX()+buttons.get(0).getX())))/possibilities+(site_distance*column_width*2))/11)*0.5f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
-          if (clicked_box.size()==3) {
-            float xcord=0;
-            float y_add=0;
-            float y_mult=0;
+          if (clicked_box.size() == 3) {
+            float xcord = 0;
+            float y_add = 0;
+            float y_mult = 0;
             if (minimalistic) {
-              button ref_one=buttons.get(7);
-              xcord=column_width*1.3-column_width/1.2+X_offset/2+column_width/2;
-              y_add=(float)((ref_one.getY()+ref_one.getH())+(float)((float)((column_height+column_width)/2)*(site_distance-1.7)));
-              y_mult=(float)(((height-column_height)-(ref_one.getY()+ref_one.getH()))/possibilities+5)*1.0f;
+              button ref_one = buttons.get(7);
+              xcord = column_width*1.3-column_width/1.2+X_offset/2+column_width/2;
+              y_add = (float)((ref_one.getY()+ref_one.getH())+(float)((float)((column_height+column_width)/2)*(site_distance-1.7)));
+              y_mult = (float)(((height-column_height)-(ref_one.getY()+ref_one.getH()))/possibilities+5)*1.0f;
               textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs((height-column_height)-(ref_one.getX()+ref_one.getX())))/8+(site_distance*column_width*2))/11)*0.8f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
             } else {
-              button ref_one=buttons.get(6);
-              button ref_sec=buttons.get(5);
-              xcord=column_width*1.3-column_width/1.2+X_offset/2+column_width/2;
-              y_add=(float)((ref_one.getY()+ref_one.getH())+(float)((float)((column_height+column_width)/2)*(site_distance-1.7)));
-              y_mult=(float)((ref_sec.getY()-(ref_one.getY()+ref_one.getH()))/(possibilities+7))*1.5f;
+              button ref_one = buttons.get(6);
+              button ref_sec = buttons.get(5);
+              xcord = column_width*1.3-column_width/1.2+X_offset/2+column_width/2;
+              y_add = (float)((ref_one.getY()+ref_one.getH())+(float)((float)((column_height+column_width)/2)*(site_distance-1.7)));
+              y_mult = (float)((ref_sec.getY()-(ref_one.getY()+ref_one.getH()))/(possibilities+7))*1.5f;
               textSize((float)Math.floor((float)((float)((float)((float)((float)Math.abs(ref_sec.getX()-(ref_one.getX()+ref_one.getX())))/8+(site_distance*column_width*2))/11)*0.8f)));//textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
             }
 
-            int one=r.getrandomnumbs().get(clicked_box.get(0));
-            int sec=r.getrandomnumbs().get(clicked_box.get(1));
-            int thi=r.getrandomnumbs().get(clicked_box.get(2));
+            int one = r.getrandomnumbs().get(clicked_box.get(0));
+            int sec = r.getrandomnumbs().get(clicked_box.get(1));
+            int thi = r.getrandomnumbs().get(clicked_box.get(2));
             //(1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3)
             if (r.getcurrent_random_numb()>0) {
-              for (int o=0; o<r.getcalculationlist().length; o++) {
-                double out=-1;
-                String s=r.getcalculationlist()[o];
+              for (int o = 0; o<r.getcalculationlist().length; o++) {
+                double out = -1;
+                String s = r.getcalculationlist()[o];
                 r.calculations.add(s);
-                if (s.charAt(0)=='/' && sec==0||s.charAt(1)=='/' && thi==0) {
+                if (s.charAt(0) == '/' && sec == 0||s.charAt(1) == '/' && thi == 0) {
                   continue;
                 }
                 try {
                   try {
                     //never use eval if with user input
-                    out=(double)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(1)+"")+thi));
+                    out = (double)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(1)+"")+thi));
                   }
                   catch(ClassCastException u) {
                     //never use eval if with user input
-                    out=(int)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(1)+"")+thi));
+                    out = (int)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(1)+"")+thi));
                     u.printStackTrace();
                   }
                 }
@@ -369,9 +365,9 @@ void draw() {
                   //System.out.println(q);
                   q.printStackTrace();
                 }
-                if (out==r.getcurrent_random_numb()) {
+                if (out == r.getcurrent_random_numb()) {
                   fill(right_color);
-                  right=true;
+                  right = true;
                 } else {
                   fill(wrong_color);
                 }
@@ -387,15 +383,15 @@ void draw() {
             fill(pending_color);
           }
         }
-        int x=0;
+        int x = 0;
         if (labeledbool) {
-          x=column_width/2;
+          x = column_width/2;
         } else {
-          x=0;
+          x = 0;
         }
         rect(column_width*(e+site_distance)+X_offset+x, column_height*(i+site_distance/2), column_width, column_height, roundboxes);
         if (clicked_box.size()>0&&clicked_box.size()<2) {
-          if (clicked_box.get(0)==i*columns+e) {
+          if (clicked_box.get(0) == i*columns+e) {
             fill(#FFFFFF);
           } else {
             fill(0, 0, 0);
@@ -403,58 +399,49 @@ void draw() {
         } else {
           fill(0, 0, 0);
         }
-        System.out.println(5);
         textAlign(CENTER, CENTER);
         textSize((float)Math.floor((float)((column_width+column_height)/2)*0.5f));
-        System.out.println(6);
         try {
           text(r.getrandomnumbs().get(i*columns+e)+"", column_width*(e+site_distance)+X_offset+column_width/2+x, column_height*(i+site_distance/2)+column_height/2);
         }
         catch(IndexOutOfBoundsException a) {
+          System.out.println(r.getrandomnumbs().size());
           a.printStackTrace();
+          System.exit(0);
           return;
-        }
-        System.out.println(7);
+        }      
       }
     }
-    System.out.println(4);
 
     //row+column numbers
 
     fill(#FFFFFF);
-    float ts=0;
+    float ts = 0;
     if (minimalistic) {
-      ts=(float)Math.floor((float)((column_height+column_width)/2)*0.5f);
+      ts = (float)Math.floor((float)((column_height+column_width)/2)*0.5f);
     } else {
-      ts=(float)Math.floor((float)((column_height+column_width)/2)*0.4f);
+      ts = (float)Math.floor((float)((column_height+column_width)/2)*0.4f);
     }
     ArrayList<String> abc = new ArrayList<String>();
-    int x=0;
-    System.out.println(5);
+    int x = 0;
     //x-buttons
-    int maxx=0;
+    int maxx = 0;
     ArrayList<button> xb;
     if (labelbuttons.size()>0) {
       xb = labelbuttons.get(0);
-      maxx=xb.size();
+      maxx = xb.size();
     } else {
       xb = new ArrayList<button>();
-      maxx=columns;
+      maxx = columns;
     }
     abc = init_label_list(false);
-    System.out.println("hi");
-    for(String s : abc){
-     System.out.println(s); 
-    }
-    System.out.println("maxx: " + maxx);
-    for (int i=0; i<maxx; i++) {
+    for (int i = 0; i<maxx; i++) {
       if (labeledbool) {
-        x= (int)(column_width*(i+0.5+site_distance)+X_offset);
+        x =  (int)(column_width*(i+0.5+site_distance)+X_offset);
       } else {
-        x= column_width*(i+site_distance)+X_offset;
+        x =  column_width*(i+site_distance)+X_offset;
       }
       if (label_init) {
-        System.out.println("i: " + i);
         xb.add(new button(x, column_height*(site_distance/4), column_width, column_height, abc.get(i)+"", #FFFFFF, g.backgroundColor, ts));
       } else {
         xb.get(i).update(x, column_height*(site_distance/4), column_width, column_height, abc.get(i)+"", ts);
@@ -463,27 +450,26 @@ void draw() {
     if (label_init) {
       labelbuttons.add(xb);
     }
-    System.out.println(6);
     //y-buttons
-    int maxy=0;
+    int maxy = 0;
     ArrayList<button> yb;
     if (labelbuttons.size()>1) {
       yb = labelbuttons.get(1);
-      maxy=yb.size();
+      maxy = yb.size();
     } else {
       yb = new ArrayList<button>();
-      maxy=rows;
+      maxy = rows;
     }
-    if (labeledint==1 && rows<=24) {
+    if (labeledint == 1 && rows <= 24) {
       abc = init_label_list(true);
     } else {
       abc = init_label_list(false);
     } 
-    for (int i=0; i<maxy; i++) {
+    for (int i = 0; i<maxy; i++) {
       if (labeledbool) {
-        x=(int)(column_width*(site_distance)+X_offset);
+        x = (int)(column_width*(site_distance)+X_offset);
       } else {
-        x=(int)(column_width*((double)(columns+0.2+site_distance))+X_offset);
+        x = (int)(column_width*((double)(columns+0.2+site_distance))+X_offset);
       }
       if (label_init) {
         yb.add(new button(x, column_height*(i+site_distance/2), column_width/2, column_height, abc.get(i)+"", #FFFFFF, g.backgroundColor, ts));
@@ -492,18 +478,16 @@ void draw() {
       }
     }
     if (label_init) {
-      label_init=false;
+      label_init = false;
       labelbuttons.add(yb);
     }
-    System.out.println(7);
 
     for (ArrayList<button> ab : labelbuttons) {
       for (button b : ab) {
         b.drawMe();
       }
     }
-    System.out.println(8);
-    if (labeledint==2) {
+    if (labeledint == 2) {
       if (labeledbool) {
         text("y", column_width*(site_distance*0.963)+X_offset, column_height*(0+site_distance/2)+column_height/2); 
         text("x", column_width*(0.5+site_distance)+X_offset+column_width/2, column_height*site_distance/2-column_height/1.1);
@@ -521,14 +505,13 @@ void draw() {
       buttons.get(7).drawMe(); 
       buttons.get(10).drawMe();
     }
-    System.out.println(9);
     if (r.getthreadfin()) {
-      draw=3;
+      draw = 3;
     } else {
-      draw=5;
+      draw = 5;
     }
   } else {
-    draw-=1;
+    draw -= 1;
   }
 }
 
@@ -540,33 +523,35 @@ public ArrayList<String> init_label_list(boolean b) {
       abc.add(c+"");
     }
   } else {
-    for (int i=0; i<((rows<columns)?columns:rows); i++) {
+    for (int i = 0; i<((rows<columns)?columns:rows); i++) {
       abc.add((i+""));
     }
   }
+  
+  System.out.println("hi");
   return abc;
 }
 
 public void reset_action() {
   clicked_box.removeAll(clicked_box);
-  if (r!=null) {
+  if (r != null) {
     r.stopthread();
   }
-  if (r2!=null) {
-    r=r2;
-    r2=null;
+  if (r2!= null) {
+    r = r2;
+    r2 = null;
     initpregen();
   } else {
     initpregen();
-    r=r2;
-    r2=null;
+    r = r2;
+    r2 = null;
     initpregen();
   }
 }
 
 public void initpregen() {
-  if (r2==null || r2 == r) {
-    r2=new init_numbers(0);
+  if (r2 == null || r2 ==  r) {
+    r2 = new init_numbers(0);
     r2.rand();
   }
 }
@@ -589,7 +574,7 @@ public void initButtons(boolean init) {
   int fy = 0;
   int fw = 0;
   int fh = 0;
-  float ts=0;
+  float ts = 0;
   color mc;
   color tc;
   PFont tf;
@@ -604,11 +589,11 @@ public void initButtons(boolean init) {
   }
 
   //rem_row_button
-  int x=0;
+  int x = 0;
   if (labeledbool) {
-    x=column_width/2;
+    x = column_width/2;
   } else {
-    x=0;
+    x = 0;
   }
   fx = (int)Math.round((float)column_width*((float)columns+(float)site_distance)+(float)X_offset+(float)10+x);
   fy = (int)Math.round((float)column_height*((float)rows+(float)site_distance/2)+column_height/2);
@@ -619,7 +604,7 @@ public void initButtons(boolean init) {
   if (init) {
     buttons.add(new button(fx, fy, fw, fh, "-", #FFFFFF, mc, tf));
   } else {
-    if (rows<=min_columns) {
+    if (rows <= min_columns) {
       buttons.get(1).update(fx, fy, fw, fh, #FF0000);
     } else {
       buttons.get(1).update(fx, fy, fw, fh, mc);
@@ -635,7 +620,7 @@ public void initButtons(boolean init) {
   if (init) {
     buttons.add(new button(fx, fy, fw, fh, "+", #FFFFFF, mc, tf));
   } else {
-    if (rows>=max_columns) {
+    if (rows >= max_columns) {
       buttons.get(2).update(fx, fy, fw, fh, #FF0000);
     } else {
       buttons.get(2).update(fx, fy, fw, fh, mc);
@@ -651,7 +636,7 @@ public void initButtons(boolean init) {
   if (init) {
     buttons.add(new button(fx, fy, fw, fh, "-", #FFFFFF, mc, tf));
   } else {
-    if (columns<=min_columns) {
+    if (columns <= min_columns) {
       buttons.get(3).update(fx, fy, fw, fh, #FF0000);
     } else {
       buttons.get(3).update(fx, fy, fw, fh, mc);
@@ -667,7 +652,7 @@ public void initButtons(boolean init) {
   if (init) {
     buttons.add(new button(fx, fy, fw, fh, "+", #FFFFFF, mc, tf));
   } else {
-    if (columns>=max_columns) {
+    if (columns >= max_columns) {
       buttons.get(4).update(fx, fy, fw, fh, #FF0000);
     } else {
       buttons.get(4).update(fx, fy, fw, fh, mc);
@@ -710,21 +695,21 @@ public void initButtons(boolean init) {
     if ((double)((int)(r.getprogress()*10))/10>99) {
       if (!r.getfound()) {
         tc = #000000;
-        mc=#FFFFFF;
+        mc = #FFFFFF;
       } else {
         tc = #FFFFFF;
-        mc=#0000FF;
+        mc = #0000FF;
       }
     } else {
-      tc=#000000;
-      mc=#FFFFFF;
+      tc = #000000;
+      mc = #FFFFFF;
     }
-    t=r.getcurrent_random_numb()+"";
+    t = r.getcurrent_random_numb()+"";
   } else {
     tc = #000000;
     mc = #FF0000;
-    ts =(float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*2.5);
-    t=(double)((int)(r.getprogress()*10))/10+"%";
+    ts = (float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*2.5);
+    t = (double)((int)(r.getprogress()*10))/10+"%";
   }
   if (init) {
     buttons.add(new button(fx, fy, fw, fh, t, tc, mc, ts));
@@ -751,14 +736,14 @@ public void initButtons(boolean init) {
   fy = (int)Math.round(height/100);
   fw = (int)Math.round((float)column_width*1.2f);
   fh = (int)Math.round((float)column_height/4);
-  tc =color(seed_green_fade, 255, seed_green_fade);
-  mc=#000000;
+  tc = color(seed_green_fade, 255, seed_green_fade);
+  mc = #000000;
   if (init) {
     buttons.add(new button(fx, fy, fw, fh, "seed: "+Integer.toHexString(r.getSeed()), tc, g.backgroundColor));
   } else {
     buttons.get(9).update(fx, fy, fw, fh, tc, "seed: "+Integer.toHexString(r.getSeed()), g.backgroundColor);
     if (seed_green_fade<255) {
-      seed_green_fade+=3;
+      seed_green_fade += 3;
     }
   }
 
@@ -777,7 +762,7 @@ public void initButtons(boolean init) {
   stroke(255, 255, 255);
   if (init) {
     for (button b : buttons) {
-      b.lastPressed=System.currentTimeMillis()+5;
+      b.lastPressed = System.currentTimeMillis()+5;
     }
   }
 }

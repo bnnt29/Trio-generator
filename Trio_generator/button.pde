@@ -5,7 +5,7 @@ class button {
   private int x, y, w, h;
   private String text = "";
   private color mc = #FFFFFF;
-  private color tc = #000000;//tc=textColor, mc=MainColor
+  private color tc = #000000;//tc = textColor, mc = MainColor
   private float ts = -1;
   private long lastPressed;
   private static final long DELAY_TIME = 150;
@@ -35,7 +35,7 @@ class button {
   }
   public button(int x, int y, int w, int h, String text, color tc, color mc, PFont tf) {
     this(x, y, w, h, text, tc, mc);
-    this.tf=tf;
+    this.tf = tf;
   }
 
   public button(int x, int y, int w, int h, String text, color mc) {
@@ -56,13 +56,13 @@ class button {
 
     textAlign(CENTER, CENTER);
 
-    if (tf==null)
+    if (tf == null)
       textFont(createFont("Lucida Sans Typewriter", 20));
     else {
       textFont(tf);
     }
 
-    if (ts == -1)
+    if (ts ==  -1)
       textSize((float)Math.floor((float)((h/2+(w*2))/2)*0.2f));
     else
       textSize(ts);
@@ -120,8 +120,8 @@ class button {
   
   public void update(int x, int y, int w, int h, String text, float ts) {
     update(x, y, w, h);
-    this.text=text;
-    this.ts=ts;
+    this.text = text;
+    this.ts = ts;
   }
 
   public int getX() {
@@ -140,6 +140,6 @@ class button {
   }
 
   public void set_lastPressed(long lastPressed) {
-    this.lastPressed=lastPressed;
+    this.lastPressed = lastPressed;
   }
 }

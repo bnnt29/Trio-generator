@@ -17,12 +17,12 @@ class init_numbers {
   private int max=(grid_max-1)*(grid_max-1)+grid_max-1;
 
   //numbers  
-  private ArrayList<Integer> possible_numbs=new ArrayList<Integer>();
+  private ArrayList<Integer> possible_numbs = new ArrayList<Integer>();
   private String[] calculations_list = {"*+", "+*", "/+", "+/", "*-", "-*", "/-", "-/", "*/", "/*", "+-", "-+"};
   private ArrayList<String> calculations = new ArrayList<String>();
   private ArrayList<Integer> random_numbs = new ArrayList<Integer>();
   private int current_random_numb;
-  private boolean found_nothing=false;
+  private boolean found_nothing = false;
   private int seed;
   //random
   private Random gen;
@@ -30,7 +30,7 @@ class init_numbers {
   public init_numbers() {
   }
   public init_numbers(int seed) {
-    this.seed=seed;
+    this.seed = seed;
   }
 
   //public void reset() {
@@ -48,22 +48,23 @@ class init_numbers {
 
   public void rerand() {
     clicked_box.removeAll(clicked_box);
-    current_random_numb=new_current_random_numb();
+    current_random_numb = new_current_random_numb();
   }
 
   public void rand() {
+    System.out.println("hi");
     stopthread();
-    if (seed==0) {
-      seed=(int)((double)Math.random()*10000*Math.random());
+    if (seed == 0) {
+      seed = (int)((double)Math.random()*10000*Math.random());
     }
     possible_numbs.removeAll(possible_numbs);
     random_numbs = gen_random_numbs(rows, columns);
     if (extreme_calc) {
       p = new possiblenumbs().set_init_numbers(this);
-      t = new Thread(p);
+      t = new Thread();
       t.start();
     } else {
-      for (int i=min; i<max; i++) {
+      for (int i = min; i<max; i++) {
         possible_numbs.add(i);
         setprogress((double)i/max);
       }
@@ -72,23 +73,23 @@ class init_numbers {
       setthreadfin(true);
       clicked_box.removeAll(clicked_box);
     }
-    current_random_numb=new_current_random_numb();
+    current_random_numb = new_current_random_numb();
   }
 
   public int new_current_random_numb() {
     //new current random Number (unique)
     if (possible_numbs.size()>0) {
       if (possible_numbs.contains(new Integer(current_random_numb))) possible_numbs.remove(new Integer(current_random_numb));
-      double i=Math.random()*(possible_numbs.size()-1);
+      double i = Math.random() * (possible_numbs.size()-1);
       if (i<0) {
-        if (possible_numbs.size()>=1 && (possible_numbs.get(0)>min && possible_numbs.get(0)<max)) {
+        if (possible_numbs.size() >= 1 && (possible_numbs.get(0)>min && possible_numbs.get(0)<max)) {
           return possible_numbs.get(0);
         } else {
-          found_nothing=true;
+          found_nothing = true;
           return (int) ((double)((double)Math.random()*(double)(max-min)+min));
         }
       }
-      found_nothing=false;
+      found_nothing = false;
       return possible_numbs.get((int)i);
     } else if (threadfin) {
       return (int) ((double)((double)Math.random()*(double)(max-min)+min));
@@ -100,9 +101,9 @@ class init_numbers {
   public ArrayList<Integer> gen_random_numbs(int rows, int columns) {
     //generates random Numbers
     gen = new Random(seed);
-    ArrayList<Integer> save =new ArrayList<Integer>(rows*columns);
-    for (int i =0; i < rows; i++) {
-      for (int e =0; e < columns; e++) {
+    ArrayList<Integer> save  = new ArrayList<Integer>(rows*columns);
+    for (int i  = 0; i < rows; i++) {
+      for (int e  = 0; e < columns; i++) {
         save.add((int)(((double)gen.nextDouble()*(grid_max-grid_min))+grid_min));
       }
     }
@@ -110,7 +111,7 @@ class init_numbers {
   }
 
   public void setSeed(int seed) {
-    this.seed=seed;
+    this.seed = seed;
   }
 
   public int getSeed() {
@@ -118,7 +119,7 @@ class init_numbers {
   }
 
   public void setfound(boolean found) {
-    this.found_nothing=found;
+    this.found_nothing = found;
   }
 
   public boolean getfound() {
@@ -134,12 +135,12 @@ class init_numbers {
   }
 
   public void setpossiblenumbs(ArrayList<Integer> p) {
-    this.possible_numbs=p;
+    this.possible_numbs = p;
   }
 
   public void getrandom_numb() {
-    if (current_random_numb<=0) {
-      current_random_numb=new_current_random_numb();
+    if (current_random_numb <= 0) {
+      current_random_numb = new_current_random_numb();
     }
   }
 
@@ -172,14 +173,14 @@ class init_numbers {
   }
 
   public void stopthread() {
-    if (t!=null) {
+    if (t != null) {
       p.setstop();
     }
-    t=null;
+    t = null;
   }
 
   public void setprogress(double p) {
-    this.progress=p;
+    this.progress = p;
   }
 
   public double getprogress() {
@@ -195,48 +196,48 @@ class init_numbers {
 
 class possiblenumbs extends Thread {
 
-  private ArrayList<Integer> possible = new ArrayList<Integer>();
-  private init_numbers n;
-  private boolean stop = false;
-  private final long m=System.currentTimeMillis();
+  private ArrayList<Integer> possible = new ArrayList<Integer>(); 
+  private init_numbers n; 
+  private boolean stop = false; 
+  private final long m = System.currentTimeMillis(); 
 
   public void setstop() {
-    this.stop=true;
+    this.stop = true;
   }
 
   public possiblenumbs set_init_numbers(init_numbers r) {
-    n=r; 
+    n = r; 
     return this;
   }
 
   public void run() {
-    n.setthreadfin(false);
-    check();
+    n.setthreadfin(false); 
+    check(); 
     if (possible.size()>n.getmax()-n.getmin()) {
       n.setpossiblenumbs(new ArrayList<Integer>()); 
       initpregen();
     } else {
-      n.setpossiblenumbs(possible);
-      n.getrandom_numb();
-      n.setthreadfin(true);
-      n.setprogress(100);
-      initpregen();
+      n.setpossiblenumbs(possible); 
+      n.getrandom_numb(); 
+      n.setthreadfin(true); 
+      n.setprogress(100); 
+      initpregen(); 
       System.out.println("Thread finished in: "+((double)System.currentTimeMillis()-m)/1000+" sec and found: "+n.getpossiblenumbs().size()+" possibilities");
     }
   }
 
   public void possibilities(int one_, int sec_, int thi_) {
-    double one=n.getrandomnumbs().get(one_);
-    double sec=n.getrandomnumbs().get(sec_);
-    double thi=n.getrandomnumbs().get(thi_);
+    double one = n.getrandomnumbs().get(one_); 
+    double sec = n.getrandomnumbs().get(sec_); 
+    double thi = n.getrandomnumbs().get(thi_); 
     for (String s : n.getcalculationlist()) {
-      if ((s.charAt(0)=='/' && sec==0)||(s.charAt(1)=='/' && thi==0)) {
+      if ((s.charAt(0) == '/' && sec == 0)||(s.charAt(1) == '/' && thi == 0)) {
         continue;
       }
       try {
         //never use eval if with user input
-        double e=(double)(engine.eval(one+(s.charAt(0)+"")+sec+(s.charAt(1)+"")+thi));
-        if (e>r.getmin() && e<r.getmax()) possible.add((int)e);
+        double e = (double)(engine.eval(one + (s.charAt(0)+"") + sec + (s.charAt(1)+"") + thi)); 
+        if (e > r.getmin() && e < r.getmax()) possible.add((int)e); 
         continue;
       }
       catch(Exception q) {
@@ -245,13 +246,13 @@ class possiblenumbs extends Thread {
   }
 
   public void check() {
-    int clomuns_t2 =columns<< 1;
-    for (int i=0; i<rows; i++) {
-      int index_=i*columns;
+    int clomuns_t2  = columns << 1; 
+    for (int i = 0; i<rows; i++) {
+      int index_ = i*columns; 
       n.setthreadfin(false);
-      for (int e=0; e<columns; e++) {
+      for (int e = 0; e<columns; e++) {
         if (stop) return;
-        int index=index_+e;
+        int index = index_ + e;
         n.setprogress(((double)index/(rows*columns))*100);
 
         if (i>2 && i<rows-2 && e>2 && e<columns-2) {
@@ -307,8 +308,7 @@ class possiblenumbs extends Thread {
 
 public ArrayList removeDuplicates(ArrayList list) 
 {
-  if (list == null || list.size() == 0)
-  {
+  if (list ==  null || list.size() ==  0) {
     return list;
   }
   Set set = new HashSet(list);
