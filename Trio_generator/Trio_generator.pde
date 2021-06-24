@@ -485,11 +485,8 @@ void draw() {
         } else {
           x = 0;
         }
-        int rand = 0;
-        stroke(g.backgroundColor);
-        strokeWeight(1);
+        int rand = 1;
         rect(column_width*(e+site_distance)+X_offset+x+rand, column_height*(i+site_distance/2)+rand, column_width-rand, column_height-rand, roundboxes);
-        strokeWeight(0);
         if (clicked_box.size()>0&&clicked_box.size()<2) {
           if (clicked_box.get(0) == i*columns+e) {
             fill(#FFFFFF);
