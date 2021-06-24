@@ -225,7 +225,9 @@ class possiblenumbs extends Thread {
     double sec = n.getrandomnumbs().get(sec_); 
     double thi = n.getrandomnumbs().get(thi_); 
     for (String s : n.getcalculationlist()) {
-      if ((s.charAt(0) == '/' && sec == 0)||(s.charAt(1) == '/' && thi == 0)) {
+      if (s.charAt(0) == '/' && sec == 0) {
+        continue;
+      } else if (s.charAt(1) == '/' && thi == 0) {
         continue;
       }
       try {

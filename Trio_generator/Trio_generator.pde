@@ -657,7 +657,6 @@ public void reset_action(boolean b) {
     }
     if (r!=null) {
       r.stopthread();  
-
       initpregen();     
       r=null;
     }
