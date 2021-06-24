@@ -162,7 +162,7 @@ void mousePressed() {
     clicked_button = true;
   }
 
-  //labes-buttons
+  //labels-buttons
   //ArrayList<button> ab;
   //if (labelbuttons.size()>1) {
   //  ab = labelbuttons.get(0);
@@ -192,7 +192,10 @@ void mousePressed() {
   //}
 
   //clickable boxes
-  if (mouseX >= column_width*(site_distance)+X_offset && mouseX <= column_width*(columns+site_distance)+X_offset && mouseY >= column_height*(site_distance/2) && mouseY <= column_height*(rows+site_distance/2)+column_height) {
+  boolean goForward = (mouseX >= column_width*(site_distance)+X_offset && mouseX <= column_width*(columns+site_distance)+X_offset && mouseY >= column_height*(site_distance/2) && mouseY <= column_height*(rows+site_distance/2)+column_height);
+  if(labeledbool)
+  goForward = (mouseX >= column_width*(site_distance)+X_offset && (mouseX-column_width/2) <= column_width*(columns+site_distance)+X_offset && mouseY >= column_height*(site_distance/2) && mouseY <= column_height*(rows+site_distance/2)+column_height);
+  if (goForward) {
     clicked_button = true;
     int column = ((mouseX-X_offset)/column_width)-site_distance;
     if (labeledbool)
@@ -425,7 +428,8 @@ void draw() {
         } else {
           x = 0;
         }
-        rect(column_width*(e+site_distance)+X_offset+x, column_height*(i+site_distance/2), column_width, column_height, roundboxes);
+        int rand = 1;
+        rect(column_width*(e+site_distance)+X_offset+x+rand, column_height*(i+site_distance/2)+rand, column_width-rand, column_height-rand, roundboxes);
         if (clicked_box.size()>0&&clicked_box.size()<2) {
           if (clicked_box.get(0) == i*columns+e) {
             fill(#FFFFFF);
