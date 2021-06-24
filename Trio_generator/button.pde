@@ -50,10 +50,10 @@ class button {
 
   public void drawMe() {
     fill(mc);
-    //stroke(mc);
+    stroke(g.backgroundColor);
+    strokeWeight(0);
+    //stroke(#FFFFFF);
     //strokeWeight(0);
-    stroke(#FFFFFF);
-    strokeWeight(2);
     rect(x, y, w, h, roundboxes);
 
     textAlign(CENTER, CENTER);

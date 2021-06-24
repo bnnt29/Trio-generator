@@ -135,7 +135,6 @@ void mousePressed() {
     //reroll-button
     if (buttons.get(6).isPushed()) {
       r.rerand();
-      System.out.println(7);
       x_buttons.clear();
       y_buttons.clear();
     }
@@ -171,16 +170,24 @@ void mousePressed() {
     int ykord;
     for (button xb : labelbuttons.get(0)) {
       if (xb.isPushed()) {
-        x_buttons.add(xb);
-        clicked_button = true;
-          System.out.println("1: "+x_buttons.size()+", "+y_buttons.size());
+        if (!x_buttons.remove(xb)) {
+          if (clicked_box.size()<1 && x_buttons.size()>0) {
+            x_buttons.clear();
+          }
+          x_buttons.add(xb);
+          clicked_button = true;
+        }
       }
     }
     for (button yb : labelbuttons.get(1)) {
       if (yb.isPushed()) {
-        y_buttons.add(yb);
-        clicked_button = true;
-        System.out.println("2: "+x_buttons.size()+", "+y_buttons.size());
+        if (!y_buttons.remove(yb)) {
+          if (clicked_box.size()<1 && y_buttons.size()>0) {
+            y_buttons.clear();
+          }
+          y_buttons.add(yb);
+          clicked_button = true;
+        }
       }
     }
     if ((!x_buttons.isEmpty()) && (!y_buttons.isEmpty())) {
@@ -193,8 +200,33 @@ void mousePressed() {
         clicked_box.clear();
       }
       clicked_box.add(index);
-      System.out.println(xkord+", "+ykord+", "+index+", "+ clicked_box.get(0)+", "+labelbuttons.get(0).indexOf(x_buttons.get(x_buttons.size()-1))+1+", "+labelbuttons.get(1).indexOf(y_buttons.get(y_buttons.size()-1))+1);
       clickedlabel=true;
+      x_buttons.clear();
+      y_buttons.clear();
+    } else if (x_buttons.size()>0) {
+      if (clicked_box.size()==1) {
+        xkord=labelbuttons.get(0).indexOf(x_buttons.get(x_buttons.size()-1))+1;
+        ykord=(int) getCoordinatesForIndex(clicked_box.get(0)).getY();
+        Point p = new Point();
+        p.setLocation(xkord, ykord);
+        int index = getIndexForPoint(p);
+        clicked_box.add(index);
+        clickedlabel=true;
+        x_buttons.clear();
+        y_buttons.clear();
+      }
+    } else if (y_buttons.size()>0) {
+      if (clicked_box.size()==1) {
+        xkord=(int) getCoordinatesForIndex(clicked_box.get(0)).getX();
+        ykord=labelbuttons.get(1).indexOf(y_buttons.get(y_buttons.size()-1))+1;
+        Point p = new Point();
+        p.setLocation(xkord, ykord);
+        int index = getIndexForPoint(p);
+        clicked_box.add(index);
+        clickedlabel=true;
+        x_buttons.clear();
+        y_buttons.clear();
+      }
     }
   }
 
@@ -204,128 +236,134 @@ void mousePressed() {
   if (labeledbool)
     goForward = (mouseX >= column_width*(site_distance+0.5)+X_offset && mouseX <= column_width*(columns+site_distance+0.5)+X_offset && mouseY >= column_height*(site_distance/2) && mouseY <= column_height*(rows+site_distance/2)+column_height);
   if (goForward || clicked_box.size()>1) {
-    clicked_button = true;
-    int column = ((mouseX-X_offset)/column_width)-site_distance;
-    if (labeledbool)
-      column = (int)(((double)(mouseX-X_offset)/column_width)-(double)(site_distance+0.5));
-    int row = ((mouseY)/column_height)-(site_distance/2);
-    int index = row*columns+column;
+    int index=-1;
+    if (goForward) {
+      clicked_button = true;
+      int column = ((mouseX-X_offset)/column_width)-site_distance;
+      if (labeledbool)
+        column = (int)(((double)(mouseX-X_offset)/column_width)-(double)(site_distance+0.5));
+      int row = ((mouseY)/column_height)-(site_distance/2);
+      index = row*columns+column;
+      x_buttons.clear();
+      y_buttons.clear();
+    }
     if (clickedlabel) {
       index = clicked_box.get(clicked_box.size()-1); 
       while (clicked_box.size()>1) {
         clicked_box.remove(clicked_box.size()-1);
       }
-      System.out.println("8: "+ clicked_box.size());
-      x_buttons.clear();
-      y_buttons.clear();
+      clickedlabel=false;
     }
-    if (clicked_box.contains(index)) {
-      if (clicked_box.indexOf(index) == 0) {
-        clicked_box.clear();
-        System.out.println(3);
-        x_buttons.clear();
-        y_buttons.clear();
-      } else {
-        clicked_box.remove(2);
-        clicked_box.remove(1);
-      }
-    } else {
-      if (clicked_box.size()<3) {
-        switch(clicked_box.size()) {
-        case 0:
-          clicked_box.add(index);
-          break;
-        case 1:
-          Point origin = getCoordinatesForIndex(clicked_box.get(0));
-          Point newPoint = getCoordinatesForIndex(index);
-          Point newNewPoint = new Point();
-          boolean newnewIstAussen = false;
-          if (newPoint.equals(new Point()))
-            break;
-          if (newPoint.equals(new Point())) {
-            System.err.println("Second point is not valid");
-            break;
-          }
-          //Auf x daneben
-          if (newPoint.getX() ==  origin.getX()+1 && newPoint.getY() ==  origin.getY()) {
-            newNewPoint.setLocation(origin.getX()+2, origin.getY());
-            newnewIstAussen = true;
-          } else if (newPoint.getX() ==  origin.getX()+2 && newPoint.getY() ==  origin.getY()) {
-            newNewPoint.setLocation(origin.getX()+1, origin.getY());
-          } else if (newPoint.getX() ==  origin.getX()-1 && newPoint.getY() ==  origin.getY()) {
-            newNewPoint.setLocation(origin.getX()-2, origin.getY());  
-            newnewIstAussen = true;
-          } else if (newPoint.getX() ==  origin.getX()-2 && newPoint.getY() ==  origin.getY()) {
-            newNewPoint.setLocation(origin.getX()-1, origin.getY());
-
-            //Auf y daneben
-          } else if (newPoint.getY() ==  origin.getY()+1 && newPoint.getX() ==  origin.getX()) {
-            newNewPoint.setLocation(origin.getX(), origin.getY()+2);
-            newnewIstAussen = true;
-          } else if (newPoint.getY() ==  origin.getY()+2 && newPoint.getX() ==  origin.getX()) {
-            newNewPoint.setLocation(origin.getX(), origin.getY()+1);
-          } else if (newPoint.getY() ==  origin.getY()-1 && newPoint.getX() ==  origin.getX()) {
-            newNewPoint.setLocation(origin.getX(), origin.getY()-2);
-            newnewIstAussen = true;
-          } else if (newPoint.getY() ==  origin.getY()-2 && newPoint.getX() ==  origin.getX()) {
-            newNewPoint.setLocation(origin.getX(), origin.getY()-1);
-
-            //Diagonal positiv
-          } else if (newPoint.getY() ==  origin.getY()+1 && newPoint.getX() ==  origin.getX()+1) {
-            newNewPoint.setLocation(origin.getX()+2, origin.getY()+2);
-            newnewIstAussen = true;
-          } else if (newPoint.getY() ==  origin.getY()+2 && newPoint.getX() ==  origin.getX()+2) {
-            newNewPoint.setLocation(origin.getX()+1, origin.getY()+1);
-
-            //Diagonal negativ
-          } else if (newPoint.getY() ==  origin.getY()-1 && newPoint.getX() ==  origin.getX()-1) {
-            newNewPoint.setLocation(origin.getX()-2, origin.getY()-2);
-            newnewIstAussen = true;
-          } else if (newPoint.getY() ==  origin.getY()-2 && newPoint.getX() ==  origin.getX()-2) {
-            newNewPoint.setLocation(origin.getX()-1, origin.getY()-1);
-
-            //Diagonal positiv negativ
-          } else if (newPoint.getY() ==  origin.getY()+1 && newPoint.getX() ==  origin.getX()-1) {
-            newNewPoint.setLocation(origin.getX()-2, origin.getY()+2);
-            newnewIstAussen = true;
-          } else if (newPoint.getY() ==  origin.getY()+2 && newPoint.getX() ==  origin.getX()-2) {
-            newNewPoint.setLocation(origin.getX()-1, origin.getY()+1);
-
-            //Diagonal negativ positiv
-          } else if (newPoint.getY() ==  origin.getY()-1 && newPoint.getX() ==  origin.getX()+1) {
-            newNewPoint.setLocation(origin.getX()+2, origin.getY()-2);
-            newnewIstAussen = true;
-          } else if (newPoint.getY() ==  origin.getY()-2 && newPoint.getX() ==  origin.getX()+2) {
-            newNewPoint.setLocation(origin.getX()+1, origin.getY()-1);
-          } else {
-            clicked_box.clear();
-            clicked_box.add(getIndexForPoint(newPoint));
-            break;
-          }
-
-          if (newNewPoint.equals(new Point())) {
-            System.err.println("No valid third point");
-            break;
-          }
-          if (getIndexForPoint(newPoint) ==  -1 || getIndexForPoint(newNewPoint) ==  -1) {
-            break;
-          }
-          if (newnewIstAussen) {
-            clicked_box.add(getIndexForPoint(newPoint));
-            clicked_box.add(getIndexForPoint(newNewPoint));
-          } else {
-            clicked_box.add(getIndexForPoint(newNewPoint));
-            clicked_box.add(getIndexForPoint(newPoint));
-          }
+    if (index>=0) {
+      if (clicked_box.contains(index)) {
+        if (clicked_box.indexOf(index) == 0) {
+          clicked_box.clear();
+        } else {
+          clicked_box.remove(2);
+          clicked_box.remove(1);
         }
       } else {
-        clicked_box.clear();
-        clicked_box.add(index);
+        if (clicked_box.size()<3) {
+          switch(clicked_box.size()) {
+          case 0:
+            clicked_box.add(index);
+            break;
+          case 1:
+            Point origin = getCoordinatesForIndex(clicked_box.get(0));
+            Point newPoint = getCoordinatesForIndex(index);
+            Point newNewPoint = new Point();
+            boolean newnewIstAussen = false;
+            if (newPoint.equals(new Point()))
+              break;
+            if (newPoint.equals(new Point())) {
+              System.err.println("Second point is not valid");
+              break;
+            }
+            //Auf x daneben
+            if (newPoint.getX() ==  origin.getX()+1 && newPoint.getY() ==  origin.getY()) {
+              newNewPoint.setLocation(origin.getX()+2, origin.getY());
+              newnewIstAussen = true;
+            } else if (newPoint.getX() ==  origin.getX()+2 && newPoint.getY() ==  origin.getY()) {
+              newNewPoint.setLocation(origin.getX()+1, origin.getY());
+            } else if (newPoint.getX() ==  origin.getX()-1 && newPoint.getY() ==  origin.getY()) {
+              newNewPoint.setLocation(origin.getX()-2, origin.getY());  
+              newnewIstAussen = true;
+            } else if (newPoint.getX() ==  origin.getX()-2 && newPoint.getY() ==  origin.getY()) {
+              newNewPoint.setLocation(origin.getX()-1, origin.getY());
+
+              //Auf y daneben
+            } else if (newPoint.getY() ==  origin.getY()+1 && newPoint.getX() ==  origin.getX()) {
+              newNewPoint.setLocation(origin.getX(), origin.getY()+2);
+              newnewIstAussen = true;
+            } else if (newPoint.getY() ==  origin.getY()+2 && newPoint.getX() ==  origin.getX()) {
+              newNewPoint.setLocation(origin.getX(), origin.getY()+1);
+            } else if (newPoint.getY() ==  origin.getY()-1 && newPoint.getX() ==  origin.getX()) {
+              newNewPoint.setLocation(origin.getX(), origin.getY()-2);
+              newnewIstAussen = true;
+            } else if (newPoint.getY() ==  origin.getY()-2 && newPoint.getX() ==  origin.getX()) {
+              newNewPoint.setLocation(origin.getX(), origin.getY()-1);
+
+              //Diagonal positiv
+            } else if (newPoint.getY() ==  origin.getY()+1 && newPoint.getX() ==  origin.getX()+1) {
+              newNewPoint.setLocation(origin.getX()+2, origin.getY()+2);
+              newnewIstAussen = true;
+            } else if (newPoint.getY() ==  origin.getY()+2 && newPoint.getX() ==  origin.getX()+2) {
+              newNewPoint.setLocation(origin.getX()+1, origin.getY()+1);
+
+              //Diagonal negativ
+            } else if (newPoint.getY() ==  origin.getY()-1 && newPoint.getX() ==  origin.getX()-1) {
+              newNewPoint.setLocation(origin.getX()-2, origin.getY()-2);
+              newnewIstAussen = true;
+            } else if (newPoint.getY() ==  origin.getY()-2 && newPoint.getX() ==  origin.getX()-2) {
+              newNewPoint.setLocation(origin.getX()-1, origin.getY()-1);
+
+              //Diagonal positiv negativ
+            } else if (newPoint.getY() ==  origin.getY()+1 && newPoint.getX() ==  origin.getX()-1) {
+              newNewPoint.setLocation(origin.getX()-2, origin.getY()+2);
+              newnewIstAussen = true;
+            } else if (newPoint.getY() ==  origin.getY()+2 && newPoint.getX() ==  origin.getX()-2) {
+              newNewPoint.setLocation(origin.getX()-1, origin.getY()+1);
+
+              //Diagonal negativ positiv
+            } else if (newPoint.getY() ==  origin.getY()-1 && newPoint.getX() ==  origin.getX()+1) {
+              newNewPoint.setLocation(origin.getX()+2, origin.getY()-2);
+              newnewIstAussen = true;
+            } else if (newPoint.getY() ==  origin.getY()-2 && newPoint.getX() ==  origin.getX()+2) {
+              newNewPoint.setLocation(origin.getX()+1, origin.getY()-1);
+            } else {
+              clicked_box.clear();
+              clicked_box.add(getIndexForPoint(newPoint));
+              break;
+            }
+
+            if (newNewPoint.equals(new Point())) {
+              System.err.println("No valid third point");
+              break;
+            }
+            if (getIndexForPoint(newPoint) ==  -1 || getIndexForPoint(newNewPoint) ==  -1) {
+              break;
+            }
+            if (newnewIstAussen) {
+              clicked_box.add(getIndexForPoint(newPoint));
+              clicked_box.add(getIndexForPoint(newNewPoint));
+            } else {
+              clicked_box.add(getIndexForPoint(newNewPoint));
+              clicked_box.add(getIndexForPoint(newPoint));
+            }
+          }
+        } else {
+          clicked_box.clear();
+          clicked_box.add(index);
+        }
       }
+    } else {
+      clicked_box.clear();
     }
   }
   if (!clicked_button) {
     clicked_box.clear();
+    x_buttons.clear();
+    y_buttons.clear();
   }
 }
 
@@ -492,9 +530,13 @@ void draw() {
     abc = init_label_list(false);
     for (int i = 0; i<maxx; i++) {
       tc=#FFFFFF;
-      for(Integer clb: clicked_box){
-        if((getCoordinatesForIndex(clb).getX()-1==i)){
-          tc = #28B05C;
+      for (Integer clb : clicked_box) {
+        if ((getCoordinatesForIndex(clb).getX()-1==i)) {
+          if (clicked_box.size()==1) {
+            tc=pending_color;
+          } else {
+            tc=right_color;
+          }
         }
       }
       if (labeledbool) {
@@ -503,9 +545,12 @@ void draw() {
         x =  column_width*(i+site_distance)+X_offset;
       }
       if (label_init) {
-        xb.add(new button(x+column_width/3, column_height*(site_distance/4), column_width/3, column_height, abc.get(i)+"", tc, g.backgroundColor, ts));
+        xb.add(new button(x+column_width/4, column_height*(site_distance/4), column_width/2, column_height, abc.get(i)+"", tc, g.backgroundColor, ts));
       } else {
-        xb.get(i).update(x+column_width/3, column_height*(site_distance/4), column_width/3, column_height, abc.get(i)+"", ts, tc);
+        if (x_buttons.contains(xb.get(i))&&clicked_box.size()<1) {
+          tc=#28B05C;
+        }
+        xb.get(i).update(x+column_width/4, column_height*(site_distance/4), column_width/2, column_height, abc.get(i)+"", ts, tc);
       }
     }
     if (label_init) {
@@ -528,9 +573,13 @@ void draw() {
     } 
     for (int i = 0; i<maxy; i++) {
       tc=#FFFFFF;
-      for(Integer clb: clicked_box){
-        if((getCoordinatesForIndex(clb).getY()-1==i)){
-          tc = #28B05C;
+      for (Integer clb : clicked_box) {
+        if ((getCoordinatesForIndex(clb).getY()-1==i)) {
+          if (clicked_box.size()==1) {
+            tc=pending_color;
+          } else {
+            tc=right_color;
+          }
         }
       }
       if (labeledbool) {
@@ -539,9 +588,12 @@ void draw() {
         x = (int)(column_width*((double)(columns+0.2+site_distance))+X_offset);
       }
       if (label_init) {
-        yb.add(new button(x, column_height*(i+site_distance/2), column_width/3, column_height, abc.get(i)+"", tc, g.backgroundColor, ts));
+        yb.add(new button(x-column_width/8, column_height*(i+site_distance/2), column_width/2, column_height, abc.get(i)+"", tc, g.backgroundColor, ts));
       } else {
-        yb.get(i).update(x, column_height*(i+site_distance/2), column_width/3, column_height, abc.get(i)+"", ts, tc);
+        if (y_buttons.contains(yb.get(i))&&clicked_box.size()<1) {
+          tc=#28B05C;
+        }
+        yb.get(i).update(x-column_width/8, column_height*(i+site_distance/2), column_width/2, column_height, abc.get(i)+"", ts, tc);
       }
     }
     if (label_init) {
@@ -556,11 +608,11 @@ void draw() {
     }
     if (labeledint == 2) {
       if (labeledbool) {
-        text("y", column_width*(site_distance*0.963)+X_offset, column_height*(0+site_distance/2)+column_height/2); 
-        text("x", column_width*(0.5+site_distance)+X_offset+column_width/2, column_height*site_distance/2-column_height/1.1);
+        text("y", column_width*(site_distance*0.9)+X_offset, column_height*(0+site_distance/2)+column_height/2); 
+        text("x", column_width*(site_distance)+X_offset+column_width/2, column_height*site_distance/2-column_height/2);
       } else {
         text("y", column_width*(columns+site_distance+0.4)+X_offset+column_width/2.5, column_height*(0+site_distance/2)+column_height/2); 
-        text("x", column_width*(0+site_distance)+X_offset+column_width/2, column_height*site_distance/2-column_height/1.1);
+        text("x", column_width*(site_distance-0.5)+X_offset+column_width/2, column_height*site_distance/2-column_height/2);
       }
     }
 
@@ -611,7 +663,6 @@ public void reset_action(boolean b) {
     }
   }
   clicked_box.removeAll(clicked_box);
-  System.out.println(4);
   x_buttons.clear();
   y_buttons.clear();
   if (r != null) {
