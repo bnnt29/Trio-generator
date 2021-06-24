@@ -50,8 +50,10 @@ class button {
 
   public void drawMe() {
     fill(mc);
-    stroke(mc);
-    strokeWeight(0);
+    //stroke(mc);
+    //strokeWeight(0);
+    stroke(#FFFFFF);
+    strokeWeight(2);
     rect(x, y, w, h, roundboxes);
 
     textAlign(CENTER, CENTER);
@@ -116,12 +118,6 @@ class button {
   public void update(int x, int y, int w, int h, String text, float ts, color tc, color mc) {
     update(x, y, w, h, text, ts, tc);
     update(mc);
-  }
-  
-  public void update(int x, int y, int w, int h, String text, float ts) {
-    update(x, y, w, h);
-    this.text = text;
-    this.ts = ts;
   }
 
   public int getX() {
