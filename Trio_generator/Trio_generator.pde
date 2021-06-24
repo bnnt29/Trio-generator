@@ -817,7 +817,7 @@ public void initButtons(boolean init) {
   fh = (int)Math.round((float)column_height*1.3f);
   ts = (float)Math.floor(((float)((column_height+column_width)/2)*0.2f)*3.6);
   // System.out.println("10: "+r.getcurrent_random_numb()+", "+r.getthreadfin()+", "+((double)((int)(r.getprogress()*10))/10)+", "+r.getpossiblenumbs().size());
-  if (r.getthreadfin() && r.getcurrent_random_numb()>r.getmin() && r.getcurrent_random_numb()<r.getmax()) {
+  if (r.getcurrent_random_numb()>r.getmin() && r.getcurrent_random_numb()<r.getmax()) {
     if ((double)((int)(r.getprogress()*10))/10>99) {
       if (!r.getfound()) {
         tc = #000000;

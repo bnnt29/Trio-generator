@@ -62,6 +62,7 @@ class init_numbers {
       p = new possiblenumbs().set_init_numbers(this);
       t = new Thread(p);
       t.start();
+      start_numb();
     } else {
       for (int i = min; i<max; i++) {
         possible_numbs.add(i);
@@ -75,10 +76,122 @@ class init_numbers {
     current_random_numb = new_current_random_numb();
   }
 
+  public void start_numb() {
+    int index = (int)(Math.random()*rows*columns); 
+    String s = calculations_list[(int)(Math.random()*calculations_list.length)];
+    int direction = (int)(Math.random()*8);
+    double e=-1;
+    int one=random_numbs.get(index);
+    int sec=1;
+    int thi=1;
+    switch(direction) {
+    case 1:
+      if (index%rows<8) {
+        System.out.println(1);
+        sec = random_numbs.get(index+1);
+        thi = random_numbs.get(index+2);
+      } else {
+        start_numb();
+      }
+      break;
+    case 2:
+      if (index%rows<9 && index%columns<8) {
+        System.out.println(2);
+        sec = random_numbs.get(index+columns+1);
+        thi = random_numbs.get(index+columns*2+2);
+      } else {
+        start_numb();
+      }
+      break;
+    case 3:
+      if (index%columns<8) {
+        System.out.println(3);
+        sec = random_numbs.get(index+columns);
+        thi = random_numbs.get(index+columns*2);
+      } else {
+        start_numb();
+      }
+      break;
+    case 4:
+      if (index%rows>2 && index%columns<8) {
+        System.out.println(4);
+        sec = random_numbs.get(index+columns-1);
+        thi = random_numbs.get(index+columns*2-2);
+      } else {
+        start_numb();
+      }
+      break;
+    case 5:
+      if (index%rows>2) {
+        System.out.println(5);
+        sec = random_numbs.get(index-1);
+        thi = random_numbs.get(index-2);
+      } else {
+        start_numb();
+      }
+      break;
+    case 6:
+      if (index%rows>2 && index%columns>2) {
+        System.out.println(6);
+        sec = random_numbs.get(index-columns-1);
+        thi = random_numbs.get(index-columns*2-2);
+      } else {
+        start_numb();
+      }
+      break;
+    case 7:
+      if (index%columns>2) {
+        System.out.println(7);
+        sec = random_numbs.get(index-columns);
+        thi = random_numbs.get(index-columns*2);
+      } else {
+        start_numb();
+      }
+      break;
+    case 8:
+      if (index%rows>8 && index%columns>2) {
+        System.out.println(8);
+        sec = random_numbs.get(index-columns+1);
+        thi = random_numbs.get(index-columns*2+2);
+      } else {
+        start_numb();
+      }
+      break;
+    default:
+      if (index%rows<8) {
+        System.out.println(9);
+        sec = random_numbs.get(index+1);
+        thi = random_numbs.get(index+2);
+      } else {
+        start_numb();
+      }
+      break;
+    }
+    System.out.println("10: "+index+", "+one+", "+sec+", "+thi+", "+s);
+    if (s.charAt(0) == '/' && sec == 0) {
+      start_numb();
+    } else if (s.charAt(1) == '/' && thi == 0) {
+      start_numb();
+    }
+    try {
+      //never use eval if with user input
+      e = (double)(engine.eval(one + (s.charAt(0)+"") + sec + (s.charAt(1)+"") + thi)); 
+      if (e <= r.getmin() && e >= r.getmax()) {
+        e=-1;
+      }
+    }
+    catch(Exception q) {
+    }
+    System.out.println(e);
+    if (e>0) {
+      current_random_numb=(int)e;
+    }
+  }
+
   public int new_current_random_numb() {
     //new current random Number (unique)
     if (possible_numbs.size()>0) {
-      if (possible_numbs.contains(new Integer(current_random_numb))) possible_numbs.remove(new Integer(current_random_numb));
+      possible_numbs.remove(new Integer(current_random_numb));
       double i = Math.random() * (possible_numbs.size()-1);
       if (i<0) {
         if (possible_numbs.size() >= 1 && (possible_numbs.get(0)>min && possible_numbs.get(0)<max)) {
