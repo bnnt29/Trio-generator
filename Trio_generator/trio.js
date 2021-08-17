@@ -48,6 +48,7 @@ function setup() {
 }
 
 function gen_html_fields() {
+  let b;
   var win = window,
     doc = document,
     docElem = doc.documentElement,
@@ -55,175 +56,109 @@ function gen_html_fields() {
     x = win.innerWidth || docElem.clientWidth || body.clientWidth,
     y = win.innerHeight || docElem.clientHeight || body.clientHeight;
   console.log("1:" + rows);
+  let height = (100 / (rows * 1.1)) + "%";
+  let width = (100 / (columns * 1.1)) + "%";
   for (let i = 0; i < rows; i++) {
     //console.log("2:" + i + ", " + columns);
     let row = document.createElement("div");
     row.classList.add("row");
     row.id = "r" + i;
     row.style.justifyContent = "center";
+    row.style.height = height;
     for (let e = 0; e < columns; e++) {
       //console.log("3:" + e);
-      let b = document.createElement("button");
+      b = document.createElement("button");
       b.id = "r" + i + ",c" + e;
       b.onclick = function () { field_pressed(i, e) };
       b.innerHTML = i * e;
-      console.log(x / columns);
-      let height = (y / (rows * 1.1)) + "px";
-      let width = (x / (columns * 1.4)) + "px";
-      b.style.paddingLeft = 0;
-      b.style.paddingRight = 0;
-      if (height <= 0 || width <= 0) {
-        height = 0;
-        width = 0;
-        b.style.borderLeftWidth = 0;
-        b.style.borderRightWidth = 0;
-      }
-      b.style.minHeight = 0;
-      b.style.minWidth = 0;
-      b.style.whiteSpace = "nowrap";
-      b.style.overflow = "hidden";
-      b.style.height = height;
-      b.style.width = width;
-      b.style.backgroundColor = "#FFFFFF";
+      button_styles(b, height, width);
       row.appendChild(b);
     }
     document.getElementById("container").appendChild(row);
+    document.getElementById("container").style.height = y + "px";
   }
+  b = document.getElementById("current_rand");
+  button_styles(b, height, width);
+  b.style.width = "100%";
+  b.style.height = "100%";
+  b = document.getElementById("reroll_b");
+  button_styles(b, height, width);
+  b.style.width = "100%";
+  b.parentElement.style.height = "100%";
+}
+
+function button_styles(b, height, width) {
+  b.style.paddingLeft = 0;
+  b.style.paddingRight = 0;
+  if (height <= 0 || width <= 0) {
+    height = 0;
+    width = 0;
+    b.style.borderLeftWidth = 0;
+    b.style.borderRightWidth = 0;
+  }
+  b.style.fontSize = "90 vmin";
+  b.style.minHeight = 0;
+  b.style.minWidth = 0;
+  b.style.whiteSpace = "nowrap";
+  b.style.overflow = "hidden";
+  b.style.height = "100%";
+  b.style.width = width;
+  b.style.backgroundColor = "#FFFFFF";
+  b.style.borderRadius = "20%";
 }
 
 function field_pressed(i, e) {
   let b = document.getElementById("r" + i + ",c" + e);
-  console.log(i + ", " + e + ", " + b.style.backgroundColor);
-  b.style.backgroundColor = "#FF0000";
+  //console.log(i + ", " + e + ", " + b.style.backgroundColor);
+  //b.style.backgroundColor = "#FF0000";
+
+  let right = false;
+  let possibilities = calculations_list.length;
+  b.style.backgroundClip = "#FFFFFF";
+  if (clicked_box.contains("r" + i + ",c" + e)) {
+    if (clicked_box.size() == 3) {
+      let one = r.getrandomnumbs().get(clicked_box.get(0));
+      let sec = r.getrandomnumbs().get(clicked_box.get(1));
+      let thi = r.getrandomnumbs().get(clicked_box.get(2));
+      //(1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3)
+      if (r.getcurrent_random_numb() > 0) {
+        for (let o = 0; o < r.getcalculationlist().length; o++) {
+          let out = -1; let s = r.getcalculationlist()[o]; r.calculations.add(s);
+          if (s.charAt(0) == '/' && sec == 0 || s.charAt(1) == '/' && thi == 0) { continue; }
+          //never use eval if with user input
+          out = (eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi));
+          if (out == r.getcurrent_random_numb()) { fill(right_color); right = true; } else { fill(wrong_color); }
+          text((one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi), xcord, (y_mult * o) + y_add);
+        }
+      } if (right) { fill(right_color); } else { fill(wrong_color); }
+    } else { fill(pending_color); }
+  }
+  let x = 0;
+  if (labeledbool) { x = column_width / 2; } else { x = 0; }
+  let rand = 1;
+  rect(column_width * (e + site_distance) + X_offset + x + rand, column_height * (i + site_distance / 2) + rand, column_width - rand, column_height - rand, roundboxes);
+  if (clicked_box.size() > 0 && clicked_box.size() < 2) { if (clicked_box.get(0) == i * columns + e) { fill("#FFFFFF"); } else { fill(0, 0, 0); } } else { fill(0, 0, 0); }
+  textAlign(CENTER, CENTER);
+  textSize(Math.floor(((column_width + column_height) / 2) * 0.5));
+  text(r.getrandomnumbs().get(i * columns + e) + "", column_width * (e + site_distance) + X_offset + column_width / 2 + x, column_height * (i + site_distance / 2) + column_height / 2);
 }
 
-function mousePressed() {
-  //disselect selected boxes
-  let clicked_button = false;
-
-  // if(!minimalistic){
-  // //rem row
-  // if(rows>min_columns){if(buttons.get(1).isPushed()){rows-=1;reset_action(true);labelbuttons.clear();label_init=true;}}
-
-  // //add row
-  // if(rows<max_columns){if(buttons.get(2).isPushed()){rows+=1;reset_action(true);labelbuttons.clear();label_init=true;}}
-
-  // //rem column
-  // if(columns>min_columns){if(buttons.get(3).isPushed()){columns-=1;reset_action(true);labelbuttons.clear();label_init=true;}}
-
-  // //add column
-  // if(columns<max_columns){if(buttons.get(4).isPushed()){columns+=1;reset_action(true);labelbuttons.clear();label_init=true;}}
-
-  // //reset_button
-  // if(buttons.get(5).isPushed()){if(rows!=10||columns!=10){rows=10;columns=10;reset_action(true);}reset_action(false);labelbuttons.clear();label_init=true;}
-
-  // //label
-  // if(buttons.get(8).isPushed()){clicked_button=true;switch(labeledint){case 0:labeledint=1;break;case 1:labeledint=2;break;case 2:labeledbool=!labeledbool;labeledint=0;break;default:labeledint=0;break;}}
-
-  // //reroll-button
-  // if(buttons.get(6).isPushed()){r.rerand();x_buttons.clear();y_buttons.clear();}
-
-  // //seed-button
-  // if(buttons.get(9).isPushed()){let myString=r.getSeed()+"";StringSelection stringSelection=new StringSelection(myString);Clipboard clipboard=Toolkit.getDefaultToolkit().getSystemClipboard();clipboard.setContents(stringSelection,null);System.out.println("SEED: "+r.getSeed());seed_green_fade=0;clicked_button=true;}}else{
-  // //reroll-field
-  // if(buttons.get(7).isPushed()){r.rerand();}}
-
-  // //minimalistic
-  // if(buttons.get(10).isPushed()){minimalistic=!minimalistic;buttons.get(0).set_lastPressed(System.currentTimeMillis()+5);clicked_button=true;}
-
-  // //labels-buttons
-  // boolean clickedlabel=false;if(labelbuttons.size()>1){let xkord;let ykord;for(button xb:labelbuttons.get(0)){if(xb.isPushed()){if(!x_buttons.remove(xb)){if(clicked_box.size()<1&&x_buttons.size()>0){x_buttons.clear();}x_buttons.add(xb);clicked_button=true;}}}for(button yb:labelbuttons.get(1)){if(yb.isPushed()){if(!y_buttons.remove(yb)){if(clicked_box.size()<1&&y_buttons.size()>0){y_buttons.clear();}y_buttons.add(yb);clicked_button=true;}}}if((!x_buttons.isEmpty())&&(!y_buttons.isEmpty())){xkord=labelbuttons.get(0).indexOf(x_buttons.get(x_buttons.size()-1))+1;ykord=labelbuttons.get(1).indexOf(y_buttons.get(y_buttons.size()-1))+1;Polet p=new Point();p.setLocation(xkord,ykord);let index=getIndexForPoint(p);if(clicked_box.size()!=1){clicked_box.clear();}clicked_box.add(index);clickedlabel=true;x_buttons.clear();y_buttons.clear();}else if(x_buttons.size()>0){if(clicked_box.size()==1){xkord=labelbuttons.get(0).indexOf(x_buttons.get(x_buttons.size()-1))+1;ykord=  getCoordinatesForIndex(clicked_box.get(0)).getY();Polet p=new Point();p.setLocation(xkord,ykord);let index=getIndexForPoint(p);clicked_box.add(index);clickedlabel=true;x_buttons.clear();y_buttons.clear();}}else if(y_buttons.size()>0){if(clicked_box.size()==1){xkord=  getCoordinatesForIndex(clicked_box.get(0)).getX();ykord=labelbuttons.get(1).indexOf(y_buttons.get(y_buttons.size()-1))+1;Polet p=new Point();p.setLocation(xkord,ykord);let index=getIndexForPoint(p);clicked_box.add(index);clickedlabel=true;x_buttons.clear();y_buttons.clear();}}}
-
-  // //clickable boxes
-  // boolean goForward=(mouseX>=column_width*(site_distance)+X_offset&&mouseX<=column_width*(columns+site_distance)+X_offset&&mouseY>=column_height*(site_distance/2)&&mouseY<=column_height*(rows+site_distance/2)+column_height);if(labeledbool)goForward=(mouseX>=column_width*(site_distance+0.5)+X_offset&&mouseX<=column_width*(columns+site_distance+0.5)+X_offset&&mouseY>=column_height*(site_distance/2)&&mouseY<=column_height*(rows+site_distance/2)+column_height);if(goForward||clicked_box.size()>1){let index=-1;if(goForward){clicked_button=true;let column=((mouseX-X_offset)/column_width)-site_distance;if(labeledbool)column=  (((let )(mouseX-X_offset)/column_width)-(let )(site_distance+0.5));let row=((mouseY)/column_height)-(site_distance/2);index=row*columns+column;x_buttons.clear();y_buttons.clear();}if(clickedlabel){index=clicked_box.get(clicked_box.size()-1);while(clicked_box.size()>1){clicked_box.remove(clicked_box.size()-1);}clickedlabel=false;}if(index>=0){if(clicked_box.contains(index)){if(clicked_box.indexOf(index)==0){clicked_box.clear();}else{clicked_box.remove(2);clicked_box.remove(1);}}else{if(clicked_box.size()<3){switch(clicked_box.size()){case 0:clicked_box.add(index);break;case 1:Polet origin=getCoordinatesForIndex(clicked_box.get(0));Polet newPoint=getCoordinatesForIndex(index);Polet newNewPoint=new Point();boolean newnewIstAussen=false;if(newPoint.equals(new Point()))break;if(newPoint.equals(new Point())){System.err.println("Second polet is not valid");break;}
-  // //Auf x daneben
-  // if(newPoint.getX()==origin.getX()+1&&newPoint.getY()==origin.getY()){newNewPoint.setLocation(origin.getX()+2,origin.getY());newnewIstAussen=true;}else if(newPoint.getX()==origin.getX()+2&&newPoint.getY()==origin.getY()){newNewPoint.setLocation(origin.getX()+1,origin.getY());}else if(newPoint.getX()==origin.getX()-1&&newPoint.getY()==origin.getY()){newNewPoint.setLocation(origin.getX()-2,origin.getY());newnewIstAussen=true;}else if(newPoint.getX()==origin.getX()-2&&newPoint.getY()==origin.getY()){newNewPoint.setLocation(origin.getX()-1,origin.getY());
-
-  // //Auf y daneben
-  // }else if(newPoint.getY()==origin.getY()+1&&newPoint.getX()==origin.getX()){newNewPoint.setLocation(origin.getX(),origin.getY()+2);newnewIstAussen=true;}else if(newPoint.getY()==origin.getY()+2&&newPoint.getX()==origin.getX()){newNewPoint.setLocation(origin.getX(),origin.getY()+1);}else if(newPoint.getY()==origin.getY()-1&&newPoint.getX()==origin.getX()){newNewPoint.setLocation(origin.getX(),origin.getY()-2);newnewIstAussen=true;}else if(newPoint.getY()==origin.getY()-2&&newPoint.getX()==origin.getX()){newNewPoint.setLocation(origin.getX(),origin.getY()-1);
-
-  // //Diagonal positiv
-  // }else if(newPoint.getY()==origin.getY()+1&&newPoint.getX()==origin.getX()+1){newNewPoint.setLocation(origin.getX()+2,origin.getY()+2);newnewIstAussen=true;}else if(newPoint.getY()==origin.getY()+2&&newPoint.getX()==origin.getX()+2){newNewPoint.setLocation(origin.getX()+1,origin.getY()+1);
-
-  // //Diagonal negativ
-  // }else if(newPoint.getY()==origin.getY()-1&&newPoint.getX()==origin.getX()-1){newNewPoint.setLocation(origin.getX()-2,origin.getY()-2);newnewIstAussen=true;}else if(newPoint.getY()==origin.getY()-2&&newPoint.getX()==origin.getX()-2){newNewPoint.setLocation(origin.getX()-1,origin.getY()-1);
-
-  // //Diagonal positiv negativ
-  // }else if(newPoint.getY()==origin.getY()+1&&newPoint.getX()==origin.getX()-1){newNewPoint.setLocation(origin.getX()-2,origin.getY()+2);newnewIstAussen=true;}else if(newPoint.getY()==origin.getY()+2&&newPoint.getX()==origin.getX()-2){newNewPoint.setLocation(origin.getX()-1,origin.getY()+1);
-
-  // //Diagonal negativ positiv
-  // }else if(newPoint.getY()==origin.getY()-1&&newPoint.getX()==origin.getX()+1){newNewPoint.setLocation(origin.getX()+2,origin.getY()-2);newnewIstAussen=true;}else if(newPoint.getY()==origin.getY()-2&&newPoint.getX()==origin.getX()+2){newNewPoint.setLocation(origin.getX()+1,origin.getY()-1);}else{clicked_box.clear();clicked_box.add(getIndexForPoint(newPoint));break;}
-
-  // if(newNewPoint.equals(new Point())){System.err.println("No valid third point");break;}if(getIndexForPoint(newPoint)==-1||getIndexForPoint(newNewPoint)==-1){break;}if(newnewIstAussen){clicked_box.add(getIndexForPoint(newPoint));clicked_box.add(getIndexForPoint(newNewPoint));}else{clicked_box.add(getIndexForPoint(newNewPoint));clicked_box.add(getIndexForPoint(newPoint));}}}else{clicked_box.clear();clicked_box.add(index);}}}else{clicked_box.clear();}}if(!clicked_button){clicked_box.clear();x_buttons.clear();y_buttons.clear();}}
-
-  // Polet getCoordinatesForIndex(i){Polet result=new Point();index=i+1;let x=  (index-(Math.floor(  index/  columns)*columns));let y=  (Math.floor(  index/columns))+1;result.setLocation(x,y);if(x<1||x>(columns)||y<1||y>(rows))if(result.getX()==0){result.setLocation(columns,result.getY()-1);}if(result.getX()<1||result.getX()>(columns)||result.getY()<1||result.getY()>(rows)){System.err.println("Polet not existent");return new Point();}return result;}
-
-  // let getIndexForPoint(Polet p){if(p.getX()<1||p.getX()>columns||p.getY()<1||p.getY()>rows)return-1;let result=  (p.getX()-1+columns*(p.getY()-1));return result;}
-
-}
 function draw() {
   if (draw <= 0) {
-    clear();
-    background(50, 50, 50);
-    fill(255, 255, 255);
-    //grid setup
-    column_height = height / (rows + site_distance); X_offset = 0; column_width = width / (columns + site_distance * 2);
     if (!buttons_init) {
       buttons_init = true;
       initButtons(buttons_init);
     }
     initButtons(false);
-    //grid
-    for (let i = 0; i < rows; i++) {
-      for (let e = 0; e < columns; e++) {
-        let right = false;
-        let possibilities = r.calculations_list.length;
-        fill("#FFFFFF");
-        if (clicked_box.contains(i * columns + e)) {
-          textSize(Math.floor(((((Math.abs(buttons.get(5).getX() - (buttons.get(0).getX() + buttons.get(0).getX()))) / possibilities + (site_distance * column_width * 2)) / 11) * 0.5)));//textSize(  Math.floor(  ((h/2+(w*2))/2)*0.2f));
-          if (clicked_box.size() == 3) {
-            let xcord = 0;
-            let y_add = 0;
-            let y_mult = 0;
-            if (minimalistic) {
-              let ref_one = buttons.get(7); xcord = column_width * 1.3 - column_width / 1.2 + X_offset / 2 + column_width / 2; y_add = ((ref_one.getY() + ref_one.getH()) + (((column_height + column_width) / 2) * (site_distance - 1.7))); y_mult = (((height - column_height) - (ref_one.getY() + ref_one.getH())) / possibilities + 5) * 1.0; textSize(Math.floor(((((Math.abs((height - column_height) - (ref_one.getX() + ref_one.getX()))) / 8 + (site_distance * column_width * 2)) / 11) * 0.8)));//textSize(  Math.floor(  ((h/2+(w*2))/2)*0.2f));
-            } else {
-              let ref_one = buttons.get(6); let ref_sec = buttons.get(5); xcord = column_width * 1.3 - column_width / 1.2 + X_offset / 2 + column_width / 2; y_add = ((ref_one.getY() + ref_one.getH()) + (((column_height + column_width) / 2) * (site_distance - 1.7))); y_mult = ((ref_sec.getY() - (ref_one.getY() + ref_one.getH())) / (possibilities + 7)) * 1.5; textSize(Math.floor(((((Math.abs(ref_sec.getX() - (ref_one.getX() + ref_one.getX()))) / 8 + (site_distance * column_width * 2)) / 11) * 0.8)));//textSize(  Math.floor(  ((h/2+(w*2))/2)*0.2f));
-            }
-            let one = r.getrandomnumbs().get(clicked_box.get(0));
-            let sec = r.getrandomnumbs().get(clicked_box.get(1));
-            let thi = r.getrandomnumbs().get(clicked_box.get(2));
-            //(1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3)
-            if (r.getcurrent_random_numb() > 0) {
-              for (let o = 0; o < r.getcalculationlist().length; o++) {
-                let out = -1; let s = r.getcalculationlist()[o]; r.calculations.add(s);
-                if (s.charAt(0) == '/' && sec == 0 || s.charAt(1) == '/' && thi == 0) { continue; }
-                //never use eval if with user input
-                out = (eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi));
-                if (out == r.getcurrent_random_numb()) { fill(right_color); right = true; } else { fill(wrong_color); }
-                text((one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi), xcord, (y_mult * o) + y_add);
-              }
-            } if (right) { fill(right_color); } else { fill(wrong_color); }
-          } else { fill(pending_color); }
-        } let x = 0; if (labeledbool) { x = column_width / 2; } else { x = 0; }
-        let rand = 1;
-        rect(column_width * (e + site_distance) + X_offset + x + rand, column_height * (i + site_distance / 2) + rand, column_width - rand, column_height - rand, roundboxes);
-        if (clicked_box.size() > 0 && clicked_box.size() < 2) { if (clicked_box.get(0) == i * columns + e) { fill("#FFFFFF"); } else { fill(0, 0, 0); } } else { fill(0, 0, 0); }
-        textAlign(CENTER, CENTER);
-        textSize(Math.floor(((column_width + column_height) / 2) * 0.5));
-        text(r.getrandomnumbs().get(i * columns + e) + "", column_width * (e + site_distance) + X_offset + column_width / 2 + x, column_height * (i + site_distance / 2) + column_height / 2);
-      }
-    }
 
     //row+column numbers
 
-    fill("#FFFFFF"); let ts = 0;
-    if (minimalistic) { ts = Math.floor(((column_height + column_width) / 2) * 0.6); } else { ts = Math.floor(((column_height + column_width) / 2) * 0.4); }
     let abc = [];
     let x = 0;
     let tc;
     //x-buttons
-    let maxx = 0; let xb;
+    let maxx = 0;
+    let xb;
     if (labelbuttons.size() > 0) { xb = labelbuttons.get(0); maxx = xb.size(); } else { xb = []; maxx = columns; }
     abc = init_label_list(false);
     for (let i = 0; i < maxx; i++) {
@@ -332,150 +267,150 @@ function initpregen() { if (r2 == null || r2 == r) { r2 = new init_numbers(0); r
 
 
 
-var x;
-var y;
-var w;
-var h;
-var text = "";
-var mc = "#FFFFFF";
-var tc = "#000000";//tc = textColor, mc = MainColor
-var ts = -1;
-var lastPressed;
-var DELAY_TIME = 150;
-var tf; // tf = textFont
+// var x;
+// var y;
+// var w;
+// var h;
+// var text = "";
+// var mc = "#FFFFFF";
+// var tc = "#000000";//tc = textColor, mc = MainColor
+// var ts = -1;
+// var lastPressed;
+// var DELAY_TIME = 150;
+// var tf; // tf = textFont
 
-function button(x, y, w, h) {
-  this.x = x;
-  this.y = y;
-  this.w = w;
-  this.h = h;
-}
+// function button(x, y, w, h) {
+//   this.x = x;
+//   this.y = y;
+//   this.w = w;
+//   this.h = h;
+// }
 
-function button(x, y, w, h, text) {
-  this(x, y, w, h);
-  this.text = text;
-}
+// function button(x, y, w, h, text) {
+//   this(x, y, w, h);
+//   this.text = text;
+// }
 
-function button(x, y, w, h, ts) {
-  this(x, y, w, h);
-  this.ts = ts;
-}
+// function button(x, y, w, h, ts) {
+//   this(x, y, w, h);
+//   this.ts = ts;
+// }
 
-function button(x, y, w, h, text, tc, mc) {
-  this(x, y, w, h, text);
-  this.tc = tc;
-  this.mc = mc;
-}
+// function button(x, y, w, h, text, tc, mc) {
+//   this(x, y, w, h, text);
+//   this.tc = tc;
+//   this.mc = mc;
+// }
 
-function button(x, y, w, h, text, tc, mc, tf) {
-  this(x, y, w, h, text, tc, mc);
-  this.tf = tf;
-}
+// function button(x, y, w, h, text, tc, mc, tf) {
+//   this(x, y, w, h, text, tc, mc);
+//   this.tf = tf;
+// }
 
-function button(x, y, w, h, text, mc) {
-  this(x, y, w, h, text);
-  this.mc = mc;
-}
+// function button(x, y, w, h, text, mc) {
+//   this(x, y, w, h, text);
+//   this.mc = mc;
+// }
 
-function button(x, y, w, h, text, tc, mc, ts) {
-  this(x, y, w, h, text, tc, mc);
-  this.ts = ts;
-}
+// function button(x, y, w, h, text, tc, mc, ts) {
+//   this(x, y, w, h, text, tc, mc);
+//   this.ts = ts;
+// }
 
-function drawMe() {
-  fill(mc);
-  stroke(g.backgroundColor);
-  strokeWeight(0);
-  // stroke("#FFFFFF");
-  // strokeWeight(0);
-  rect(x, y, w, h, roundboxes);
+// function drawMe() {
+//   fill(mc);
+//   stroke(g.backgroundColor);
+//   strokeWeight(0);
+//   // stroke("#FFFFFF");
+//   // strokeWeight(0);
+//   rect(x, y, w, h, roundboxes);
 
-  textAlign(CENTER, CENTER);
+//   textAlign(CENTER, CENTER);
 
-  if (tf == null)
-    textFont(createFont("Lucida Sans Typewriter", 20));
-  else {
-    textFont(tf);
-  }
+//   if (tf == null)
+//     textFont(createFont("Lucida Sans Typewriter", 20));
+//   else {
+//     textFont(tf);
+//   }
 
-  if (ts == -1)
-    textSize(Math.floor(((h / 2 + (w * 2)) / 2) * 0.2));
-  else
-    textSize(ts);
+//   if (ts == -1)
+//     textSize(Math.floor(((h / 2 + (w * 2)) / 2) * 0.2));
+//   else
+//     textSize(ts);
 
-  fill(tc);
-  stroke(tc);
-  strokeWeight(0);
+//   fill(tc);
+//   stroke(tc);
+//   strokeWeight(0);
 
-  text(text, x + w / 2, y + h / 2);
-}
+//   text(text, x + w / 2, y + h / 2);
+// }
 
-function isPushed() {
-  if (mousePressed && (lastPressed + DELAY_TIME) < System.currentTimeMillis() && mouseX > x && mouseX < (x + w)
-    && mouseY > y && mouseY < (y + h)) {
-    lastPressed = System.currentTimeMillis();
-    return true;
-  }
-  return false;
-}
+// function isPushed() {
+//   if (mousePressed && (lastPressed + DELAY_TIME) < System.currentTimeMillis() && mouseX > x && mouseX < (x + w)
+//     && mouseY > y && mouseY < (y + h)) {
+//     lastPressed = System.currentTimeMillis();
+//     return true;
+//   }
+//   return false;
+// }
 
-function update(mc) {
-  this.mc = mc;
-}
+// function update(mc) {
+//   this.mc = mc;
+// }
 
-function update(x, y, w, h) {
-  this.x = x;
-  this.y = y;
-  this.w = w;
-  this.h = h;
-}
+// function update(x, y, w, h) {
+//   this.x = x;
+//   this.y = y;
+//   this.w = w;
+//   this.h = h;
+// }
 
-function update(x, y, w, h, tc, mc) {
-  update(x, y, w, h, mc);
-  this.tc = tc;
-}
+// function update(x, y, w, h, tc, mc) {
+//   update(x, y, w, h, mc);
+//   this.tc = tc;
+// }
 
-function update(x, y, w, h, tc, text, mc) {
-  update(x, y, w, h, tc, mc);
-  this.text = text;
-}
+// function update(x, y, w, h, tc, text, mc) {
+//   update(x, y, w, h, tc, mc);
+//   this.text = text;
+// }
 
-function update(x, y, w, h, mc) {
-  update(x, y, w, h);
-  update(mc);
-}
+// function update(x, y, w, h, mc) {
+//   update(x, y, w, h);
+//   update(mc);
+// }
 
-function update(x, y, w, h, text, ts, tc) {
-  update(x, y, w, h);
-  this.text = text;
-  this.ts = ts;
-  this.tc = tc;
-}
+// function update(x, y, w, h, text, ts, tc) {
+//   update(x, y, w, h);
+//   this.text = text;
+//   this.ts = ts;
+//   this.tc = tc;
+// }
 
-function update(x, y, w, h, text, ts, tc, mc) {
-  update(x, y, w, h, text, ts, tc);
-  update(mc);
-}
+// function update(x, y, w, h, text, ts, tc, mc) {
+//   update(x, y, w, h, text, ts, tc);
+//   update(mc);
+// }
 
-function getX() {
-  return x;
-}
+// function getX() {
+//   return x;
+// }
 
-function getY() {
-  return y;
-}
+// function getY() {
+//   return y;
+// }
 
-function getW() {
-  return w;
-}
+// function getW() {
+//   return w;
+// }
 
-function getH() {
-  return h;
-}
+// function getH() {
+//   return h;
+// }
 
-function set_lastPressed(lastPressed) {
-  this.lastPressed = lastPressed;
-}
+// function set_lastPressed(lastPressed) {
+//   this.lastPressed = lastPressed;
+// }
 
 var t;
 var p;
