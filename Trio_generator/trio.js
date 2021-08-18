@@ -21,7 +21,7 @@ var r2;
 //colors
 var right_color = "#00FF00";
 var wrong_color = "#FF0000";
-var pending_color = "#0000F";
+var pending_color = "#0000FF";
 var seed_green_fade = 255;
 
 //numbers
@@ -80,7 +80,7 @@ function gen_html_fields() {
   b = document.getElementById("current_rand");
   button_styles(b, height, width);
   b.style.width = "100%";
-  b.style.height = (100 / (rows * 1.1)) + "%";
+  b.style.height = height;
   b = document.getElementById("reroll_b");
   button_styles(b, height, width);
   b.style.width = "100%";
@@ -115,34 +115,38 @@ function field_pressed(i, e) {
   //b.style.backgroundColor = "#FF0000";
 
   let right = false;
-  let possibilities = calculations_list.length;
-  b.style.backgroundClip = "#FFFFFF";
-  if (clicked_box.contains("r" + i + ",c" + e)) {
-    if (clicked_box.size() == 3) {
-      let one = r.getrandomnumbs().get(clicked_box.get(0));
-      let sec = r.getrandomnumbs().get(clicked_box.get(1));
-      let thi = r.getrandomnumbs().get(clicked_box.get(2));
+  let possibilities = calculations_list;
+  b.style.backgroundColor = "#FFFFFF";
+  if (!clicked_box.includes("r" + i + ",c" + e)) {
+    clicked_box = [...clicked_box, "r" + i + ",c" + e];
+    if (clicked_box.length == 3) {
+      // let one = r.getrandomnumbs().get(clicked_box.get(0));
+      // let sec = r.getrandomnumbs().get(clicked_box.get(1));
+      // let thi = r.getrandomnumbs().get(clicked_box.get(2));
       //(1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3)
-      if (r.getcurrent_random_numb() > 0) {
-        for (let o = 0; o < r.getcalculationlist().length; o++) {
-          let out = -1; let s = r.getcalculationlist()[o]; r.calculations.add(s);
+      if (1 > 0) {
+        for (let o = 0; o < possibilities.length; o++) {
+          let out = -1; let s = possibilities[o]; calculations = [...calculations, s];
           if (s.charAt(0) == '/' && sec == 0 || s.charAt(1) == '/' && thi == 0) { continue; }
           //never use eval if with user input
           out = (eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi));
-          if (out == r.getcurrent_random_numb()) { fill(right_color); right = true; } else { fill(wrong_color); }
-          text((one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi), xcord, (y_mult * o) + y_add);
+          if (out == 1) { b.style.backgroundColor = right_color; right = true; } else { b.style.backgroundColor = wrong_color; }
+          //text((one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi), xcord, (y_mult * o) + y_add);
         }
-      } if (right) { fill(right_color); } else { fill(wrong_color); }
-    } else { fill(pending_color); }
+      } if (right) { b.style.backgroundColor = right_color; } else { b.style.backgroundColor = wrong_color; }
+    } else { b.style.backgroundColor = pending_color; }
+  } else {
+    clicked_box.splice(clicked_box.indexOf("r" + i + ",c" + e), clicked_box.indexOf("r" + i + ",c" + e) + 1);
+    b.style.backgroundColor = pending_color;
   }
-  let x = 0;
-  if (labeledbool) { x = column_width / 2; } else { x = 0; }
-  let rand = 1;
-  rect(column_width * (e + site_distance) + X_offset + x + rand, column_height * (i + site_distance / 2) + rand, column_width - rand, column_height - rand, roundboxes);
-  if (clicked_box.size() > 0 && clicked_box.size() < 2) { if (clicked_box.get(0) == i * columns + e) { fill("#FFFFFF"); } else { fill(0, 0, 0); } } else { fill(0, 0, 0); }
-  textAlign(CENTER, CENTER);
-  textSize(Math.floor(((column_width + column_height) / 2) * 0.5));
-  text(r.getrandomnumbs().get(i * columns + e) + "", column_width * (e + site_distance) + X_offset + column_width / 2 + x, column_height * (i + site_distance / 2) + column_height / 2);
+  // let x = 0;
+  // if (labeledbool) { x = column_width / 2; } else { x = 0; }
+  // let rand = 1;
+  // rect(column_width * (e + site_distance) + X_offset + x + rand, column_height * (i + site_distance / 2) + rand, column_width - rand, column_height - rand, roundboxes);
+  // if (clicked_box.size() > 0 && clicked_box.size() < 2) { if (clicked_box.get(0) == i * columns + e) { fill("#FFFFFF"); } else { fill(0, 0, 0); } } else { fill(0, 0, 0); }
+  // textAlign(CENTER, CENTER);
+  // textSize(Math.floor(((column_width + column_height) / 2) * 0.5));
+  // text(r.getrandomnumbs().get(i * columns + e) + "", column_width * (e + site_distance) + X_offset + column_width / 2 + x, column_height * (i + site_distance / 2) + column_height / 2);
 }
 
 function draw() {
