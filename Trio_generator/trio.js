@@ -80,11 +80,13 @@ function gen_html_fields() {
   b = document.getElementById("current_rand");
   button_styles(b, height, width);
   b.style.width = "100%";
-  b.style.height = "100%";
+  b.style.height = (100 / (rows * 1.1)) + "%";
   b = document.getElementById("reroll_b");
   button_styles(b, height, width);
   b.style.width = "100%";
-  b.parentElement.style.height = "100%";
+  b.style.height = (100 / (rows * 1.1)) / 3 + "%";
+  b.style.marginTop = "1rem";
+  document.getElementById("buts_container").style.minHeight = "5rem";
 }
 
 function button_styles(b, height, width) {
