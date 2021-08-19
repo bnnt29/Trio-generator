@@ -27,6 +27,8 @@ var seed_green_fade = 255;
 //numbers
 var extreme_calc = true;
 var clicked_box = [];
+var possible_box = [];
+var box = [];
 //seed
 var Hex_r_seed = "0000";
 
@@ -44,6 +46,7 @@ var buttons_init = false;
 
 //function setup(){r=new init_numbers(Integer.parseInt(Hex_r_seed,16));r.rand();fullScreen();}
 function setup() {
+  rand();
   gen_html_fields();
 }
 
@@ -69,6 +72,8 @@ function gen_html_fields() {
       //console.log("3:" + e);
       b = document.createElement("button");
       b.id = "r" + i + ",c" + e;
+      box = [...box, "r" + i + ",c" + e];
+      b.setAttribute("value", i * e);
       b.onclick = function () { field_pressed(i, e) };
       b.innerHTML = i * e;
       button_styles(b, height, width);
@@ -120,9 +125,9 @@ function field_pressed(i, e) {
   if (!clicked_box.includes("r" + i + ",c" + e)) {
     clicked_box = [...clicked_box, "r" + i + ",c" + e];
     if (clicked_box.length == 3) {
-      // let one = r.getrandomnumbs().get(clicked_box.get(0));
-      // let sec = r.getrandomnumbs().get(clicked_box.get(1));
-      // let thi = r.getrandomnumbs().get(clicked_box.get(2));
+      let one = document.getElementById(clicked_box[0]).getAttribute("value");
+      let sec = document.getElementById(clicked_box[1]).getAttribute("value");
+      let thi = document.getElementById(clicked_box[2]).getAttribute("value");
       //(1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3)
       if (1 > 0) {
         for (let o = 0; o < possibilities.length; o++) {
@@ -130,22 +135,15 @@ function field_pressed(i, e) {
           if (s.charAt(0) == '/' && sec == 0 || s.charAt(1) == '/' && thi == 0) { continue; }
           //never use eval if with user input
           out = (eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi));
-          if (out == 1) { b.style.backgroundColor = right_color; right = true; } else { b.style.backgroundColor = wrong_color; }
-          //text((one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi), xcord, (y_mult * o) + y_add);
+          if (out == 1) { clicked_box.forEach((data) => { document.getElementById(data).style.backgroundColor = right_color; }); right = true; } else { clicked_box.forEach((data) => { document.getElementById(data).style.backgroundColor = wrong_color; }); right = false; }
         }
       } if (right) { b.style.backgroundColor = right_color; } else { b.style.backgroundColor = wrong_color; }
     } else { b.style.backgroundColor = pending_color; }
   } else {
     clicked_box.splice(clicked_box.indexOf("r" + i + ",c" + e), clicked_box.indexOf("r" + i + ",c" + e) + 1);
-    b.style.backgroundColor = pending_color;
+    b.style.backgroundColor = "#FFFFFF";
+    clicked_box.forEach((data) => { document.getElementById(data).style.backgroundColor = pending_color; });
   }
-  // let x = 0;
-  // if (labeledbool) { x = column_width / 2; } else { x = 0; }
-  // let rand = 1;
-  // rect(column_width * (e + site_distance) + X_offset + x + rand, column_height * (i + site_distance / 2) + rand, column_width - rand, column_height - rand, roundboxes);
-  // if (clicked_box.size() > 0 && clicked_box.size() < 2) { if (clicked_box.get(0) == i * columns + e) { fill("#FFFFFF"); } else { fill(0, 0, 0); } } else { fill(0, 0, 0); }
-  // textAlign(CENTER, CENTER);
-  // textSize(Math.floor(((column_width + column_height) / 2) * 0.5));
   // text(r.getrandomnumbs().get(i * columns + e) + "", column_width * (e + site_distance) + X_offset + column_width / 2 + x, column_height * (i + site_distance / 2) + column_height / 2);
 }
 
@@ -213,210 +211,6 @@ function initpregen() { if (r2 == null || r2 == r) { r2 = new init_numbers(0); r
  9.seed
  10.minimalistic
  */
-// function initButtons(init) {
-//   let fx = 0; 
-//   let fy = 0; 
-//   let fw = 0; 
-//   let fh = 0; 
-//   let ts = 0; 
-//   let mc; 
-//   let tc; 
-//   let tf; 
-//   let t;
-
-//   fx = 0; 
-//   fy = 0; 
-//   fw = 0; 
-//   fh = 0; 
-//   if (init) { buttons.add(new button(fx, fy, fw, fh, 1)); }
-
-//   //rem_row_button
-//   let x = 0; 
-//   if (labeledbool) { x = column_width / 2; } else { x = 0; } 
-//   fx = Math.round(column_width * (columns + site_distance) + X_offset + 10 + x); 
-//   fy = Math.round(column_height * (rows + site_distance / 2) + column_height / 2); 
-//   fw = Math.round(column_width); 
-//   fh = Math.round(column_height / 2); 
-//   mc = "#28B05C"; 
-//   tf = createFont("Lucida Sans Typewriter Bold", 1); 
-//   if (init) { buttons.add(new button(fx, fy, fw, fh, "-", "#FFFFFF", mc, tf)); } else { if (rows <= min_columns) { buttons.get(1).update(fx, fy, fw, fh, "#FF0000"); } else { buttons.get(1).update(fx, fy, fw, fh, mc); } }
-
-//   //add_row_button
-//   fy = Math.round(column_height * (rows + site_distance / 2)); fw = Math.round(column_width); fh = Math.round(column_height / 2); tf = createFont("Lucida Sans Typewriter Bold", 1); mc = "#28B05C"; if (init) { buttons.add(new button(fx, fy, fw, fh, "+", "#FFFFFF", mc, tf)); } else { if (rows >= max_columns) { buttons.get(2).update(fx, fy, fw, fh, "#FF0000"); } else { buttons.get(2).update(fx, fy, fw, fh, mc); } }
-
-//   //rem_column_button
-//   fy = Math.round(0); fw = Math.round(column_width); fh = Math.round(column_height / 2); tf = createFont("Lucida Sans Typewriter Bold", 1); mc = "#28B05C"; if (init) { buttons.add(new button(fx, fy, fw, fh, "-", "#FFFFFF", mc, tf)); } else { if (columns <= min_columns) { buttons.get(3).update(fx, fy, fw, fh, "#FF0000"); } else { buttons.get(3).update(fx, fy, fw, fh, mc); } }
-
-//   //add_column_button
-//   fy = Math.round(column_height / 2); fw = Math.round(column_width); fh = Math.round(column_height / 2); tf = createFont("Lucida Sans Typewriter Bold", 1); mc = "#28B05C"; if (init) { buttons.add(new button(fx, fy, fw, fh, "+", "#FFFFFF", mc, tf)); } else { if (columns >= max_columns) { buttons.get(4).update(fx, fy, fw, fh, "#FF0000"); } else { buttons.get(4).update(fx, fy, fw, fh, mc); } }
-
-//   //reset_button
-//   fx = Math.round(column_width - column_width / 1.5 + X_offset / 2); fy = Math.round(height - column_height / 1.5); fw = Math.round(column_width * 1.3); fh = Math.round(column_height / 2); mc = "#7d2835"; if (init) { buttons.add(new button(fx, fy, fw, fh, "reset", "#FFFFFF", mc)); } else { buttons.get(5).update(fx, fy, fw, fh); }
-
-//   //reroll_button
-//   fx = Math.round(column_width - column_width / 1.5 + X_offset / 2); fy = Math.round(column_height * 3.5); fw = Math.round(column_width * 1.3); fh = Math.round(column_height / 2); mc = "#7d2835"; if (init) { buttons.add(new button(fx, fy, fw, fh, "reroll", "#FFFFFF", mc)); } else { buttons.get(6).update(fx, fy, fw, fh); }
-
-//   //random number + field
-//   fx = Math.round(column_width - column_width / 1.16 + X_offset / 2); fy = Math.round(column_height * 2f); fw = Math.round(column_width * 1.5f); fh = Math.round(column_height * 1.3); ts = Math.floor((((column_height + column_width) / 2) * 0.2) * 3.6);
-//   // System.out.println("10: "+r.getcurrent_random_numb()+", "+r.getthreadfin()+", "+((let )(  (r.getprogress()*10))/10)+", "+r.getpossiblenumbs().size());
-//   if (r.getcurrent_random_numb() > r.getmin() && r.getcurrent_random_numb() < r.getmax()) { if ((let)((r.getprogress() * 10)) / 10 > 99) { if (!r.getfound()) { tc = "#000000"; mc = "#FFFFFF"; } else { tc = "#FFFFFF"; mc = "#0000FF"; } } else { tc = "#000000"; mc = "#FFFFFF"; } t = r.getcurrent_random_numb() + ""; } else { tc = "#000000"; mc = "#FF0000"; ts = Math.floor((((column_height + column_width) / 2) * 0.2) * 2.5); t = (let)((r.getprogress() * 10)) / 10 + "%"; } if (init) { buttons.add(new button(fx, fy, fw, fh, t, tc, mc, ts)); } else { buttons.get(7).update(fx, fy, fw, fh, t, ts, tc, mc); }
-
-//   //label
-//   fx = Math.round(column_width - column_width / 1.5f + X_offset / 2); fy = Math.round(column_height / 3); fw = Math.round(column_width * 1.3); fh = Math.round(column_height / 2); mc = "#464f75"; if (init) { buttons.add(new button(fx, fy, fw, fh, "label", "#FFFFFF", mc)); } else { buttons.get(8).update(fx, fy, fw, fh); }
-
-//   //seed
-//   fx = Math.round(width / 2); fy = Math.round(height / 100); fw = Math.round(column_width * 1.2); fh = Math.round(column_height / 4); tc = color(seed_green_fade, 255, seed_green_fade); mc = "#000000"; if (init) { buttons.add(new button(fx, fy, fw, fh, "seed: " + Integer.toHexString(r.getSeed()), tc, g.backgroundColor)); } else { buttons.get(9).update(fx, fy, fw, fh, tc, "seed: " + Integer.toHexString(r.getSeed()), g.backgroundColor); if (seed_green_fade < 255) { seed_green_fade += 3; } }
-
-//   //minimalistic
-//   fx = Math.round(column_width - column_width / 1.5f + X_offset / 2); fy = Math.round(column_height); fw = Math.round(column_width * 1.3); fh = Math.round(column_height / 2); mc = "#464f75"; if (init) { buttons.add(new button(fx, fy, fw, fh, "minimal", "#FFFFFF", mc)); } else { buttons.get(10).update(fx, fy, fw, fh); } fill(255, 255, 255); stroke(255, 255, 255); if (init) { for (let b: buttons) { b.lastPressed = System.currentTimeMillis() + 5; }
-// }
-
-
-
-// var x;
-// var y;
-// var w;
-// var h;
-// var text = "";
-// var mc = "#FFFFFF";
-// var tc = "#000000";//tc = textColor, mc = MainColor
-// var ts = -1;
-// var lastPressed;
-// var DELAY_TIME = 150;
-// var tf; // tf = textFont
-
-// function button(x, y, w, h) {
-//   this.x = x;
-//   this.y = y;
-//   this.w = w;
-//   this.h = h;
-// }
-
-// function button(x, y, w, h, text) {
-//   this(x, y, w, h);
-//   this.text = text;
-// }
-
-// function button(x, y, w, h, ts) {
-//   this(x, y, w, h);
-//   this.ts = ts;
-// }
-
-// function button(x, y, w, h, text, tc, mc) {
-//   this(x, y, w, h, text);
-//   this.tc = tc;
-//   this.mc = mc;
-// }
-
-// function button(x, y, w, h, text, tc, mc, tf) {
-//   this(x, y, w, h, text, tc, mc);
-//   this.tf = tf;
-// }
-
-// function button(x, y, w, h, text, mc) {
-//   this(x, y, w, h, text);
-//   this.mc = mc;
-// }
-
-// function button(x, y, w, h, text, tc, mc, ts) {
-//   this(x, y, w, h, text, tc, mc);
-//   this.ts = ts;
-// }
-
-// function drawMe() {
-//   fill(mc);
-//   stroke(g.backgroundColor);
-//   strokeWeight(0);
-//   // stroke("#FFFFFF");
-//   // strokeWeight(0);
-//   rect(x, y, w, h, roundboxes);
-
-//   textAlign(CENTER, CENTER);
-
-//   if (tf == null)
-//     textFont(createFont("Lucida Sans Typewriter", 20));
-//   else {
-//     textFont(tf);
-//   }
-
-//   if (ts == -1)
-//     textSize(Math.floor(((h / 2 + (w * 2)) / 2) * 0.2));
-//   else
-//     textSize(ts);
-
-//   fill(tc);
-//   stroke(tc);
-//   strokeWeight(0);
-
-//   text(text, x + w / 2, y + h / 2);
-// }
-
-// function isPushed() {
-//   if (mousePressed && (lastPressed + DELAY_TIME) < System.currentTimeMillis() && mouseX > x && mouseX < (x + w)
-//     && mouseY > y && mouseY < (y + h)) {
-//     lastPressed = System.currentTimeMillis();
-//     return true;
-//   }
-//   return false;
-// }
-
-// function update(mc) {
-//   this.mc = mc;
-// }
-
-// function update(x, y, w, h) {
-//   this.x = x;
-//   this.y = y;
-//   this.w = w;
-//   this.h = h;
-// }
-
-// function update(x, y, w, h, tc, mc) {
-//   update(x, y, w, h, mc);
-//   this.tc = tc;
-// }
-
-// function update(x, y, w, h, tc, text, mc) {
-//   update(x, y, w, h, tc, mc);
-//   this.text = text;
-// }
-
-// function update(x, y, w, h, mc) {
-//   update(x, y, w, h);
-//   update(mc);
-// }
-
-// function update(x, y, w, h, text, ts, tc) {
-//   update(x, y, w, h);
-//   this.text = text;
-//   this.ts = ts;
-//   this.tc = tc;
-// }
-
-// function update(x, y, w, h, text, ts, tc, mc) {
-//   update(x, y, w, h, text, ts, tc);
-//   update(mc);
-// }
-
-// function getX() {
-//   return x;
-// }
-
-// function getY() {
-//   return y;
-// }
-
-// function getW() {
-//   return w;
-// }
-
-// function getH() {
-//   return h;
-// }
-
-// function set_lastPressed(lastPressed) {
-//   this.lastPressed = lastPressed;
-// }
 
 var t;
 var p;
@@ -460,31 +254,31 @@ function add_usedrandnumbs(i) {
 }
 
 function rerand() {
-  clicked_box.removeAll(clicked_box);
-  current_random_numb = new_current_random_numb();
+  clicked_box = [],
+    current_random_numb = new_current_random_numb();
 }
 
 function rand() {
-  stopthread();
+  // stopthread();
   if (seed == 0) {
     seed = (Math.random() * 10000 * Math.random());
   }
-  possible_numbs.removeAll(possible_numbs);
+  possible_numbs = [];
   random_numbs = gen_random_numbs(rows, columns);
   if (extreme_calc) {
     p = new possiblenumbs().set_init_numbers(this);
-    t = new Thread(p);
-    t.start();
-    start_numb();
+    // t = new Thread(p);
+    // t.start();
+    // start_numb();
   } else {
     for (let i = min; i < max; i++) {
       possible_numbs.add(i);
-      setprogress(i / max);
+      //setprogress(i / max);
     }
-    setprogress(100);
+    //setprogress(100);
     getrandom_numb();
-    setthreadfin(true);
-    clicked_box.removeAll(clicked_box);
+    // setthreadfin(true);
+    clicked_box = [];
   }
   current_random_numb = new_current_random_numb();
 }
@@ -634,81 +428,18 @@ function gen_random_numbs(rows, columns) {
   return save;
 }
 
-function setSeed(seed) {
-  this.seed = seed;
-}
-
-function getSeed() {
-  return seed;
-}
-
-function setfound(found) {
-  this.found_nothing = found;
-}
-
-function getfound() {
-  return found_nothing;
-}
-
-function getrandomnumbs() {
-  return random_numbs;
-}
-
-function getpossiblenumbs() {
-  return possible_numbs;
-}
-
-function setpossiblenumbs(p) {
-  this.possible_numbs = p;
-}
-
-function getrandom_numb() {
-  if (current_random_numb <= 0) {
-    current_random_numb = new_current_random_numb();
+function sfc32(a, b, c, d) {
+  return function() {
+    a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0; 
+    var t = (a + b) | 0;
+    a = b ^ b >>> 9;
+    b = c + (c << 3) | 0;
+    c = (c << 21 | c >>> 11);
+    d = d + 1 | 0;
+    t = t + d | 0;
+    c = c + t | 0;
+    return (t >>> 0) / 4294967296;
   }
-}
-
-function getcalculationlist() {
-  return calculations_list;
-}
-
-function getthreadfin() {
-  return threadfin;
-}
-
-function setthreadfin(b) {
-  threadfin = b;
-}
-
-function getmin() {
-  return min;
-}
-
-function getminplays() {
-  return min_plays;
-}
-
-function getmax() {
-  return max;
-}
-
-function getcurrent_random_numb() {
-  return current_random_numb;
-}
-
-function stopthread() {
-  if (t != null) {
-    p.setstop();
-  }
-  t = null;
-}
-
-function setprogress(p) {
-  this.progress = p;
-}
-
-function getprogress() {
-  return progress;
 }
 
 var possible = [];
