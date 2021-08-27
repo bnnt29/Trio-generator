@@ -23,6 +23,8 @@ var right_color = "#00FF00";
 var wrong_color = "#FF0000";
 var pending_color = "#0000FF";
 var seed_green_fade = 255;
+var weight = "#FFFFFF";
+var black = "000000";
 
 //numbers
 var extreme_calc = true;
@@ -46,7 +48,8 @@ var buttons_init = false;
 
 //function setup(){r=new init_numbers(Integer.parseInt(Hex_r_seed,16));r.rand();fullScreen();}
 function setup() {
-  rand();
+  r = new init_numbers(parseInt(Hex_r_seed, 16), this);
+  let rands = r.rand();
   gen_html_fields();
 }
 
@@ -58,8 +61,7 @@ function gen_html_fields() {
     body = doc.getElementsByTagName('body')[0],
     x = win.innerWidth || docElem.clientWidth || body.clientWidth,
     y = win.innerHeight || docElem.clientHeight || body.clientHeight;
-  console.log("1:" + rows);
-  let height = (100 / (rows * 1.1)) + "%";
+  let height = (100 / (rows)) + "%";
   let width = (100 / (columns * 1.1)) + "%";
   for (let i = 0; i < rows; i++) {
     //console.log("2:" + i + ", " + columns);
@@ -73,25 +75,46 @@ function gen_html_fields() {
       b = document.createElement("button");
       b.id = "r" + i + ",c" + e;
       box = [...box, "r" + i + ",c" + e];
-      b.setAttribute("value", i * e);
+      b.setAttribute("value", r.getrandomnumbs()[i * columns + e]);
       b.onclick = function () { field_pressed(i, e) };
-      b.innerHTML = i * e;
+      b.innerHTML = r.getrandomnumbs()[i * columns + e] + "";
       button_styles(b, height, width);
       row.appendChild(b);
     }
     document.getElementById("container").appendChild(row);
-    document.getElementById("container").style.height = y + "px";
+    document.getElementById("container").style.height = y * 0.9 + "px";
   }
   b = document.getElementById("current_rand");
   button_styles(b, height, width);
   b.style.width = "100%";
   b.style.height = height;
+  r.getrandom_numb();
+  b.innerHTML = r.getcurrent_random_numb();
   b = document.getElementById("reroll_b");
   button_styles(b, height, width);
   b.style.width = "100%";
-  b.style.height = (100 / (rows * 1.1)) / 3 + "%";
+  b.style.height = (100 / (rows)) / 3 + "%";
   b.style.marginTop = "1rem";
-  document.getElementById("buts_container").style.minHeight = "5rem";
+  b = document.getElementById("reset_b");
+  button_styles(b, height, width);
+  b.style.width = "100%";
+  b.style.height = (100 / (rows)) / 3 + "%";
+  b.style.marginTop = "1rem";
+  b = document.getElementById("darkmode_b");
+  button_styles(b, height, width);
+  b.style.width = "100%";
+  b.style.height = (100 / (rows)) / 3 + "%";
+  b.style.marginTop = "1rem";
+  b = document.getElementById("instructions_b");
+  button_styles(b, height, width);
+  b.style.width = "100%";
+  b.style.height = (100 / (rows)) / 3 + "%";
+  b.style.marginTop = "1rem";
+  b = document.getElementById("settings_b");
+  button_styles(b, height, width);
+  b.style.width = "100%";
+  b.style.height = (100 / (rows)) / 3 + "%";
+  b.style.marginTop = "1rem";
 }
 
 function button_styles(b, height, width) {
@@ -104,7 +127,7 @@ function button_styles(b, height, width) {
     b.style.borderRightWidth = 0;
   }
   b.style.fontSize = "90 vmin";
-  b.style.minHeight = 0;
+  // b.style.minHeight = 0;
   b.style.minWidth = 0;
   b.style.whiteSpace = "nowrap";
   b.style.overflow = "hidden";
@@ -116,87 +139,228 @@ function button_styles(b, height, width) {
 
 function field_pressed(i, e) {
   let b = document.getElementById("r" + i + ",c" + e);
-  //console.log(i + ", " + e + ", " + b.style.backgroundColor);
-  //b.style.backgroundColor = "#FF0000";
-
+  document.getElementById("calculation_list").innerHTML = "";
   let right = false;
-  let possibilities = calculations_list;
-  b.style.backgroundColor = "#FFFFFF";
-  if (!clicked_box.includes("r" + i + ",c" + e)) {
-    clicked_box = [...clicked_box, "r" + i + ",c" + e];
-    if (clicked_box.length == 3) {
-      let one = document.getElementById(clicked_box[0]).getAttribute("value");
-      let sec = document.getElementById(clicked_box[1]).getAttribute("value");
-      let thi = document.getElementById(clicked_box[2]).getAttribute("value");
-      //(1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3)
-      if (1 > 0) {
-        for (let o = 0; o < possibilities.length; o++) {
-          let out = -1; let s = possibilities[o]; calculations = [...calculations, s];
-          if (s.charAt(0) == '/' && sec == 0 || s.charAt(1) == '/' && thi == 0) { continue; }
-          //never use eval if with user input
-          out = (eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi));
-          if (out == 1) { clicked_box.forEach((data) => { document.getElementById(data).style.backgroundColor = right_color; }); right = true; } else { clicked_box.forEach((data) => { document.getElementById(data).style.backgroundColor = wrong_color; }); right = false; }
+  let possibilities = r.getcalculationlist();
+  if (clicked_box.contains([i, e]) == -1) {
+    if (clicked_box.length < 3) {
+      clicked_box = [...clicked_box, [i, e]];
+      if (clicked_box.length == 3) {
+        let one = document.getElementById("r" + clicked_box[0][0] + ",c" + clicked_box[0][1]).getAttribute("value");
+        let sec = document.getElementById("r" + clicked_box[1][0] + ",c" + clicked_box[1][1]).getAttribute("value");
+        let thi = document.getElementById("r" + clicked_box[2][0] + ",c" + clicked_box[2][1]).getAttribute("value");
+        //(1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3)
+        if (1 > 0) {
+          let calcs = document.getElementById("calculation_list");
+          for (let o = 0; o < possibilities.length; o++) {
+            let out = -1;
+            let s = possibilities[o];
+            r.calculations = [...r.calculations, s];
+            let p = document.createElement("p");
+            if (s.charAt(0) == '/' && sec == 0 || s.charAt(1) == '/' && thi == 0) { continue; }
+            p.innerHTML = one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi;
+            p.style.color = wrong_color;
+            p.style.textAlign = "center";
+            calcs.appendChild(p);
+            //never use eval if with user input
+            out = (eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi));
+            if (out == r.getcurrent_random_numb()) {
+              clicked_box.forEach((data) => { document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = right_color; p.style.color = right_color; document.getElementById("r" + data[0] + ",c" + data[1]).style.color = '#000000'; });
+              right = true;
+            } else {
+              p.style.color = wrong_color;
+              clicked_box.forEach((data) => { document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = wrong_color; document.getElementById("r" + data[0] + ",c" + data[1]).style.color = '#FFFFFF'; });
+              right = false;
+            }
+          }
+        } if (right) { b.style.backgroundColor = right_color; b.style.color = '#000000'; } else { b.style.backgroundColor = wrong_color; b.style.color = '#FFFFFF'; }
+      } else {
+        b.style.backgroundColor = pending_color;
+        b.style.color = '#FFFFFF';
+        if (clicked_box.length == 1) {
+          box.forEach((data) => {
+            document.getElementById(data).disabled = true;
+          });
+          clicked_box.forEach((data) => {
+            document.getElementById("r" + data[0] + ",c" + data[1]).disabled = false;
+          });
+          possible_box = [...possible_box, [(i), (e + 1)], [(i), (e - 1)], [(i + 1), (e)], [(i - 1), (e)], [(i + 1), (e + 1)], [(i + 1), (e - 1)], [(i - 1), (e + 1)], [(i - 1), (e - 1)]];
+          possible_box = [...possible_box, [(i), (e + 2)], [(i), (e - 2)], [(i + 2), (e)], [(i - 2), (e)], [(i + 2), (e + 2)], [(i + 2), (e - 2)], [(i - 2), (e + 2)], [(i - 2), (e - 2)]];
+          let save = [];
+          possible_box.forEach((value) => {
+            let data = "r" + value[0] + ",c" + value[1];
+            if (document.getElementById(data) == null) {
+              save = [...save, value];
+              data = "";
+              let values = [];
+              if (value[0] != i) {
+                if (i > value[0]) {
+                  if (value[0] + 1 == i) {
+                    values = [(value[0] - 1)];
+                  } else {
+                    values = [(value[0] + 1)];
+                  }
+                } else {
+                  if (value[0] - 1 == i) {
+                    values = [(value[0] + 1)];
+                  } else {
+                    values = [(value[0] - 1)];
+                  }
+                }
+              } else {
+                values = [value[0]];
+              }
+              if (value[1] != e) {
+                if (e > value[1]) {
+                  if (value[1] + 1 == e) {
+                    values = [values[0], (value[1] - 1)];
+                  } else {
+                    values = [values[0], (value[1] + 1)];
+                  }
+                } else {
+                  if (value[1] - 1 == e) {
+                    values = [values[0], (value[1] + 1)];
+                  } else {
+                    values = [values[0], (value[1] - 1)];
+                  }
+                }
+              } else {
+                values = [values[0], value[1]];
+              }
+              save = [...save, values];
+            }
+          });
+          possible_box.forEach((value) => {
+            let tr = true;
+            save.forEach((data) => { if (data.equals(value)) { tr = false; } });
+            if (tr) {
+              let data = "r" + value[0] + ",c" + value[1];
+              document.getElementById(data).disabled = false;
+            }
+          });
+          possible_box = [];
+        } else if (clicked_box.length == 2) {
+          if (i == clicked_box[0][0] && e == clicked_box[0][1]) {
+            clicked_box = [];
+          } else {
+            let ico = clicked_box[0][0];
+            let eco = clicked_box[0][1];
+            if (clicked_box[0][0] > clicked_box[1][0]) {
+              if (clicked_box[0][0] - clicked_box[1][0] == 2) {
+                ico = clicked_box[0][0] - 1;
+              } else if (clicked_box[0][0] - clicked_box[1][0] == 1) {
+                ico = clicked_box[0][0] - 2;
+              }
+            } else {
+              if (clicked_box[1][0] - clicked_box[0][0] == 2) {
+                ico = clicked_box[0][0] + 1;
+              } else if (clicked_box[1][0] - clicked_box[0][0] == 1) {
+                ico = clicked_box[0][0] + 2;
+              }
+            }
+            if (clicked_box[0][1] > clicked_box[1][1]) {
+              if (clicked_box[0][1] - clicked_box[1][1] == 2) {
+                eco = clicked_box[0][1] - 1;
+              } else if (clicked_box[0][1] - clicked_box[1][1] == 1) {
+                eco = clicked_box[0][1] - 2;
+              }
+            } else {
+              if (clicked_box[1][1] - clicked_box[0][1] == 2) {
+                eco = clicked_box[0][1] + 1;
+              } else if (clicked_box[1][1] - clicked_box[0][1] == 1) {
+                eco = clicked_box[0][1] + 2;
+              }
+            }
+            document.getElementById("r" + ico + ",c" + eco).click();
+          }
         }
-      } if (right) { b.style.backgroundColor = right_color; } else { b.style.backgroundColor = wrong_color; }
-    } else { b.style.backgroundColor = pending_color; }
+      }
+    }
   } else {
-    clicked_box.splice(clicked_box.indexOf("r" + i + ",c" + e), clicked_box.indexOf("r" + i + ",c" + e) + 1);
-    b.style.backgroundColor = "#FFFFFF";
-    clicked_box.forEach((data) => { document.getElementById(data).style.backgroundColor = pending_color; });
+    if (clicked_box.contains([i, e]) != 0) {
+      document.getElementById("r" + clicked_box[1][0] + ",c" + clicked_box[1][1]).style.backgroundColor = "#FFFFFF";
+      document.getElementById("r" + clicked_box[1][0] + ",c" + clicked_box[1][1]).style.color = '#000000';
+      document.getElementById("r" + clicked_box[2][0] + ",c" + clicked_box[2][1]).style.backgroundColor = "#FFFFFF";
+      document.getElementById("r" + clicked_box[2][0] + ",c" + clicked_box[2][1]).style.color = '#000000';
+      clicked_box = [clicked_box[0]];
+    } else {
+      clicked_box.forEach((data) => {
+        document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = "#FFFFFF"; document.getElementById("r" + data[0] + ",c" + data[1]).style.color = '#000000';
+      });
+      clicked_box = [];
+      box.forEach((data) => {
+        document.getElementById(data).disabled = false;
+      });
+    }
+    clicked_box.forEach((data) => {
+      document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = pending_color; document.getElementById("r" + data[0] + ",c" + data[1]).style.color = '#FFFFFF';
+    });
   }
   // text(r.getrandomnumbs().get(i * columns + e) + "", column_width * (e + site_distance) + X_offset + column_width / 2 + x, column_height * (i + site_distance / 2) + column_height / 2);
 }
 
-function draw() {
-  if (draw <= 0) {
-    if (!buttons_init) {
-      buttons_init = true;
-      initButtons(buttons_init);
-    }
-    initButtons(false);
+// function draw() {
+//   if (draw <= 0) {
+//     if (!buttons_init) {
+//       buttons_init = true;
+//       initButtons(buttons_init);
+//     }
+//     initButtons(false);
 
-    //row+column numbers
+//     //row+column numbers
 
-    let abc = [];
-    let x = 0;
-    let tc;
-    //x-buttons
-    let maxx = 0;
-    let xb;
-    if (labelbuttons.size() > 0) { xb = labelbuttons.get(0); maxx = xb.size(); } else { xb = []; maxx = columns; }
-    abc = init_label_list(false);
-    for (let i = 0; i < maxx; i++) {
-      tc = "#FFFFFF"; clicked_box.forEach((clb) => { if ((getCoordinatesForIndex(clb).getX() - 1 == i)) { if (clicked_box.size() == 1) { tc = pending_color; } else { tc = right_color; } } });
-      if (labeledbool) { x = (column_width * (i + 0.5 + site_distance) + X_offset); } else { x = column_width * (i + site_distance) + X_offset; }
-      if (label_init) { xb.add(new button(x + column_width / 4, column_height * (site_distance / 4), column_width / 2, column_height, abc.get(i) + "", tc, g.backgroundColor, ts)); } else { if (x_buttons.contains(xb.get(i)) && clicked_box.size() < 1) { tc = "#28B05C"; } xb.get(i).update(x + column_width / 4, column_height * (site_distance / 4), column_width / 2, column_height, abc.get(i) + "", ts, tc); }
-    }
-    if (label_init) { labelbuttons.add(xb); }
-    //y-buttons
-    let maxy = 0; let yb;
-    if (labelbuttons.size() > 1) { yb = labelbuttons.get(1); maxy = yb.size(); } else { yb = []; maxy = rows; }
-    if (labeledint == 1 && rows <= 24) { abc = init_label_list(true); } else { abc = init_label_list(false); }
-    for (let i = 0; i < maxy; i++) {
-      tc = "#FFFFFF"; clicked_box.forEach((clb) => { if ((getCoordinatesForIndex(clb).getY() - 1 == i)) { if (clicked_box.size() == 1) { tc = pending_color; } else { tc = right_color; } } });
-      if (labeledbool) { x = (column_width * (site_distance) + X_offset); } else { x = (column_width * ((let)(columns + 0.2 + site_distance)) + X_offset); }
-      if (label_init) { yb.add(new button(x - column_width / 8, column_height * (i + site_distance / 2), column_width / 2, column_height, abc.get(i) + "", tc, g.backgroundColor, ts)); } else { if (y_buttons.contains(yb.get(i)) && clicked_box.size() < 1) { tc = "#28B05C"; } yb.get(i).update(x - column_width / 8, column_height * (i + site_distance / 2), column_width / 2, column_height, abc.get(i) + "", ts, tc); }
-    }
-    if (label_init) { label_init = false; labelbuttons.add(yb); }
+//     let abc = [];
+//     let x = 0;
+//     let tc;
+//     //x-buttons
+//     let maxx = 0;
+//     let xb;
+//     if (labelbuttons.size() > 0) { xb = labelbuttons.get(0); maxx = xb.size(); } else { xb = []; maxx = columns; }
+//     abc = init_label_list(false);
+//     for (let i = 0; i < maxx; i++) {
+//       tc = "#FFFFFF"; clicked_box.forEach((clb) => { if ((getCoordinatesForIndex(clb).getX() - 1 == i)) { if (clicked_box.size() == 1) { tc = pending_color; } else { tc = right_color; } } });
+//       if (labeledbool) { x = (column_width * (i + 0.5 + site_distance) + X_offset); } else { x = column_width * (i + site_distance) + X_offset; }
+//       if (label_init) { xb.add(new button(x + column_width / 4, column_height * (site_distance / 4), column_width / 2, column_height, abc.get(i) + "", tc, g.backgroundColor, ts)); } else { if (x_buttons.contains(xb.get(i)) && clicked_box.size() < 1) { tc = "#28B05C"; } xb.get(i).update(x + column_width / 4, column_height * (site_distance / 4), column_width / 2, column_height, abc.get(i) + "", ts, tc); }
+//     }
+//     if (label_init) { labelbuttons.add(xb); }
+//     //y-buttons
+//     let maxy = 0; let yb;
+//     if (labelbuttons.size() > 1) { yb = labelbuttons.get(1); maxy = yb.size(); } else { yb = []; maxy = rows; }
+//     if (labeledint == 1 && rows <= 24) { abc = init_label_list(true); } else { abc = init_label_list(false); }
+//     for (let i = 0; i < maxy; i++) {
+//       tc = "#FFFFFF"; clicked_box.forEach((clb) => { if ((getCoordinatesForIndex(clb).getY() - 1 == i)) { if (clicked_box.size() == 1) { tc = pending_color; } else { tc = right_color; } } });
+//       if (labeledbool) { x = (column_width * (site_distance) + X_offset); } else { x = (column_width * ((columns + 0.2 + site_distance)) + X_offset); }
+//       if (label_init) { yb.add(new button(x - column_width / 8, column_height * (i + site_distance / 2), column_width / 2, column_height, abc.get(i) + "", tc, g.backgroundColor, ts)); } else { if (y_buttons.contains(yb.get(i)) && clicked_box.size() < 1) { tc = "#28B05C"; } yb.get(i).update(x - column_width / 8, column_height * (i + site_distance / 2), column_width / 2, column_height, abc.get(i) + "", ts, tc); }
+//     }
+//     if (label_init) { label_init = false; labelbuttons.add(yb); }
 
-    labelbuttons.forEach((ab) => { ab.forEach((b) => { b.drawMe(); }); });
-    if (labeledint == 2) { if (labeledbool) { text("y", column_width * (site_distance * 0.9) + X_offset, column_height * (0 + site_distance / 2) + column_height / 2); text("x", column_width * (site_distance) + X_offset + column_width / 2, column_height * site_distance / 2 - column_height / 2); } else { text("y", column_width * (columns + site_distance + 0.4) + X_offset + column_width / 2.5, column_height * (0 + site_distance / 2) + column_height / 2); text("x", column_width * (site_distance - 0.5) + X_offset + column_width / 2, column_height * site_distance / 2 - column_height / 2); } }
+//     labelbuttons.forEach((ab) => { ab.forEach((b) => { b.drawMe(); }); });
+//     if (labeledint == 2) { if (labeledbool) { text("y", column_width * (site_distance * 0.9) + X_offset, column_height * (0 + site_distance / 2) + column_height / 2); text("x", column_width * (site_distance) + X_offset + column_width / 2, column_height * site_distance / 2 - column_height / 2); } else { text("y", column_width * (columns + site_distance + 0.4) + X_offset + column_width / 2.5, column_height * (0 + site_distance / 2) + column_height / 2); text("x", column_width * (site_distance - 0.5) + X_offset + column_width / 2, column_height * site_distance / 2 - column_height / 2); } }
 
-    if (!minimalistic) {
-      buttons.forEach((b) => { b.drawMe(); });
-    } else { buttons.get(7).drawMe(); buttons.get(10).drawMe(); }
-    if (r.getthreadfin()) { draw = 3; } else { draw = 5; }
-  } else { draw -= 1; }
-}
+//     if (!minimalistic) {
+//       buttons.forEach((b) => { b.drawMe(); });
+//     } else { buttons.get(7).drawMe(); buttons.get(10).drawMe(); }
+//     if (r.getthreadfin()) { draw = 3; } else { draw = 5; }
+//   } else { draw -= 1; }
+// }
 
 function init_label_list(b) { let abc = []; if (b) { let alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']; alphabet.forEach((c) => { abc.add(c + ""); }); } else { for (let i = 0; i < ((rows < columns) ? columns : rows); i++) { abc.add(((i + 1) + "")); } } return abc; }
 
 function reset_action(b) { if (b) { if (r2 != null) { r2.stopthread(); r2 = null; } if (r != null) { r.stopthread(); initpregen(); r = null; } } clicked_box.removeAll(clicked_box); x_buttons.clear(); y_buttons.clear(); if (r != null) { r.stopthread(); } if (r2 != null) { r = r2; r2 = null; initpregen(); } else { initpregen(); r = r2; r2 = null; } }
 
 function initpregen() { if (r2 == null || r2 == r) { r2 = new init_numbers(0); r2.rand(); } }
+
+function setclicked_box(array) {
+  clicked_box = array;
+}
+
+function rerand() { r.rerand(); document.getElementById("current_rand").innerHTML = r.getcurrent_random_numb(); }
+
+function reset() { location.reload(); }
+
+function darkswitch() { /* TODO*/ }
+function opensettings() { /* TODO*/ }
+function openinstructions() { /* TODO*/ }
 
 /*
  0. zero
@@ -212,352 +376,698 @@ function initpregen() { if (r2 == null || r2 == r) { r2 = new init_numbers(0); r
  10.minimalistic
  */
 
-var t;
-var p;
-var min_plays = 30;
-var threadfin;
-var progress = 0;
+class init_numbers {
+  constructor(seed, trio) {
+    // this.t;
+    this.p;
+    this.min_plays = 30;
+    // this.threadfin;
+    // this.progress = 0;
 
-// grid
-var grid_min = 0;
-var grid_max = 10;
-var min = grid_min + 1;
-var max = (grid_max - 1) * (grid_max - 1) + grid_max - 1;
+    this.trio = trio;
 
-// numbers
-var possible_numbs = [];
-var calculations_list = ["*+", "+*", "/+", "+/", "*-", "-*", "/-", "-/", "*/", "/*", "+-", "-+"];
-var calculations = [];
-var random_numbs = [];
-var current_random_numb;
-var found_nothing = false;
-var seed;
-// random
-var gen;
+    // grid
+    this.grid_min = 0;
+    this.grid_max = 10;
+    this.min = this.grid_min + 1;
+    this.max = (this.grid_max - 1) * (this.grid_max - 1) + this.grid_max - 1;
 
-function init_numbers(seed) {
-  this.seed = seed;
-}
-
-// public function reset() {
-// setSeed(0);
-// setthreadfin(false);
-// setprogress(0);
-// setfound(false);
-// rand();
-// }
-
-function add_usedrandnumbs(i) {
-  add_usedrandnumbs(i);
-  if (possible_numbs.contains(i))
-    possible_numbs.remove(new Integer(i));
-}
-
-function rerand() {
-  clicked_box = [],
-    current_random_numb = new_current_random_numb();
-}
-
-function rand() {
-  // stopthread();
-  if (seed == 0) {
-    seed = (Math.random() * 10000 * Math.random());
+    // numbers
+    this.possible_numbs = [];
+    this.calculations_list = ["*+", "+*", "/+", "+/", "*-", "-*", "/-", "-/", "*/", "/*", "+-", "-+"];
+    this.calculations = [];
+    this.random_numbs = [];
+    this.current_random_numb;
+    this.found_nothing = false;
+    this.seed = seed;
+    // random
+    this.gen;
   }
-  possible_numbs = [];
-  random_numbs = gen_random_numbs(rows, columns);
-  if (extreme_calc) {
-    p = new possiblenumbs().set_init_numbers(this);
-    // t = new Thread(p);
-    // t.start();
-    // start_numb();
-  } else {
-    for (let i = min; i < max; i++) {
-      possible_numbs.add(i);
-      //setprogress(i / max);
+
+  reset() {
+    this.seed = 0;
+    this.found = false;
+    rand();
+  }
+
+  add_usedrandnumbs(i) {
+    if (possible_numbs.contains(i))
+      possible_numbs.remove(new Integer(i));
+  }
+
+  rerand() {
+    this.trio.setclicked_box([]);
+    this.current_random_numb = this.new_current_random_numb();
+    console.log(this.current_random_numb);
+  }
+
+  rand() {
+    // stopthread();
+    if (this.seed == 0) {
+      this.seed = (Math.random() * 10000 * Math.random());
     }
-    //setprogress(100);
-    getrandom_numb();
-    // setthreadfin(true);
-    clicked_box = [];
+    this.possible_numbs = [];
+    this.random_numbs = this.gen_random_numbs(rows, columns);
+    if (this.trio.extreme_calc) {
+      this.p = new possiblenumbs(this, this.calculations_list, this.trio);
+      this.p.run();
+      // t.start();
+      this.start_numb();
+    } else {
+      for (let i = this.min; i < this.max; i++) {
+        this.possible_numbs = [...this.possible_numbs, i];
+        //setprogress(i / max);
+      }
+      //setprogress(100);
+      this.getrandom_numb();
+      // setthreadfin(true);
+      this.clicked_box = [];
+    }
+    this.current_random_numb = this.new_current_random_numb();
+    return this.current_random_numb;
   }
-  current_random_numb = new_current_random_numb();
-}
 
-function start_numb() {
-  let index = (Math.random() * rows * columns);
-  let s = calculations_list[(Math.random() * calculations_list.length)];
-  let direction = (Math.random() * 8);
-  let e = -1;
-  let one = random_numbs.get(index);
-  let sec = 1;
-  let thi = 1;
-  switch (direction) {
-    case 1:
-      if (index % rows < 8) {
-        System.out.println(1);
-        sec = random_numbs.get(index + 1);
-        thi = random_numbs.get(index + 2);
-      } else {
-        start_numb();
-      }
-      break;
-    case 2:
-      if (index % rows < 9 && index % columns < 8) {
-        System.out.println(2);
-        sec = random_numbs.get(index + columns + 1);
-        thi = random_numbs.get(index + columns * 2 + 2);
-      } else {
-        start_numb();
-      }
-      break;
-    case 3:
-      if (index % columns < 8) {
-        System.out.println(3);
-        sec = random_numbs.get(index + columns);
-        thi = random_numbs.get(index + columns * 2);
-      } else {
-        start_numb();
-      }
-      break;
-    case 4:
-      if (index % rows > 2 && index % columns < 8) {
-        System.out.println(4);
-        sec = random_numbs.get(index + columns - 1);
-        thi = random_numbs.get(index + columns * 2 - 2);
-      } else {
-        start_numb();
-      }
-      break;
-    case 5:
-      if (index % rows > 2) {
-        System.out.println(5);
-        sec = random_numbs.get(index - 1);
-        thi = random_numbs.get(index - 2);
-      } else {
-        start_numb();
-      }
-      break;
-    case 6:
-      if (index % rows > 2 && index % columns > 2) {
-        System.out.println(6);
-        sec = random_numbs.get(index - columns - 1);
-        thi = random_numbs.get(index - columns * 2 - 2);
-      } else {
-        start_numb();
-      }
-      break;
-    case 7:
-      if (index % columns > 2) {
-        System.out.println(7);
-        sec = random_numbs.get(index - columns);
-        thi = random_numbs.get(index - columns * 2);
-      } else {
-        start_numb();
-      }
-      break;
-    case 8:
-      if (index % rows > 8 && index % columns > 2) {
-        System.out.println(8);
-        sec = random_numbs.get(index - columns + 1);
-        thi = random_numbs.get(index - columns * 2 + 2);
-      } else {
-        start_numb();
-      }
-      break;
-    default:
-      if (index % rows < 8) {
-        System.out.println(9);
-        sec = random_numbs.get(index + 1);
-        thi = random_numbs.get(index + 2);
-      } else {
-        start_numb();
-      }
-      break;
-  }
-  System.out.println("10: " + index + ", " + one + ", " + sec + ", " + thi + ", " + s);
-  if (s.charAt(0) == '/' && sec == 0) {
-    start_numb();
-  } else if (s.charAt(1) == '/' && thi == 0) {
-    start_numb();
-  }
-  try {
+  start_numb() {
+    let index = Math.round(Math.random() * rows * columns);
+    let s = this.calculations_list[Math.round(Math.random() * this.calculations_list.length)];
+    let direction = (Math.random() * 8);
+    let e = -1;
+    let one = this.random_numbs[index];
+    let sec = 1;
+    let thi = 1;
+    switch (direction) {
+      case 1:
+        if (index % rows < 8) {
+          sec = this.random_numbs[index + 1];
+          thi = this.random_numbs[index + 2];
+        } else {
+          this.start_numb();
+        }
+        break;
+      case 2:
+        if (index % rows < 9 && index % columns < 8) {
+          sec = this.random_numbs[index + columns + 1];
+          thi = this.random_numbs[index + columns * 2 + 2];
+        } else {
+          this.start_numb();
+        }
+        break;
+      case 3:
+        if (index % columns < 8) {
+          sec = this.random_numbs[index + columns];
+          thi = this.random_numbs[index + columns * 2];
+        } else {
+          this.start_numb();
+        }
+        break;
+      case 4:
+        if (index % rows > 2 && index % columns < 8) {
+          sec = this.random_numbs[index + columns - 1];
+          thi = this.random_numbs[index + columns * 2 - 2];
+        } else {
+          this.start_numb();
+        }
+        break;
+      case 5:
+        if (index % rows > 2) {
+          sec = this.random_numbs[index - 1];
+          thi = this.random_numbs[index - 2];
+        } else {
+          this.start_numb();
+        }
+        break;
+      case 6:
+        if (index % rows > 2 && index % columns > 2) {
+          sec = this.random_numbs[index - columns - 1];
+          thi = this.random_numbs[index - columns * 2 - 2];
+        } else {
+          this.start_numb();
+        }
+        break;
+      case 7:
+        if (index % columns > 2) {
+          sec = this.random_numbs[index - columns];
+          thi = this.random_numbs[index - columns * 2];
+        } else {
+          this.start_numb();
+        }
+        break;
+      case 8:
+        if (index % rows > 8 && index % columns > 2) {
+          sec = this.random_numbs[index - columns + 1];
+          thi = this.random_numbs[index - columns * 2 + 2];
+        } else {
+          this.start_numb();
+        }
+        break;
+      default:
+        if (index % rows < 8) {
+          sec = this.random_numbs[index + 1];
+          thi = this.random_numbs[index + 2];
+        } else {
+          this.start_numb();
+        }
+        break;
+    }
+    // System.out.println("10: " + index + ", " + one + ", " + sec + ", " + thi + ", " + s);
+    if (s.charAt(0) == '/' && sec == 0) {
+      this.start_numb();
+    } else if (s.charAt(1) == '/' && thi == 0) {
+      this.start_numb();
+    }
     // never use eval if with user input
-    e = (engine.eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi));
-    if (e <= r.getmin() && e >= r.getmax()) {
+    e = (eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi));
+    if (e <= this.getmin() && this.e >= this.getmax()) {
       e = -1;
     }
-  } catch (q) {
+    if (e > 0) {
+      this.current_random_numb = e;
+    }
   }
-  System.out.println(e);
-  if (e > 0) {
-    current_random_numb = e;
-  }
-}
 
-function new_current_random_numb() {
-  // new current random Number (unique)
-  if (possible_numbs.size() > 0) {
-    possible_numbs.remove(new Integer(current_random_numb));
-    let i = Math.random() * (possible_numbs.size() - 1);
-    if (i < 0) {
-      if (possible_numbs.size() >= 1 && (possible_numbs.get(0) > min && possible_numbs.get(0) < max)) {
-        return possible_numbs.get(0);
-      } else {
-        found_nothing = true;
-        return ((Math.random() * (max - min) + min));
+  new_current_random_numb() {
+    // new current random Number (unique)
+    if (this.possible_numbs.length > 0) {
+      this.possible_numbs.splice(this.possible_numbs.indexOf(this.current_random_numb), this.possible_numbs.indexOf(this.current_random_numb));
+      let i = Math.round(Math.random() * (this.possible_numbs.length - 1));
+      if (i < 0) {
+        if (this.possible_numbs.size() >= 1 && (this.possible_numbs.get(0) > this.min && this.possible_numbs.get(0) < this.max)) {
+          return this.possible_numbs.get(0);
+        } else {
+          this.found_nothing = true;
+          return ((Math.random() * (this.max - this.min) + this.min));
+        }
+      }
+      this.found_nothing = false;
+      return this.possible_numbs[i];
+    } else if (this.threadfin) {
+      return ((Math.random() * (this.max - this.min) + this.min));
+    } else {
+      return -2;
+    }
+  }
+
+  gen_random_numbs(rows, columns) {
+    // generates random Numbers
+    this.gen = new Random(this.seed);
+    let save = [];
+    for (let i = 0; i < rows; i++) {
+      for (let e = 0; e < columns; e++) {
+        save = [...save, Math.round((((this.gen.nextFloat() * ((this.grid_max - 1) - this.grid_min)) + this.grid_min)))];
       }
     }
-    found_nothing = false;
-    return possible_numbs.get(i);
-  } else if (threadfin) {
-    return ((Math.random() * (max - min) + min));
-  } else {
-    return -2;
+    return save;
   }
-}
 
-function gen_random_numbs(rows, columns) {
-  // generates random Numbers
-  gen = new Random(seed);
-  let save = [];
-  for (let i = 0; i < rows; i++) {
-    for (let e = 0; e < columns; e++) {
-      save.add((((gen.nextlet() * (grid_max - grid_min)) + grid_min)));
+  setSeed(seed) {
+    this.seed = seed;
+  }
+
+  getSeed() {
+    return this.seed;
+  }
+
+  setfound(found) {
+    this.found_nothing = found;
+  }
+
+  getfound() {
+    return this.found_nothing;
+  }
+
+  getrandomnumbs() {
+    return this.random_numbs;
+  }
+
+  getpossiblenumbs() {
+    return this.possible_numbs;
+  }
+
+  setpossiblenumbs(p) {
+    this.possible_numbs = p;
+  }
+
+  getrandom_numb() {
+    if (this.current_random_numb <= 0) {
+      this.current_random_numb = this.new_current_random_numb();
     }
   }
-  return save;
-}
 
-function sfc32(a, b, c, d) {
-  return function() {
-    a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0; 
-    var t = (a + b) | 0;
-    a = b ^ b >>> 9;
-    b = c + (c << 3) | 0;
-    c = (c << 21 | c >>> 11);
-    d = d + 1 | 0;
-    t = t + d | 0;
-    c = c + t | 0;
-    return (t >>> 0) / 4294967296;
+  getcalculationlist() {
+    return this.calculations_list;
   }
-}
 
-var possible = [];
-var n;
-var stop = false;
-// var m = System.currentTimeMillis();
-
-function setstop() {
-  this.stop = true;
-}
-
-function set_init_numbers(r) {
-  n = r;
-  return this;
-}
-
-function run() {
-  n.setthreadfin(false);
-  check();
-  if (possible.size() > n.getmax() - n.getmin()) {
-    n.setpossiblenumbs([]);
-    initpregen();
-  } else {
-    n.setpossiblenumbs(possible);
-    n.getrandom_numb();
-    n.setthreadfin(true);
-    n.setprogress(100);
-    initpregen();
-    // System.out.println("Thread finished in: " + (System.currentTimeMillis() - m) / 1000 + " sec and found: "
-    //   + n.getpossiblenumbs().size() + " possibilities");
+  getthreadfin() {
+    return this.threadfin;
   }
-}
 
-function possibilities(one_, sec_, thi_) {
-  let one = n.getrandomnumbs().get(one_);
-  let sec = n.getrandomnumbs().get(sec_);
-  let thi = n.getrandomnumbs().get(thi_);
-  n.getcalculationlist().forEach((s) => {
-    if (s.charAt(0) == '/' && sec == 0) {
-    } else if (s.charAt(1) == '/' && thi == 0) {
+  setthreadfin(b) {
+    this.threadfin = b;
+  }
+
+  getmin() {
+    return this.min;
+  }
+
+  getminplays() {
+    return this.min_plays;
+  }
+
+  getmax() {
+    return this.max;
+  }
+
+  getcurrent_random_numb() {
+    return this.current_random_numb;
+  }
+
+  stopthread() {
+    if (this.t != null) {
+      this.p.setstop();
     }
-    try {
+    this.t = null;
+  }
+
+  setprogress(p) {
+    this.progress = p;
+  }
+
+  getprogress() {
+    return this.progress;
+  }
+}
+
+class possiblenumbs {
+  constructor(r, c, tri) {
+    this.possible = [];
+    this.n = r;
+    this.stop = false;
+    this.calcs = c;
+    this.trio = tri;
+    // var m = System.currentTimeMillis();
+  }
+
+  run() {
+    this.check();
+    if (this.possible.length > this.n.getmax() - this.n.getmin()) {
+      this.n.setpossiblenumbs([]);
+      // this.trio.initpregen();
+    } else {
+      this.n.setpossiblenumbs(this.possible);
+      this.n.getrandom_numb();
+      this.n.setthreadfin(true);
+      this.n.setprogress(100);
+      // this.trio.initpregen();
+      // System.out.println("Thread finished in: " + (System.currentTimeMillis() - m) / 1000 + " sec and found: "
+      //   + n.getpossiblenumbs().size() + " possibilities");
+    }
+  }
+
+  possibilities(one_, sec_, thi_) {
+    let one = this.n.random_numbs[one_];
+    let sec = this.n.random_numbs[sec_];
+    let thi = this.n.random_numbs[thi_];
+    this.calcs.forEach((s) => {
+      if (s.charAt(0) == '/' && this.sec == 0) {
+      } else if (s.charAt(1) == '/' && this.thi == 0) {
+      }
       // never use eval if with user input
-      let e = (engine.eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi));
-      if (e > r.getmin() && e < r.getmax())
-        possible.add(e);
-    } catch (q) {
-    }
-  });
-}
+      let e = (eval(this.one + (s.charAt(0) + "") + this.sec + (s.charAt(1) + "") + this.thi));
+      if (this.e > this.n.getmin() && this.e < this.n.getmax())
+        this.possible.add(e);
+    });
+  }
 
-function check() {
-  let clomuns_t2 = columns << 1;
-  for (let i = 0; i < rows; i++) {
-    let index_ = i * columns;
-    n.setthreadfin(false);
-    for (let e = 0; e < columns; e++) {
-      if (stop)
-        return;
-      let index = index_ + e;
-      n.setprogress((index / (rows * columns)) * 100);
+  check() {
+    let clomuns_t2 = columns << 1;
+    for (let i = 0; i < rows; i++) {
+      let index_ = i * columns;
+      this.n.setthreadfin(false);
+      for (let e = 0; e < columns; e++) {
+        if (this.stop)
+          return;
+        let index = index_ + e;
+        this.n.setprogress((index / (rows * columns)) * 100);
 
-      if (i > 2 && i < rows - 2 && e > 2 && e < columns - 2) {
-        possibilities(index, index + 1, index + 2);
-        possibilities(index, index - 1, index - 2);
-        possibilities(index, index - columns, index - clomuns_t2);
-        possibilities(index, index + columns, index + clomuns_t2);
-        possibilities(index, index - columns + 1, index - clomuns_t2 + 2);
-        possibilities(index, index + columns + 1, index + clomuns_t2 + 2);
-        possibilities(index, index - columns - 1, index - clomuns_t2 - 2);
-        possibilities(index, index + columns - 1, index + clomuns_t2 - 2);
-      } else {
-        if (i < 2) {
-          possibilities(index, index + columns, index + clomuns_t2);
-          if (e > 2 && e < columns - 2) {
-            possibilities(index, index + 1, index + 2);
-            possibilities(index, index - 1, index - 2);
-            possibilities(index, index + columns + 1, index + clomuns_t2 + 2);
-            possibilities(index, index + columns - 1, index + clomuns_t2 - 2);
+        if (i > 2 && i < rows - 2 && e > 2 && e < columns - 2) {
+          this.possibilities(index, index + 1, index + 2);
+          this.possibilities(index, index - 1, index - 2);
+          this.possibilities(index, index - columns, index - clomuns_t2);
+          this.possibilities(index, index + columns, index + clomuns_t2);
+          this.possibilities(index, index - columns + 1, index - clomuns_t2 + 2);
+          this.possibilities(index, index + columns + 1, index + clomuns_t2 + 2);
+          this.possibilities(index, index - columns - 1, index - clomuns_t2 - 2);
+          this.possibilities(index, index + columns - 1, index + clomuns_t2 - 2);
+        } else {
+          if (i < 2) {
+            this.possibilities(index, index + columns, index + clomuns_t2);
+            if (e > 2 && e < columns - 2) {
+              this.possibilities(index, index + 1, index + 2);
+              this.possibilities(index, index - 1, index - 2);
+              this.possibilities(index, index + columns + 1, index + clomuns_t2 + 2);
+              this.possibilities(index, index + columns - 1, index + clomuns_t2 - 2);
+            }
+          } else if (i > rows - 2) {
+            this.possibilities(index, index - columns, index - clomuns_t2);
+            if (e > 2 && e < columns - 2) {
+              this.possibilities(index, index + 1, index + 2);
+              this.possibilities(index, index - 1, index - 2);
+              this.possibilities(index, index - columns + 1, index - clomuns_t2 + 2);
+              this.possibilities(index, index - columns - 1, index - clomuns_t2 - 2);
+            }
           }
-        } else if (i > rows - 2) {
-          possibilities(index, index - columns, index - clomuns_t2);
-          if (e > 2 && e < columns - 2) {
-            possibilities(index, index + 1, index + 2);
-            possibilities(index, index - 1, index - 2);
-            possibilities(index, index - columns + 1, index - clomuns_t2 + 2);
-            possibilities(index, index - columns - 1, index - clomuns_t2 - 2);
-          }
-        }
-        if (e < 2) {
-          possibilities(index, index + 1, index + 2);
-          if (i > 2 && i < rows - 2) {
-            possibilities(index, index - columns, index - clomuns_t2);
-            possibilities(index, index + columns, index + clomuns_t2);
-            possibilities(index, index - columns + 1, index - clomuns_t2 + 2);
-            possibilities(index, index + columns + 1, index + clomuns_t2 + 2);
-          }
-        } else if (e > columns - 2) {
-          possibilities(index, index - 1, index - 2);
-          if (i > 2 && i < rows - 2) {
-            possibilities(index, index - columns, index - clomuns_t2);
-            possibilities(index, index + columns, index + clomuns_t2);
-            possibilities(index, index - columns - 1, index - clomuns_t2 - 2);
-            possibilities(index, index + columns - 1, index + clomuns_t2 - 2);
+          if (e < 2) {
+            this.possibilities(index, index + 1, index + 2);
+            if (i > 2 && i < rows - 2) {
+              this.possibilities(index, index - columns, index - clomuns_t2);
+              this.possibilities(index, index + columns, index + clomuns_t2);
+              this.possibilities(index, index - columns + 1, index - clomuns_t2 + 2);
+              this.possibilities(index, index + columns + 1, index + clomuns_t2 + 2);
+            }
+          } else if (e > columns - 2) {
+            this.possibilities(index, index - 1, index - 2);
+            if (i > 2 && i < rows - 2) {
+              this.possibilities(index, index - columns, index - clomuns_t2);
+              this.possibilities(index, index + columns, index + clomuns_t2);
+              this.possibilities(index, index - columns - 1, index - clomuns_t2 - 2);
+              this.possibilities(index, index + columns - 1, index + clomuns_t2 - 2);
+            }
           }
         }
       }
     }
+    this.possible = (this.removeDuplicates(this.possible));
   }
-  possible = (removeDuplicates(possible));
+
+  removeDuplicates(list) {
+    if (list == null || list.length == 0) {
+      return list;
+    }
+    let set = new Set(list);
+    list.clear();
+    list.addAll(set);
+    return list;
+  }
 }
 
-// function removeDuplicates(list) {
-//   if (list == null || list.size() == 0) {
-//     return list;
-//   }
-//   Set set = new HashSet(list);
-//   list.clear();
-//   list.addAll(set);
-//   return list;
-// }
+const p2_16 = 0x0000000010000;
+const p2_24 = 0x0000001000000;
+const p2_27 = 0x0000008000000;
+const p2_31 = 0x0000080000000;
+const p2_32 = 0x0000100000000;
+const p2_48 = 0x1000000000000;
+const p2_53 = Math.pow(2, 53);	// NB: exceeds Number.MAX_SAFE_INTEGER
+
+const m2_16 = 0xffff;
+
+//
+// multiplicative term for the PRNG
+//
+const [c2, c1, c0] = [0x0005, 0xdeec, 0xe66d];
+class Random {
+  constructor(seedval) {
+
+    let s2, s1, s0;
+    let nextNextGaussian;
+    let haveNextNextGaussian = false;
+
+    //
+    // 53-bit safe version of
+    // seed = (seed * 0x5DEECE66DL + 0xBL) & ((1L << 48) - 1)
+    //
+    const _next = () => {
+
+      let carry = 0xb;
+
+      let r0 = (s0 * c0) + carry;
+      carry = r0 >>> 16;
+      r0 &= m2_16;
+
+      let r1 = (s1 * c0 + s0 * c1) + carry;
+      carry = r1 >>> 16;
+      r1 &= m2_16;
+
+      let r2 = (s2 * c0 + s1 * c1 + s0 * c2) + carry;
+      r2 &= m2_16;
+
+      [s2, s1, s0] = [r2, r1, r0];
+
+      return s2 * p2_16 + s1;
+    }
+
+    const next_signed = (bits) => {
+      return _next() >> (32 - bits);
+    }
+
+    const next = (bits) => {
+      return _next() >>> (32 - bits);
+    }
+
+    const checkIsNumber = (n) => {
+      if (typeof n !== 'number') {
+        throw TypeError();
+      }
+    }
+
+    const checkIsPositiveInt = (n, r = Number.MAX_SAFE_INTEGER) => {
+      checkIsNumber(n);
+      if (n < 0 || n > r) {
+        throw RangeError();
+      }
+    }
+
+    //
+    // 53-bit safe version of
+    // seed = (seed ^ 0x5DEECE66DL) & ((1L << 48) - 1)
+    //
+    function setSeed(n) {
+      checkIsPositiveInt(n);
+      s0 = ((n) & m2_16) ^ c0;
+      s1 = ((n / p2_16) & m2_16) ^ c1;
+      s2 = ((n / p2_32) & m2_16) ^ c2;
+    }
+
+    function nextInt(bound) {
+      if (bound === undefined) {
+        return next_signed(32);
+      }
+
+      checkIsPositiveInt(bound, 0x7fffffff);
+
+      // special case if bound is a power of two
+      if ((bound & -bound) === bound) {
+        let r = next(31) / p2_31;
+        return ~~(bound * r);
+      }
+
+      var bits, val;
+      do {
+        bits = next(31);
+        val = bits % bound;
+      } while (bits - val + (bound - 1) < 0);
+      return val;
+    }
+
+    function nextLong() {
+      if (typeof BigInt !== 'function') {
+        throw Error('BigInt unsupported');
+      }
+      let msb = BigInt(next_signed(32));
+      let lsb = BigInt(next_signed(32));
+      const p2_32n = BigInt(p2_32);
+      return msb * p2_32n + lsb;
+    }
+
+    function nextBoolean() {
+      return next(1) != 0;
+    }
+
+    function nextFloat() {
+      return next(24) / p2_24;
+    }
+
+    function nextDouble() {
+      return (p2_27 * next(26) + next(27)) / p2_53;
+    }
+
+    function nextBytes(bytes) {
+      if (!Array.isArray(bytes)) {
+        throw TypeError;
+      }
+
+      for (let i = 0; i < bytes.length;) {
+        for (let rnd = nextInt(), n = Math.min(bytes.length - i, 4);
+          n-- > 0;
+          rnd >>= 8) {
+          // double shift extends bit sign in bit 7
+          bytes[i++] = (rnd << 24) >> 24;
+        }
+      }
+    }
+
+    function nextGaussian() {
+      if (haveNextNextGaussian) {
+        haveNextNextGaussian = false;
+        return nextNextGaussian;
+      } else {
+        let v1, v2, s;
+        do {
+          v1 = 2 * nextDouble() - 1.0;
+          v2 = 2 * nextDouble() - 1.0;
+          s = v1 * v1 + v2 * v2;
+        } while (s >= 1 || s === 0);
+        let multiplier = Math.sqrt(-2 * Math.log(s) / s);
+        nextNextGaussian = v2 * multiplier;
+        haveNextNextGaussian = true;
+        return v1 * multiplier;
+      }
+    }
+
+    //
+    // stream functions replaced with JS generators
+    //
+    function checkStreamSize(streamSize) {
+      if (streamSize === undefined) {
+        return undefined;
+      }
+
+      checkIsPositiveInt(streamSize);
+
+      return streamSize;
+    }
+
+    function* ints(streamSize) {
+      streamSize = checkStreamSize(streamSize);
+      let forever = streamSize === undefined;
+      while (forever || (streamSize-- > 0)) {
+        yield nextInt();
+      }
+    }
+
+    function* longs(streamSize) {
+      streamSize = checkStreamSize(streamSize);
+      let forever = streamSize === undefined;
+      while (forever || (streamSize-- > 0)) {
+        yield nextLong();
+      }
+    }
+
+    function* doubles(streamSize) {
+      streamSize = checkStreamSize(streamSize);
+      let forever = streamSize === undefined;
+      while (forever || (streamSize-- > 0)) {
+        yield nextDouble();
+      }
+    }
+
+    // list of functions to export, using ES6 scoped-variable keys
+    const functions = {
+      setSeed,
+      nextInt, nextBoolean, nextLong, nextBytes,
+      nextFloat, nextDouble, nextGaussian,
+      ints, longs, doubles
+    };
+
+    // remove BigInt support if not available
+    if (typeof BigInt !== 'function') {
+      delete functions.nextLong;
+      delete functions.longs;
+    }
+
+    // convert into Property Descriptors
+    for (let f in functions) {
+      functions[f] = { value: functions[f] };
+    }
+
+    // add them to the current object
+    Object.defineProperties(this, functions);
+
+    // perform seed initialisation
+    if (seedval === undefined) {
+      seedval = Math.floor(Math.random() * p2_48);
+    }
+    setSeed(seedval);
+  }
+};
+
+// Warn if overriding existing method
+if (Array.prototype.equals)
+  console.warn("Overriding existing Array.prototype.equals. Possible causes: New API defines the method, there's a framework conflict or you've got double inclusions in your code.");
+// attach the .equals method to Array's prototype to call it on any array
+Array.prototype.equals = function (array) {
+  // if the other array is a falsy value, return
+  if (!array)
+    return false;
+
+  // compare lengths - can save a lot of time 
+  if (this.length != array.length)
+    return false;
+
+  for (var i = 0, l = this.length; i < l; i++) {
+    // Check if we have nested arrays
+    if (this[i] instanceof Array && array[i] instanceof Array) {
+      // recurse into the nested arrays
+      if (!this[i].equals(array[i]))
+        return false;
+    }
+    else if (this[i] != array[i]) {
+      // Warning - two different object instances will never be equal: {x:20} != {x:20}
+      return false;
+    }
+  }
+  return true;
+}
+// Hide method from for-in loops
+Object.defineProperty(Array.prototype, "equals", { enumerable: false });
+
+// Warn if overriding existing method
+if (Array.prototype.contains)
+  console.warn("Overriding existing Array.prototype.contains. Possible causes: New API defines the method, there's a framework conflict or you've got double inclusions in your code.");
+// attach the .equals method to Array's prototype to call it on any array
+Array.prototype.contains = function (array) {
+  if (this.length == 0)
+    return -1;
+
+  if (this == null)
+    return -1;
+
+  if (!this)
+    return -1;
+
+  if (array == null)
+    return -1;
+
+  if (!array)
+    return -1;
+
+  let e = -1;
+  let b = false;
+  let o = 0;
+  this.forEach((data) => {
+    let set = false;
+    if (b)
+      return;
+
+    if (data.length != array.length)
+      return;
+
+    for (let i = 0; i < data.length; i++) {
+      if (data[i] == array[i]) {
+        if (!set) {
+          b = true;
+          e = o;
+        }
+      } else {
+        b = false;
+        set = true;
+      }
+    }
+    o += 1;
+  });
+  if (b && e != -1)
+    return e;
+
+  return -1;
+}
+// Hide method from for-in loops
+Object.defineProperty(Array.prototype, "contains", { enumerable: false });

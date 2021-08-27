@@ -13,6 +13,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   <link rel="stylesheet" src="../trio.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script type="text/javascript" src="trio.js"></script>
   <title>Trio</title>
 </head>
@@ -24,11 +25,12 @@
       </div>
     </div>
     <div class="row" style="margin-top: 1rem;">
-      <div class="col-lg-1" style="display: flex;">
-        <div class="row" style="justify-content: center; height: inherit; display: flex;">
-          <div id="buts_container" class="col-lg-10" style="height: inherit;">
-            <button id="current_rand" onclick="rerand()">No rand at this time</button>
-            <button id="reroll_b" onclick="rerand()">reroll</button>
+      <div class="col-lg-1" style="display: flex; padding-right: 0px;">
+        <div class="row" style="justify-content: center; height: inherit; display: flex; width: 100%;">
+          <div id="buts_container_left" class="col-lg-10" style="height: inherit; width: 100%; padding-right: 0px;">
+            <button id="current_rand" onclick="rerand()" style="min-height: 30px;">No rand at this time</button>
+            <button id="reroll_b" onclick="rerand()" style="min-height: 30px;">reroll</button>
+            <button id="reset_b" onclick="reset()" style="min-height: 30px;">reset</button>
           </div>
         </div>
       </div>
@@ -52,6 +54,18 @@
         </div>
       </div>
       <div class="col-lg-1">
+        <div class="row">
+          <div id="buts_container_right">
+            <button id="darkmode_b" onclick="dark_switch()" style="min-height: 30px;"><i style="font-size:24px" class="fa">&#xf186;</i></button>
+            <button id="settings_b" onclick="opensettings()" style="min-height: 30px;"><i style="font-size:24px" class="fa">&#x2699;</i></button>
+            <button id="instructions_b" onclick="openinstructions()" style="min-height: 30px;"><i style="font-size:24px" class="fa">&#x1F5CE;</i></button>
+          </div>
+        </div>
+        <div class="row">
+          <div id="calculation_list" class="col-lg-12">
+
+          </div>
+        </div>
       </div>
     </div>
     <div class="row">
