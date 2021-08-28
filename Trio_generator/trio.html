@@ -123,20 +123,20 @@
 <body>
   <div class="container-fluid">
     <!-- The Modal -->
-    <div id="myModal" class="modal">
+    <div id="instructions_modal" class="modal">
 
       <!-- Modal content -->
       <div class="modal-content">
         <div class="modal-header">
+          <h3>Instructions</h3>
           <span class="close">&times;</span>
-          <h2>Modal Header</h2>
+
         </div>
         <div class="modal-body">
-          <p>Some text in the Modal Body</p>
-          <p>Some other text...</p>
+          <p>Anleitung für Trio</p>
+          <p>[show example]</p>
         </div>
         <div class="modal-footer">
-          <h3>Modal Footer</h3>
         </div>
       </div>
 
@@ -147,89 +147,64 @@
     </div>
     <div class="row" style="margin-top: 1rem;">
       <div class="col-lg-1" style="display: flex; padding-right: 0px;">
-        <div class="row" style="justify-content: center; height: inherit; display: flex; width: 100%;">
-          <div id="buts_container_left" class="col-lg-10" style="height: inherit; width: 100%; padding-right: 0px;">
+        <div class="row"
+          style="justify-content: center; height: inherit; display: flex; width: 100%; margin-bottom: 1rem;">
+          <div id="buts_container_left" class="col-lg-10"
+            style="height: inherit; width: 100%; padding-right: 0px; margin-top: 1rem;">
             <button id="current_rand" onclick="rerand()" style="min-height: 30px;">No rand at this time</button>
             <button id="reroll_b" onclick="rerand()" style="min-height: 30px;">reroll</button>
             <button id="reset_b" onclick="reset()" style="min-height: 30px;">reset</button>
           </div>
         </div>
       </div>
-      <div class="col-lg-10">
+      <div class="col-lg-10" style="margin-left: 0px; padding-left: 0px;">
         <div class="row">
           <div class="col-lg-12">
             <div class="row">
-              <div id="x-achse" class="col-lg-12">
-
-              </div>
-            </div>
-            <div class="row">
-              <div id="y-achse" class="col-lg-1">
-
-              </div>
-              <div id="container" class="col-lg-12">
+              <div id="container" class="col-lg-12" style="margin: 0px; padding: 0px;">
 
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-lg-1">
-        <div class="row">
-          <div id="buts_container_right">
-            <button id="darkmode_b" onclick="dark_switch()" style="min-height: 30px;"><i style="font-size:24px"
-                class="fa">&#xf186;</i></button>
-            <button id="settings_b" onclick="opensettings()" style="min-height: 30px;"><i style="font-size:24px"
-                class="fa">&#x2699;</i></button>
-            <button id="instructions_b" onclick="openinstructions()" style="min-height: 30px;"><i style="font-size:24px"
-                class="fa">&#x1F5CE;</i></button>
-          </div>
-        </div>
-        <div class="row">
-          <div id="calculation_list" class="col-lg-12">
+      <div class="col-lg-1" style="display: flex; padding-right: 0px;">
+        <div class="row"
+          style="justify-content: center; height: inherit; display: flex; width: 100%; margin-bottom: 1rem;">
+          <div class="col-lg-12" style="margin-right: 0px; padding-right: 0px;">
+            <div class="row">
+              <div id="buts_container_left" class="col-lg-10"
+                style="height: inherit; width: 100%; padding-right: 0px; margin-top: 1rem;">
+                <button id="darkmode_b" onclick="dark_switch()" style="min-height: 30px;font-size:24px"
+                  class="fa">&#xf186;</button>
+                <button id="settings_b" onclick="opensettings()" style="min-height: 30px;font-size:24px"
+                  class="fa">&#x2699;</button>
+                <button id="instructions_b" style="min-height: 30px;font-size:24px" class="fa">&#x1F5CE;</button>
+              </div>
+            </div>
+            <div class="row"
+              style="justify-content: center; height: inherit; display: flex; width: 100%; margin-bottom: 1rem; padding-right: 0px; margin-right: 0px;">
+              <div id="calculation_list" class="col-lg-12">
 
+              </div>
+            </div>
           </div>
         </div>
+
       </div>
     </div>
     <div class="row">
       <div class="col-lg-12" style="text-align: center;">
-        <h4>Erstellt von</h4>
-        <h6>Bennet Richter</h6>
-        <h6>Mattis Negraszus</h6>
-        <h6>2021</h6>
+        <h4 class="footer">Erstellt von</h4>
+        <h6 class="footer">Bennet Richter</h6>
+        <h6 class="footer">Mattis Negraszus</h6>
+        <h6 class="footer">2021</h6>
+        <h6 class="footer"><a href="https://martinum.de/" style="text-decoration: none;">Gymnasium Martinum</h6>
       </div>
     </div>
   </div>
   <script type="text/javascript">
     setup();
-  </script>
-  <script>
-    // Get the modal
-    var modal = document.getElementById("myModal");
-
-    // Get the button that opens the modal
-    var btn = document.getElementById("instructions_b");
-
-    // Get the <span> element that closes the modal
-    var span = document.getElementsByClassName("close")[0];
-
-    // When the user clicks the button, open the modal 
-    btn.onclick = function () {
-      modal.style.display = "block";
-    }
-
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function () {
-      modal.style.display = "none";
-    }
-
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function (event) {
-      if (event.target == modal) {
-        modal.style.display = "none";
-      }
-    }
   </script>
   <!--Bootstrap JS-->
   <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"

@@ -44,6 +44,9 @@ var site_distance = 2;
 var max_columns = 40;
 var min_columns = 5;
 
+var objects = [];
+var black = false;
+
 var buttons_init = false;
 
 //function setup(){r=new init_numbers(Integer.parseInt(Hex_r_seed,16));r.rand();fullScreen();}
@@ -51,6 +54,36 @@ function setup() {
   r = new init_numbers(parseInt(Hex_r_seed, 16), this);
   let rands = r.rand();
   gen_html_fields();
+  modal();
+}
+
+function modal() {
+  //modal
+  // Get the modal
+  var modal = document.getElementById("instructions_modal");
+
+  // Get the button that opens the modal
+  var btn = document.getElementById("instructions_b");
+
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close")[0];
+
+  // When the user clicks the button, open the modal 
+  btn.onclick = function () {
+    modal.style.display = "block";
+  }
+
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function () {
+    modal.style.display = "none";
+  }
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function (event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
 }
 
 function gen_html_fields() {
@@ -61,17 +94,51 @@ function gen_html_fields() {
     body = doc.getElementsByTagName('body')[0],
     x = win.innerWidth || docElem.clientWidth || body.clientWidth,
     y = win.innerHeight || docElem.clientHeight || body.clientHeight;
-  let height = (100 / (rows)) + "%";
-  let width = (100 / (columns * 1.1)) + "%";
+  let height = (100 / (rows + 1)) + "%";
+  let width = (100 / ((columns + 1) * 1.025)) + "%";
+  let row = document.createElement("div");
+  row.classList.add("row");
+  row.style.justifyContent = "center";
+  row.style.height = (100 / (rows + 1)) / 2 + "%";
+  document.getElementById("container").appendChild(row);
+  let col = document.createElement("div");
+  col.classList.add("col");
+  col.style.justifyContent = "center";
+  col.style.height = "50%";
+  b = document.createElement("button");
+  // b.onclick = function () { field_pressed(i, e) };
+  button_styles(b, height, (100 / ((columns + 1) * 1.025)) / 1.7 + "%");
+  b.style.border = "none";
+  b.style.outline = "none"
+  col.appendChild(b);
+  row.appendChild(b);
+  for (let i = 0; i < columns; i++) {
+    let col = document.createElement("div");
+    col.classList.add("col");
+    col.style.justifyContent = "center";
+    col.style.height = "50%";
+    b = document.createElement("button");
+    // b.onclick = function () { field_pressed(i, e) };
+    b.innerHTML = i;
+    button_styles(b, height, width);
+    b.style.border = "none";
+    b.style.outline = "none"
+    col.appendChild(b);
+    row.appendChild(b);
+  }
   for (let i = 0; i < rows; i++) {
-    //console.log("2:" + i + ", " + columns);
     let row = document.createElement("div");
     row.classList.add("row");
     row.id = "r" + i;
     row.style.justifyContent = "center";
     row.style.height = height;
+    b = document.createElement("button");
+    b.innerHTML = i;
+    button_styles(b, height, (100 / ((columns + 1) * 1.025)) / 1.7 + "%");
+    b.style.border = "none";
+    b.style.outline = "none"
+    row.appendChild(b);
     for (let e = 0; e < columns; e++) {
-      //console.log("3:" + e);
       b = document.createElement("button");
       b.id = "r" + i + ",c" + e;
       box = [...box, "r" + i + ",c" + e];
@@ -84,6 +151,12 @@ function gen_html_fields() {
     document.getElementById("container").appendChild(row);
     document.getElementById("container").style.height = y * 0.9 + "px";
   }
+  other_buttons();
+}
+
+function other_buttons() {
+  let height = (100 / (rows)) + "%";
+  let width = (100 / (columns * 1.025)) + "%";
   b = document.getElementById("current_rand");
   button_styles(b, height, width);
   b.style.width = "100%";
@@ -118,6 +191,9 @@ function gen_html_fields() {
 }
 
 function button_styles(b, height, width) {
+  if (objects.indexOf(b) == -1) {
+    objects = [...objects, b];
+  }
   b.style.paddingLeft = 0;
   b.style.paddingRight = 0;
   if (height <= 0 || width <= 0) {
@@ -133,8 +209,53 @@ function button_styles(b, height, width) {
   b.style.overflow = "hidden";
   b.style.height = "100%";
   b.style.width = width;
-  b.style.backgroundColor = "#FFFFFF";
   b.style.borderRadius = "20%";
+  if (black) {
+    b.style.backgroundColor = "#000000";
+    b.style.borderColor = "#FFFFFF";
+    b.style.color = "#FFFFFF";
+  } else {
+    b.style.backgroundColor = "#FFFFFF";
+    b.style.borderColor = "#000000";
+    b.style.color = "#000000";
+  }
+}
+
+function button_color(b) {
+  if (black) {
+    b.style.backgroundColor = "#000000";
+    b.style.borderColor = "#FFFFFF";
+    b.style.color = "#FFFFFF";
+  } else {
+    b.style.backgroundColor = "#FFFFFF";
+    b.style.borderColor = "#000000";
+    b.style.color = "#000000";
+  }
+}
+
+function togglebtn(b, bol) {
+  b.disabled = bol;
+  if (bol) {
+    if (black) {
+      b.style.backgroundColor = "#333333";
+      b.style.borderColor = "#666666";
+      b.style.color = "#BBBBBB";
+    } else {
+      b.style.backgroundColor = "#BBBBBB";
+      b.style.borderColor = "#666666";
+      b.style.color = "#333333";
+    }
+  } else {
+    if (black) {
+      b.style.backgroundColor = "#000000";
+      b.style.borderColor = "#FFFFFF";
+      b.style.color = "#FFFFFF";
+    } else {
+      b.style.backgroundColor = "#FFFFFF";
+      b.style.borderColor = "#000000";
+      b.style.color = "#000000";
+    }
+  }
 }
 
 function field_pressed(i, e) {
@@ -165,24 +286,38 @@ function field_pressed(i, e) {
             //never use eval if with user input
             out = (eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi));
             if (out == r.getcurrent_random_numb()) {
-              clicked_box.forEach((data) => { document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = right_color; p.style.color = right_color; document.getElementById("r" + data[0] + ",c" + data[1]).style.color = '#000000'; });
+              p.style.color = right_color;
               right = true;
             } else {
               p.style.color = wrong_color;
-              clicked_box.forEach((data) => { document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = wrong_color; document.getElementById("r" + data[0] + ",c" + data[1]).style.color = '#FFFFFF'; });
-              right = false;
             }
           }
-        } if (right) { b.style.backgroundColor = right_color; b.style.color = '#000000'; } else { b.style.backgroundColor = wrong_color; b.style.color = '#FFFFFF'; }
+          if (right) {
+            b.style.backgroundColor = right_color; b.style.color = '#000000';
+            clicked_box.forEach((data) => {
+              document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = right_color;
+              document.getElementById("r" + data[0] + ",c" + data[1]).style.color = '#000000';
+            });
+          } else {
+            b.style.backgroundColor = wrong_color;
+            b.style.color = '#FFFFFF';
+            clicked_box.forEach((data) => {
+              document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = wrong_color;
+              document.getElementById("r" + data[0] + ",c" + data[1]).style.color = '#FFFFFF';
+            });
+          }
+        }
       } else {
         b.style.backgroundColor = pending_color;
         b.style.color = '#FFFFFF';
         if (clicked_box.length == 1) {
           box.forEach((data) => {
-            document.getElementById(data).disabled = true;
+            togglebtn(document.getElementById(data), true);
           });
           clicked_box.forEach((data) => {
             document.getElementById("r" + data[0] + ",c" + data[1]).disabled = false;
+            document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = pending_color;
+            document.getElementById("r" + data[0] + ",c" + data[1]).style.color = "#FFFFFF";
           });
           possible_box = [...possible_box, [(i), (e + 1)], [(i), (e - 1)], [(i + 1), (e)], [(i - 1), (e)], [(i + 1), (e + 1)], [(i + 1), (e - 1)], [(i - 1), (e + 1)], [(i - 1), (e - 1)]];
           possible_box = [...possible_box, [(i), (e + 2)], [(i), (e - 2)], [(i + 2), (e)], [(i - 2), (e)], [(i + 2), (e + 2)], [(i + 2), (e - 2)], [(i - 2), (e + 2)], [(i - 2), (e - 2)]];
@@ -235,7 +370,7 @@ function field_pressed(i, e) {
             save.forEach((data) => { if (data.equals(value)) { tr = false; } });
             if (tr) {
               let data = "r" + value[0] + ",c" + value[1];
-              document.getElementById(data).disabled = false;
+              togglebtn(document.getElementById(data), false);
             }
           });
           possible_box = [];
@@ -278,18 +413,16 @@ function field_pressed(i, e) {
     }
   } else {
     if (clicked_box.contains([i, e]) != 0) {
-      document.getElementById("r" + clicked_box[1][0] + ",c" + clicked_box[1][1]).style.backgroundColor = "#FFFFFF";
-      document.getElementById("r" + clicked_box[1][0] + ",c" + clicked_box[1][1]).style.color = '#000000';
-      document.getElementById("r" + clicked_box[2][0] + ",c" + clicked_box[2][1]).style.backgroundColor = "#FFFFFF";
-      document.getElementById("r" + clicked_box[2][0] + ",c" + clicked_box[2][1]).style.color = '#000000';
+      button_color(document.getElementById("r" + clicked_box[1][0] + ",c" + clicked_box[1][1]));
+      button_color(document.getElementById("r" + clicked_box[2][0] + ",c" + clicked_box[2][1]));
       clicked_box = [clicked_box[0]];
     } else {
       clicked_box.forEach((data) => {
-        document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = "#FFFFFF"; document.getElementById("r" + data[0] + ",c" + data[1]).style.color = '#000000';
+        button_color(document.getElementById("r" + data[0] + ",c" + data[1]));
       });
       clicked_box = [];
       box.forEach((data) => {
-        document.getElementById(data).disabled = false;
+        togglebtn(document.getElementById(data), false);
       });
     }
     clicked_box.forEach((data) => {
@@ -350,17 +483,31 @@ function reset_action(b) { if (b) { if (r2 != null) { r2.stopthread(); r2 = null
 
 function initpregen() { if (r2 == null || r2 == r) { r2 = new init_numbers(0); r2.rand(); } }
 
-function setclicked_box(array) {
-  clicked_box = array;
-}
+function setclicked_box(array) { clicked_box = array; }
 
 function rerand() { r.rerand(); document.getElementById("current_rand").innerHTML = r.getcurrent_random_numb(); }
 
 function reset() { location.reload(); }
 
-function darkswitch() { /* TODO*/ }
+function dark_switch() {
+  clicked_box = [];
+  if (black) {
+    black = false;
+    objects.forEach((data) => { button_color(data); });
+    document.getElementsByClassName("container-fluid")[0].style.backgroundColor = "#FFFFFF";
+    Array.prototype.forEach.call(document.getElementsByClassName("footer"), (data) => { data.style.color = "#000000" });
+    document.getElementById("darkmode_b").innerHTML = "&#xf186;";
+    document.getElementById("calculation_list").innerHTML = null;
+  } else {
+    black = true;
+    objects.forEach((data) => { button_color(data); });
+    document.getElementsByClassName("container-fluid")[0].style.backgroundColor = "#000000";
+    Array.prototype.forEach.call(document.getElementsByClassName("footer"), (data) => { data.style.color = "#FFFFFF" });
+    document.getElementById("darkmode_b").innerHTML = "&#xf185;";
+    document.getElementById("calculation_list").innerHTML = null;
+  }
+}
 function opensettings() { /* TODO*/ }
-function openinstructions() { /* TODO*/ }
 
 /*
  0. zero
@@ -418,11 +565,12 @@ class init_numbers {
   rerand() {
     this.trio.setclicked_box([]);
     this.current_random_numb = this.new_current_random_numb();
-    console.log(this.current_random_numb);
+    if (this.current_random_numb == null || this.current_random_numb <= 0) {
+      this.rerand();
+    }
   }
 
   rand() {
-    // stopthread();
     if (this.seed == 0) {
       this.seed = (Math.random() * 10000 * Math.random());
     }
@@ -431,16 +579,11 @@ class init_numbers {
     if (this.trio.extreme_calc) {
       this.p = new possiblenumbs(this, this.calculations_list, this.trio);
       this.p.run();
-      // t.start();
-      this.start_numb();
     } else {
       for (let i = this.min; i < this.max; i++) {
         this.possible_numbs = [...this.possible_numbs, i];
-        //setprogress(i / max);
       }
-      //setprogress(100);
       this.getrandom_numb();
-      // setthreadfin(true);
       this.clicked_box = [];
     }
     this.current_random_numb = this.new_current_random_numb();
@@ -548,10 +691,16 @@ class init_numbers {
   new_current_random_numb() {
     // new current random Number (unique)
     if (this.possible_numbs.length > 0) {
-      this.possible_numbs.splice(this.possible_numbs.indexOf(this.current_random_numb), this.possible_numbs.indexOf(this.current_random_numb));
+      let save = [];
+      this.possible_numbs.forEach((data) => {
+        if (data != this.current_random_numb) {
+          save = [...save, data];
+        }
+      });
+      this.possible_numbs = save;
       let i = Math.round(Math.random() * (this.possible_numbs.length - 1));
       if (i < 0) {
-        if (this.possible_numbs.size() >= 1 && (this.possible_numbs.get(0) > this.min && this.possible_numbs.get(0) < this.max)) {
+        if (this.possible_numbs.length >= 1 && (this.possible_numbs[0] > this.min && this.possible_numbs[0] < this.max)) {
           return this.possible_numbs.get(0);
         } else {
           this.found_nothing = true;
@@ -560,10 +709,8 @@ class init_numbers {
       }
       this.found_nothing = false;
       return this.possible_numbs[i];
-    } else if (this.threadfin) {
-      return ((Math.random() * (this.max - this.min) + this.min));
     } else {
-      return -2;
+      return (Math.round((Math.random() * (this.max - this.min) + this.min)));
     }
   }
 
@@ -688,13 +835,17 @@ class possiblenumbs {
     let sec = this.n.random_numbs[sec_];
     let thi = this.n.random_numbs[thi_];
     this.calcs.forEach((s) => {
-      if (s.charAt(0) == '/' && this.sec == 0) {
-      } else if (s.charAt(1) == '/' && this.thi == 0) {
+      if (s.charAt(0) == '/' && sec == 0) {
+        return;
+      } else if (s.charAt(1) == '/' && thi == 0) {
+        return;
       }
       // never use eval if with user input
-      let e = (eval(this.one + (s.charAt(0) + "") + this.sec + (s.charAt(1) + "") + this.thi));
-      if (this.e > this.n.getmin() && this.e < this.n.getmax())
-        this.possible.add(e);
+      let e = eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi + "");
+      if (e != Number.parseFloat(e).toFixed(0)) { return; }
+      if (e > this.n.getmin() && e < this.n.getmax()) {
+        this.possible = [...this.possible, e];
+      }
     });
   }
 
@@ -707,7 +858,6 @@ class possiblenumbs {
         if (this.stop)
           return;
         let index = index_ + e;
-        this.n.setprogress((index / (rows * columns)) * 100);
 
         if (i > 2 && i < rows - 2 && e > 2 && e < columns - 2) {
           this.possibilities(index, index + 1, index + 2);
@@ -764,8 +914,7 @@ class possiblenumbs {
       return list;
     }
     let set = new Set(list);
-    list.clear();
-    list.addAll(set);
+    list = [...set];
     return list;
   }
 }
