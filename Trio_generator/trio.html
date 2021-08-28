@@ -129,7 +129,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h3>Instructions</h3>
-          <span class="close">&times;</span>
+          <span class="close" id="instructions_close">&times;</span>
 
         </div>
         <div class="modal-body">
@@ -139,7 +139,77 @@
         <div class="modal-footer">
         </div>
       </div>
+    </div>
 
+    <div id="settings_modal" class="modal">
+
+      <!-- Modal content -->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Settings</h3>
+          <span class="close" id="settings_close">&times;</span>
+
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-lg-6">
+              <p>rows</p>
+            </div>
+            <div class="col-lg-3">
+              <p>rows</p>
+            </div>
+            <div class="col-lg-3">
+              <button>+</button>
+              <button>-</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-6">
+              <p>columns</p>
+            </div>
+            <div class="col-lg-3">
+              <p>columns</p>
+            </div>
+            <div class="col-lg-3">
+              <button>+</button>
+              <button>-</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-6">
+              <p>xcords</p>
+            </div>
+            <div class="col-lg-6">
+                <input type="radio" id="abc" name="ycord" value="abc">
+                <label for="abc">ABC</label>
+                <input type="radio" id="123" name="ycord" value="123">
+                <label for="123">123</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-6">
+              <p>ycords</p>
+            </div>
+            <div class="col-lg-6">
+                <input type="radio" id="abc" name="ycord" value="abc">
+                <label for="abc">ABC</label>
+                <input type="radio" id="123" name="ycord" value="123">
+                <label for="123">123</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-6">
+              <p>seed</p>
+            </div>
+            <div class="col-lg-6">
+                <input>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+
+        </div>
+      </div>
     </div>
     <div class="row">
       <div class="col">
@@ -180,6 +250,8 @@
                 <button id="settings_b" onclick="opensettings()" style="min-height: 30px;font-size:24px"
                   class="fa">&#x2699;</button>
                 <button id="instructions_b" style="min-height: 30px;font-size:24px" class="fa">&#x1F5CE;</button>
+                <button id="help_b" onclick="show_help()" style="min-height: 30px;font-size:24px"
+                  class="fa">&#x3F;</button>
               </div>
             </div>
             <div class="row"

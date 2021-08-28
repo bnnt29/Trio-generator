@@ -1,5 +1,4 @@
-var draw = 8;
-
+urlp = []; if (location.toString().indexOf('?') != -1) { s = location.toString().split('?'); s = s[1].split('&'); for (i = 0; i < s.length; i++) { u = s[i].split('='); urlp[u[0]] = u[1]; } }
 //label
 var x_buttons = [];
 var y_buttons = [];
@@ -8,12 +7,10 @@ var labeledbool = true;
 var labelbuttons = [];
 var label_init = true;
 
-var minimalistic = false;
-
 var roundboxes = 10;
 var buttons = [];
 
-var darkmode = false
+var darkmode = urlp['darkmode'] || false;
 
 var r;
 var r2;
@@ -23,8 +20,6 @@ var right_color = "#00FF00";
 var wrong_color = "#FF0000";
 var pending_color = "#0000FF";
 var seed_green_fade = 255;
-var weight = "#FFFFFF";
-var black = "000000";
 
 //numbers
 var extreme_calc = true;
@@ -32,20 +27,21 @@ var clicked_box = [];
 var possible_box = [];
 var box = [];
 //seed
-var Hex_r_seed = "0000";
+var Hex_r_seed = parseInt(urlp['seed']) || 0000;
 
 //grid_setup
-var rows = 10; //Zeilen
-var columns = 10; //Spalten
+var rows = parseInt(urlp['rows']) || 10; //Zeilen
+var columns = parseInt(urlp['columns']) || 10; //Spalten
+console.log(rows + ", " + columns);
 var column_width = 0;
 var column_height = 0;
 var X_offset = 0;
 var site_distance = 2;
-var max_columns = 40;
-var min_columns = 5;
 
 var objects = [];
 var black = false;
+var help = false;
+var helps = 0;
 
 var buttons_init = false;
 
@@ -58,30 +54,41 @@ function setup() {
 }
 
 function modal() {
-  //modal
-  // Get the modal
-  var modal = document.getElementById("instructions_modal");
-
-  // Get the button that opens the modal
-  var btn = document.getElementById("instructions_b");
-
-  // Get the <span> element that closes the modal
-  var span = document.getElementsByClassName("close")[0];
+  //modal instructions
+  var instruction = document.getElementById("instructions_modal");
+  var btn_instruction = document.getElementById("instructions_b");
+  var span_instruction = document.getElementById("instructions_close");
 
   // When the user clicks the button, open the modal 
-  btn.onclick = function () {
-    modal.style.display = "block";
+  btn_instruction.onclick = function () {
+    instruction.style.display = "block";
   }
 
   // When the user clicks on <span> (x), close the modal
-  span.onclick = function () {
-    modal.style.display = "none";
+  span_instruction.onclick = function () {
+    instruction.style.display = "none";
+  }
+
+  //modal settings
+  var settings = document.getElementById("settings_modal");
+  var btn_settings = document.getElementById("settings_b");
+  var span_settings = document.getElementById("settings_close");
+
+  // When the user clicks the button, open the modal 
+  btn_settings.onclick = function () {
+    settings.style.display = "block";
+  }
+
+  // When the user clicks on <span> (x), close the modal
+  span_settings.onclick = function () {
+    settings.style.display = "none";
   }
 
   // When the user clicks anywhere outside of the modal, close it
   window.onclick = function (event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
+    if (event.target == settings || event.target == instruction) {
+      settings.style.display = "none";
+      instruction.style.display = "none";
     }
   }
 }
@@ -142,7 +149,7 @@ function gen_html_fields() {
       b = document.createElement("button");
       b.id = "r" + i + ",c" + e;
       box = [...box, "r" + i + ",c" + e];
-      b.setAttribute("value", r.getrandomnumbs()[i * columns + e]);
+      b.setAttribute("value", r.getrandomnumbs()[i * columns + e] + "");
       b.onclick = function () { field_pressed(i, e) };
       b.innerHTML = r.getrandomnumbs()[i * columns + e] + "";
       button_styles(b, height, width);
@@ -184,6 +191,11 @@ function other_buttons() {
   b.style.height = (100 / (rows)) / 3 + "%";
   b.style.marginTop = "1rem";
   b = document.getElementById("settings_b");
+  button_styles(b, height, width);
+  b.style.width = "100%";
+  b.style.height = (100 / (rows)) / 3 + "%";
+  b.style.marginTop = "1rem";
+  b = document.getElementById("help_b");
   button_styles(b, height, width);
   b.style.width = "100%";
   b.style.height = (100 / (rows)) / 3 + "%";
@@ -485,19 +497,130 @@ function initpregen() { if (r2 == null || r2 == r) { r2 = new init_numbers(0); r
 
 function setclicked_box(array) { clicked_box = array; }
 
+function show_help() {
+  if (help) {
+    help = false;
+    helps = 0;
+    box.forEach((data) => {
+      togglebtn(document.getElementById(data), false);
+    });
+    document.getElementById("calculation_list").innerHTML = null;
+  } else {
+    clicked_box = [];
+    box.forEach((data) => {
+      togglebtn(document.getElementById(data), true);
+    });
+    help = true;
+    let success = false;
+    for (let i = 0; i < rows; i++) {
+      for (let e = 0; e < columns; e++) {
+        let index = "r" + i + ",c" + e;
+        if (i > 2 && i < rows - 2 && e > 2 && e < columns - 2) {
+          help_calc(index, "r" + i + ",c" + (e + 1), "r" + i + ",c" + (e + 2));
+          help_calc(index, "r" + i + ",c" + (e - 1), "r" + i + ",c" + (e - 2));
+          help_calc(index, "r" + (i - 1) + ",c" + e, "r" + (i - 2) + ",c" + e);
+          help_calc(index, "r" + (i + 1) + ",c" + e, "r" + (i + 2) + ",c" + e);
+          help_calc(index, "r" + (i - 1) + ",c" + (e + 1), "r" + (i - 2) + ",c" + (e + 2));
+          help_calc(index, "r" + (i + 1) + ",c" + (e + 1), "r" + (i + 2) + ",c" + (e + 2));
+          help_calc(index, "r" + (i - 1) + ",c" + (e - 1), "r" + (i - 2) + ",c" + (e - 2));
+          help_calc(index, "r" + (i + 1) + ",c" + (e - 1), "r" + (i + 2) + ",c" + (e - 2));
+        } else {
+          if (i < 2) {
+            help_calc(index, "r" + (i + 1) + ",c" + e, "r" + (i + 2) + ",c" + e);
+            if (e > 2 && e < columns - 2) {
+              help_calc(index, "r" + i + ",c" + (e + 1), "r" + i + ",c" + (e + 2));
+              help_calc(index, "r" + i + ",c" + (e - 1), "r" + i + ",c" + (e - 2));
+              help_calc(index, "r" + (i + 1) + ",c" + (e + 1), "r" + (i + 2) + ",c" + (e + 2));
+              help_calc(index, "r" + (i + 1) + ",c" + (e - 1), "r" + (i + 2) + ",c" + (e - 2));
+            }
+          } else if (i > rows - 2) {
+            help_calc(index, "r" + (i - 1) + ",c" + e, "r" + (i - 2) + ",c" + e);
+            if (e > 2 && e < columns - 2) {
+              help_calc(index, "r" + i + ",c" + (e + 1), "r" + i + ",c" + (e + 2));
+              help_calc(index, "r" + i + ",c" + (e - 1), "r" + i + ",c" + (e - 2));
+              help_calc(index, "r" + (i - 1) + ",c" + (e + 1), "r" + (i - 2) + ",c" + (e + 2));
+              help_calc(index, "r" + (i - 1) + ",c" + (e - 1), "r" + (i - 2) + ",c" + (e - 2));
+            }
+          }
+          if (e < 2) {
+            help_calc(index, "r" + i + ",c" + (e + 1), "r" + i + ",c" + (e + 2));
+            if (i > 2 && i < rows - 2) {
+              help_calc(index, "r" + (i - 1) + ",c" + e, "r" + (i - 2) + ",c" + e);
+              help_calc(index, "r" + (i + 1) + ",c" + e, "r" + (i + 2) + ",c" + e);
+              help_calc(index, "r" + (i - 1) + ",c" + (e + 1), "r" + (i - 2) + ",c" + (e + 2));
+              help_calc(index, "r" + (i + 1) + ",c" + (e + 1), "r" + (i + 2) + ",c" + (e + 2));
+            }
+          } else if (e > columns - 2) {
+            help_calc(index, "r" + i + ",c" + (e - 1), "r" + i + ",c" + (e - 2));
+            if (i > 2 && i < rows - 2) {
+              help_calc(index, "r" + (i - 1) + ",c" + e, "r" + (i - 2) + ",c" + e);
+              help_calc(index, "r" + (i + 1) + ",c" + e, "r" + (i + 2) + ",c" + e);
+              help_calc(index, "r" + (i - 1) + ",c" + (e - 1), "r" + (i - 2) + ",c" + (e - 2));
+              help_calc(index, "r" + (i + 1) + ",c" + (e - 1), "r" + (i + 2) + ",c" + (e - 2));
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+function help_calc(one_, sec_, thi_) {
+  let one = document.getElementById(one_).getAttribute("value");
+  let sec = document.getElementById(sec_).getAttribute("value");
+  let thi = document.getElementById(thi_).getAttribute("value");
+  r.calculations_list.forEach((s) => {
+    if (s.charAt(0) == '/' && sec == 0) {
+      return;
+    } else if (s.charAt(1) == '/' && thi == 0) {
+      return;
+    }
+    // never use eval if with user input
+    let e = eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi + "");
+    if (e != Number.parseFloat(e).toFixed(0)) { return; }
+    if (e > r.getmin() && e < r.getmax()) {
+      if (e == r.current_random_numb) {
+        document.getElementById(one_).style.backgroundColor = right_color;
+        document.getElementById(one_).style.color = '#000000';
+        document.getElementById(sec_).style.backgroundColor = right_color;
+        document.getElementById(sec_).style.color = '#000000';
+        document.getElementById(thi_).style.backgroundColor = right_color;
+        document.getElementById(thi_).style.color = '#000000';
+        if (helps <= 20) {
+          let p = document.createElement("p");
+          p.innerHTML = one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi + "";
+          document.getElementById("calculation_list").appendChild(p);
+          if (black) {
+            p.style.color = "#FFFFFF";
+          } else {
+            p.style.color = "#000000";
+          }
+          p.style.textAlign = "center";
+          helps += 1;
+        }
+      }
+    }
+  });
+}
+
 function rerand() { r.rerand(); document.getElementById("current_rand").innerHTML = r.getcurrent_random_numb(); }
 
 function reset() { location.reload(); }
 
 function dark_switch() {
   clicked_box = [];
+  document.getElementById("calculation_list").innerHTML = null;
+  helps = 0;
+  help = false;
+  box.forEach((data) => {
+    togglebtn(document.getElementById(data), false);
+  });
   if (black) {
     black = false;
     objects.forEach((data) => { button_color(data); });
     document.getElementsByClassName("container-fluid")[0].style.backgroundColor = "#FFFFFF";
     Array.prototype.forEach.call(document.getElementsByClassName("footer"), (data) => { data.style.color = "#000000" });
     document.getElementById("darkmode_b").innerHTML = "&#xf186;";
-    document.getElementById("calculation_list").innerHTML = null;
   } else {
     black = true;
     objects.forEach((data) => { button_color(data); });
@@ -526,7 +649,7 @@ function opensettings() { /* TODO*/ }
 class init_numbers {
   constructor(seed, trio) {
     // this.t;
-    this.p;
+    // this.p;
     this.min_plays = 30;
     // this.threadfin;
     // this.progress = 0;
@@ -563,6 +686,13 @@ class init_numbers {
   }
 
   rerand() {
+    clicked_box = [];
+    document.getElementById("calculation_list").innerHTML = null;
+    helps = 0;
+    help = false;
+    box.forEach((data) => {
+      togglebtn(document.getElementById(data), false);
+    });
     this.trio.setclicked_box([]);
     this.current_random_numb = this.new_current_random_numb();
     if (this.current_random_numb == null || this.current_random_numb <= 0) {
@@ -764,14 +894,6 @@ class init_numbers {
     return this.calculations_list;
   }
 
-  getthreadfin() {
-    return this.threadfin;
-  }
-
-  setthreadfin(b) {
-    this.threadfin = b;
-  }
-
   getmin() {
     return this.min;
   }
@@ -788,20 +910,6 @@ class init_numbers {
     return this.current_random_numb;
   }
 
-  stopthread() {
-    if (this.t != null) {
-      this.p.setstop();
-    }
-    this.t = null;
-  }
-
-  setprogress(p) {
-    this.progress = p;
-  }
-
-  getprogress() {
-    return this.progress;
-  }
 }
 
 class possiblenumbs {
@@ -822,8 +930,6 @@ class possiblenumbs {
     } else {
       this.n.setpossiblenumbs(this.possible);
       this.n.getrandom_numb();
-      this.n.setthreadfin(true);
-      this.n.setprogress(100);
       // this.trio.initpregen();
       // System.out.println("Thread finished in: " + (System.currentTimeMillis() - m) / 1000 + " sec and found: "
       //   + n.getpossiblenumbs().size() + " possibilities");
@@ -853,7 +959,6 @@ class possiblenumbs {
     let clomuns_t2 = columns << 1;
     for (let i = 0; i < rows; i++) {
       let index_ = i * columns;
-      this.n.setthreadfin(false);
       for (let e = 0; e < columns; e++) {
         if (this.stop)
           return;
