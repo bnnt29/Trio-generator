@@ -580,7 +580,7 @@ class init_numbers {
       this.p = new possiblenumbs(this, this.calculations_list, this.trio);
       this.p.run();
     } else {
-      for (let i = this.min; i < this.max; i++) {
+      for (let i = this.min; i < this.max - 1; i++) {
         this.possible_numbs = [...this.possible_numbs, i];
       }
       this.getrandom_numb();
