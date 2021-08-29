@@ -156,11 +156,11 @@
               <p>rows</p>
             </div>
             <div class="col-lg-3">
-              <p>rows</p>
+              <p id="row_count"></p>
             </div>
             <div class="col-lg-3">
-              <button>+</button>
-              <button>-</button>
+              <button id="row+" onclick="row('+')">+</button>
+              <button id="row-" onclick="row('-')">-</button>
             </div>
           </div>
           <div class="row">
@@ -168,11 +168,11 @@
               <p>columns</p>
             </div>
             <div class="col-lg-3">
-              <p>columns</p>
+              <p id="col_count"></p>
             </div>
             <div class="col-lg-3">
-              <button>+</button>
-              <button>-</button>
+              <button id="col+" onclick="col('+')">+</button>
+              <button id="col-" onclick="col('-')">-</button>
             </div>
           </div>
           <div class="row">
@@ -180,9 +180,9 @@
               <p>xcords</p>
             </div>
             <div class="col-lg-6">
-                <input type="radio" id="abc" name="ycord" value="abc">
+                <input type="radio" id="xabc" name="xcord" value="abc">
                 <label for="abc">ABC</label>
-                <input type="radio" id="123" name="ycord" value="123">
+                <input type="radio" id="x123" name="xcord" value="123">
                 <label for="123">123</label>
             </div>
           </div>
@@ -191,9 +191,9 @@
               <p>ycords</p>
             </div>
             <div class="col-lg-6">
-                <input type="radio" id="abc" name="ycord" value="abc">
+                <input type="radio" id="yabc" name="ycord" value="abc">
                 <label for="abc">ABC</label>
-                <input type="radio" id="123" name="ycord" value="123">
+                <input type="radio" id="y123" name="ycord" value="123">
                 <label for="123">123</label>
             </div>
           </div>
@@ -202,7 +202,12 @@
               <p>seed</p>
             </div>
             <div class="col-lg-6">
-                <input>
+                <input id="seed_field">
+            </div>
+          </div>
+          <div class="row" style="justify-content: center; align-items: center;">
+            <div class="col-lg-2">
+              <button id="reset_url_b" onclick="reset_url()">reset settings</button>
             </div>
           </div>
         </div>
@@ -223,7 +228,13 @@
             style="height: inherit; width: 100%; padding-right: 0px; margin-top: 1rem;">
             <button id="current_rand" onclick="rerand()" style="min-height: 30px;">No rand at this time</button>
             <button id="reroll_b" onclick="rerand()" style="min-height: 30px;">reroll</button>
-            <button id="reset_b" onclick="reset()" style="min-height: 30px;">reset</button>
+            <button id="reset_b" onclick="reset()" style="min-height: 30px; position:">reset</button>
+            <div class="row">
+              <div class="col">
+                <p id="seed_label" style="text-align: center; margin-top: 1rem; ">seed:</p>
+                <p id="seed" style="text-align: center; margin-bottom: 1rem;"></p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -243,7 +254,7 @@
           style="justify-content: center; height: inherit; display: flex; width: 100%; margin-bottom: 1rem;">
           <div class="col-lg-12" style="margin-right: 0px; padding-right: 0px;">
             <div class="row">
-              <div id="buts_container_left" class="col-lg-10"
+              <div id="buts_container_right" class="col-lg-10"
                 style="height: inherit; width: 100%; padding-right: 0px; margin-top: 1rem;">
                 <button id="darkmode_b" onclick="dark_switch()" style="min-height: 30px;font-size:24px"
                   class="fa">&#xf186;</button>

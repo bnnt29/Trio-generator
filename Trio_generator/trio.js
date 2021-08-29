@@ -1,43 +1,33 @@
 urlp = []; if (location.toString().indexOf('?') != -1) { s = location.toString().split('?'); s = s[1].split('&'); for (i = 0; i < s.length; i++) { u = s[i].split('='); urlp[u[0]] = u[1]; } }
 //label
-var x_buttons = [];
-var y_buttons = [];
-var labeledint = 1;
-var labeledbool = true;
-var labelbuttons = [];
-var label_init = true;
+var xlabeled = urlp['xcord'] || false;
+var ylabeled = urlp['ycord'] || true;
 
-var roundboxes = 10;
-var buttons = [];
-
-var darkmode = urlp['darkmode'] || false;
-
-var r;
-var r2;
+var darkmode = false;
 
 //colors
 var right_color = "#00FF00";
 var wrong_color = "#FF0000";
 var pending_color = "#0000FF";
-var seed_green_fade = 255;
+var darkmode_black = "#141414";
 
 //numbers
 var extreme_calc = true;
 var clicked_box = [];
 var possible_box = [];
 var box = [];
+var clicked_rows = [];
+var clicked_columns = [];
 //seed
-var Hex_r_seed = parseInt(urlp['seed']) || 0000;
+var Hex_r_seed = urlp['seed'] || "0000";
 
 //grid_setup
 var rows = parseInt(urlp['rows']) || 10; //Zeilen
 var columns = parseInt(urlp['columns']) || 10; //Spalten
-console.log(rows + ", " + columns);
-var column_width = 0;
-var column_height = 0;
-var X_offset = 0;
-var site_distance = 2;
-
+var prerow = rows;
+var precol = columns;
+var clickedrow = -1;
+var clickedcol = -1;
 var objects = [];
 var black = false;
 var help = false;
@@ -45,12 +35,71 @@ var helps = 0;
 
 var buttons_init = false;
 
-//function setup(){r=new init_numbers(Integer.parseInt(Hex_r_seed,16));r.rand();fullScreen();}
 function setup() {
+  if (Hex_r_seed.length > 4) {
+    let s = location.toString().substring(0, location.toString().indexOf("seed=") + 5) + Hex_r_seed.substring(0, 4);
+    if (location.toString().lastIndexOf('&') > location.toString().indexOf("seed=")) {
+      s += location.toString().substring(location.toString().lastIndexOf("&"), location.toString().length);
+    }
+    location.href = s;
+  }
   r = new init_numbers(parseInt(Hex_r_seed, 16), this);
   let rands = r.rand();
   gen_html_fields();
   modal();
+  if (urlp['darkmode'] === "true") {
+    dark_switch();
+  }
+}
+
+function clicked_row(i) {
+  document.getElementById("cord_r" + i).style.backgroundColor = "#F8A000"
+  if (clicked_box.length == 0) {
+    if (clickedcol == -1) {
+      clickedrow = i;
+    } else {
+      field_pressed(i, clickedcol);
+      clickedrow = -1;
+      clickedcol = -1;
+    }
+  } else if (clicked_box.length < 2) {
+    field_pressed(i, clicked_box[0][1]);
+    clickedrow = -1;
+    clickedcol = -1;
+  } else {
+    if (i != clicked_box[0][0]) {
+      let save = clicked_box[0];
+      clickedBoxClear();
+      field_pressed(save[0], save[1]);
+    } else {
+      clickedBoxClear();
+    }
+  }
+}
+
+function clicked_column(e) {
+  document.getElementById("cord_c" + e).style.backgroundColor = "#F8A000"
+  if (clicked_box.length == 0) {
+    if (clickedrow == -1) {
+      clickedcol = e;
+    } else {
+      field_pressed(clickedrow, e);
+      clickedrow = -1;
+      clickedcol = -1;
+    }
+  } else if (clicked_box.length < 2) {
+    field_pressed(clicked_box[0][0], e);
+    clickedrow = -1;
+    clickedcol = -1;
+  } else {
+    if (e != clicked_box[0][1]) {
+      let save = clicked_box[0];
+      clickedBoxClear();
+      field_pressed(save[0], save[1]);
+    } else {
+      clickedBoxClear();
+    }
+  }
 }
 
 function modal() {
@@ -77,20 +126,138 @@ function modal() {
   // When the user clicks the button, open the modal 
   btn_settings.onclick = function () {
     settings.style.display = "block";
+    button_styles(document.getElementById("row+"), "80%", "40%");
+    button_styles(document.getElementById("row-"), "80%", "40%");
+    button_styles(document.getElementById("col+"), "80%", "40%");
+    button_styles(document.getElementById("col-"), "80%", "40%");
+
+    document.getElementById("row_count").innerHTML = rows;
+    document.getElementById("col_count").innerHTML = columns;
+
+    if (xlabeled === true || xlabeled === "true") {
+      document.getElementById("x123").checked = false;
+      document.getElementById("xabc").checked = true;
+    } else {
+      document.getElementById("xabc").checked = false;
+      document.getElementById("x123").checked = true;
+    }
+    if (ylabeled === true || ylabeled === "true") {
+      document.getElementById("y123").checked = false;
+      document.getElementById("yabc").checked = true;
+    } else {
+      document.getElementById("yabc").checked = false;
+      document.getElementById("y123").checked = true;
+    }
   }
+
+  document.getElementById("seed_field").placeholder = Hex_r_seed;
+
+  button_styles(document.getElementById("reset_url_b"), "100%", "100%");
 
   // When the user clicks on <span> (x), close the modal
   span_settings.onclick = function () {
-    settings.style.display = "none";
+    close_settings(settings);
   }
 
   // When the user clicks anywhere outside of the modal, close it
   window.onclick = function (event) {
-    if (event.target == settings || event.target == instruction) {
-      settings.style.display = "none";
+    if (event.target == settings) {
+      close_settings();
+    } else if (event.target == instruction) {
       instruction.style.display = "none";
     }
   }
+}
+
+function reset_url() {
+  location.href = location.toString().substring(0, location.toString().indexOf('?'));
+}
+
+function close_settings(settings) {
+  settings.style.display = "none";
+  let yl;
+  let xl;
+  if (document.getElementById("xabc").checked) {
+    xl = true;
+  } else if (document.getElementById("x123").checked) {
+    xl = false;
+  }
+  if (document.getElementById("yabc").checked) {
+    yl = true;
+  } else if (document.getElementById("y123").checked) {
+    yl = false;
+  }
+  if (location.toString().indexOf('&') == -1) {
+    if (!(10 == prerow && 10 == precol && document.getElementById("seed_field").value == "" && xl == false && yl == true)) {
+      let s = location.toString().substring(0, location.toString().indexOf('?') + 1);
+      if (document.getElementById("seed_field").value != "") {
+        s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
+      } else {
+        s += "seed=" + Hex_r_seed;
+      }
+      if (prerow != 10) {
+        s += '&'
+        s += "rows=" + prerow;
+      }
+      if (precol != 10) {
+        s += '&'
+        s += "columns=" + precol;
+      }
+      if (xl != false) {
+        s += '&'
+        s += "xcord=" + xl;
+      }
+      if (yl != true) {
+        s += '&'
+        s += "ycord=" + yl;
+      }
+      location.href = s;
+    }
+  } else {
+    if (!(rows == prerow && columns == precol && document.getElementById("seed_field").value == "" && xl == xlabeled && yl == ylabeled)) {
+      let s = location.toString().substring(0, location.toString().indexOf('?') + 1);
+      if (document.getElementById("seed_field").value != "") {
+        s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
+      } else {
+        s += "seed=" + Hex_r_seed;
+      }
+      if (prerow != 10) {
+        s += '&'
+        s += "rows=" + prerow;
+      }
+      if (precol != 10) {
+        s += '&'
+        s += "columns=" + precol;
+      }
+      if (xl != false) {
+        s += '&'
+        s += "xcord=" + xl;
+      }
+      if (yl != true) {
+        s += '&'
+        s += "ycord=" + yl;
+      }
+      location.href = s;
+    }
+  }
+}
+
+function row(a) {
+  if (a === '+') {
+    prerow += 1;
+  } else if (a === '-') {
+    prerow -= 1;
+  }
+  document.getElementById("row_count").innerHTML = prerow;
+}
+
+function col(a) {
+  if (a === '+') {
+    precol += 1;
+  } else if (a === '-') {
+    precol -= 1;
+  }
+  document.getElementById("col_count").innerHTML = precol;
 }
 
 function gen_html_fields() {
@@ -113,8 +280,7 @@ function gen_html_fields() {
   col.style.justifyContent = "center";
   col.style.height = "50%";
   b = document.createElement("button");
-  // b.onclick = function () { field_pressed(i, e) };
-  button_styles(b, height, (100 / ((columns + 1) * 1.025)) / 1.7 + "%");
+  button_styles(b, "100%", (100 / ((columns + 1) * 1.025)) / 1.7 + "%");
   b.style.border = "none";
   b.style.outline = "none"
   col.appendChild(b);
@@ -125,9 +291,12 @@ function gen_html_fields() {
     col.style.justifyContent = "center";
     col.style.height = "50%";
     b = document.createElement("button");
-    // b.onclick = function () { field_pressed(i, e) };
-    b.innerHTML = i;
-    button_styles(b, height, width);
+    let xlabel = init_label_list((xlabeled === true || xlabeled === "true" ? true : false));
+    b.id = "cord_c" + i;
+    b.setAttribute("c", i);
+    b.onclick = function () { clicked_column(i); }
+    b.innerHTML = xlabel[i];
+    button_styles(b, "100%", width);
     b.style.border = "none";
     b.style.outline = "none"
     col.appendChild(b);
@@ -140,8 +309,12 @@ function gen_html_fields() {
     row.style.justifyContent = "center";
     row.style.height = height;
     b = document.createElement("button");
-    b.innerHTML = i;
-    button_styles(b, height, (100 / ((columns + 1) * 1.025)) / 1.7 + "%");
+    let ylabel = init_label_list((ylabeled === true || ylabeled === "true" ? true : false));
+    b.id = "cord_r" + i;
+    b.setAttribute("r", i);
+    b.onclick = function () { clicked_row(i); }
+    b.innerHTML = ylabel[i];
+    button_styles(b, "100%", (100 / ((columns + 1) * 1.025)) / 1.7 + "%");
     b.style.border = "none";
     b.style.outline = "none"
     row.appendChild(b);
@@ -150,9 +323,11 @@ function gen_html_fields() {
       b.id = "r" + i + ",c" + e;
       box = [...box, "r" + i + ",c" + e];
       b.setAttribute("value", r.getrandomnumbs()[i * columns + e] + "");
-      b.onclick = function () { field_pressed(i, e) };
+      b.setAttribute("r", i);
+      b.setAttribute("c", e);
+      b.onclick = function () { field_pressed(i, e); }
       b.innerHTML = r.getrandomnumbs()[i * columns + e] + "";
-      button_styles(b, height, width);
+      button_styles(b, "100%", width);
       row.appendChild(b);
     }
     document.getElementById("container").appendChild(row);
@@ -219,7 +394,7 @@ function button_styles(b, height, width) {
   b.style.minWidth = 0;
   b.style.whiteSpace = "nowrap";
   b.style.overflow = "hidden";
-  b.style.height = "100%";
+  b.style.height = height;
   b.style.width = width;
   b.style.borderRadius = "20%";
   if (black) {
@@ -235,7 +410,7 @@ function button_styles(b, height, width) {
 
 function button_color(b) {
   if (black) {
-    b.style.backgroundColor = "#000000";
+    b.style.backgroundColor = darkmode_black;
     b.style.borderColor = "#FFFFFF";
     b.style.color = "#FFFFFF";
   } else {
@@ -270,6 +445,71 @@ function togglebtn(b, bol) {
   }
 }
 
+function clickedBoxAdd(e) {
+  clicked_box = [...clicked_box, e];
+  clicked_rows = [...clicked_rows, e[0]];
+  clicked_columns = [...clicked_columns, e[1]];
+  clicked_row_column(true, clicked_rows, true, "#FFFFFF", pending_color);
+  clicked_row_column(false, clicked_columns, true, "#FFFFFF", pending_color);
+}
+
+function clickedBoxClear() {
+  box.forEach((data) => {
+    togglebtn(document.getElementById(data), false);
+  });
+  document.getElementById("calculation_list").innerHTML = null;
+  clicked_box = [];
+  clicked_row_column(true, clicked_rows, false, "#FFFFFF", pending_color);
+  clicked_row_column(false, clicked_columns, false, "#FFFFFF", pending_color);
+  clicked_rows = [];
+  clicked_columns = [];
+  clickedcol = -1;
+  clickedrow = -1;
+}
+
+function sortclicked() {
+  let save = [clicked_box[0]];
+  let i = clicked_box[0][0] - clicked_box[1][0];
+  let e = clicked_box[0][1] - clicked_box[1][1];
+  if (i == -2 || i == 2) {
+    save = [...save, clicked_box[2], clicked_box[1]];
+  } else if (i == -1 || i == 1) {
+    save = [...save, clicked_box[1], clicked_box[2]];
+  } else if (e == -2 || e == 2) {
+    save = [...save, clicked_box[2], clicked_box[1]];
+  } else if (e == -1 || e == 1) {
+    save = [...save, clicked_box[1], clicked_box[2]];
+  } else {
+    console.log("error");
+  }
+  clicked_box = save;
+}
+
+function clicked_row_column(r, clicked, activate, color, backgroundColor) {
+  clicked.forEach((i) => {
+    if (i < columns && i >= 0) {
+      let b;
+      if (r) {
+        b = document.getElementById("cord_r" + i);
+      } else {
+        b = document.getElementById("cord_c" + i);
+      }
+      if (activate) {
+        b.style.backgroundColor = backgroundColor;
+        b.style.color = color;
+      } else {
+        if (black) {
+          b.style.backgroundColor = darkmode_black;
+          b.style.color = "#FFFFFF";
+        } else {
+          b.style.backgroundColor = "#FFFFFF";
+          b.style.color = "#000000";
+        }
+      }
+    }
+  });
+}
+
 function field_pressed(i, e) {
   let b = document.getElementById("r" + i + ",c" + e);
   document.getElementById("calculation_list").innerHTML = "";
@@ -277,8 +517,9 @@ function field_pressed(i, e) {
   let possibilities = r.getcalculationlist();
   if (clicked_box.contains([i, e]) == -1) {
     if (clicked_box.length < 3) {
-      clicked_box = [...clicked_box, [i, e]];
+      clickedBoxAdd([i, e]);
       if (clicked_box.length == 3) {
+        sortclicked();
         let one = document.getElementById("r" + clicked_box[0][0] + ",c" + clicked_box[0][1]).getAttribute("value");
         let sec = document.getElementById("r" + clicked_box[1][0] + ",c" + clicked_box[1][1]).getAttribute("value");
         let thi = document.getElementById("r" + clicked_box[2][0] + ",c" + clicked_box[2][1]).getAttribute("value");
@@ -310,6 +551,8 @@ function field_pressed(i, e) {
               document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = right_color;
               document.getElementById("r" + data[0] + ",c" + data[1]).style.color = '#000000';
             });
+            clicked_row_column(true, clicked_rows, true, '#000000', right_color);
+            clicked_row_column(false, clicked_columns, true, '#000000', right_color);
           } else {
             b.style.backgroundColor = wrong_color;
             b.style.color = '#FFFFFF';
@@ -317,6 +560,8 @@ function field_pressed(i, e) {
               document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = wrong_color;
               document.getElementById("r" + data[0] + ",c" + data[1]).style.color = '#FFFFFF';
             });
+            clicked_row_column(true, clicked_rows, true, '#FFFFFF', wrong_color);
+            clicked_row_column(false, clicked_columns, true, '#FFFFFF', wrong_color);
           }
         }
       } else {
@@ -331,6 +576,8 @@ function field_pressed(i, e) {
             document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = pending_color;
             document.getElementById("r" + data[0] + ",c" + data[1]).style.color = "#FFFFFF";
           });
+          clicked_row_column(true, clicked_rows, true, "#FFFFFF", pending_color);
+          clicked_row_column(false, clicked_columns, true, "#FFFFFF", pending_color);
           possible_box = [...possible_box, [(i), (e + 1)], [(i), (e - 1)], [(i + 1), (e)], [(i - 1), (e)], [(i + 1), (e + 1)], [(i + 1), (e - 1)], [(i - 1), (e + 1)], [(i - 1), (e - 1)]];
           possible_box = [...possible_box, [(i), (e + 2)], [(i), (e - 2)], [(i + 2), (e)], [(i - 2), (e)], [(i + 2), (e + 2)], [(i + 2), (e - 2)], [(i - 2), (e + 2)], [(i - 2), (e - 2)]];
           let save = [];
@@ -388,7 +635,7 @@ function field_pressed(i, e) {
           possible_box = [];
         } else if (clicked_box.length == 2) {
           if (i == clicked_box[0][0] && e == clicked_box[0][1]) {
-            clicked_box = [];
+            clickedBoxClear();
           } else {
             let ico = clicked_box[0][0];
             let eco = clicked_box[0][1];
@@ -418,7 +665,7 @@ function field_pressed(i, e) {
                 eco = clicked_box[0][1] + 2;
               }
             }
-            document.getElementById("r" + ico + ",c" + eco).click();
+            field_pressed(ico, eco);
           }
         }
       }
@@ -427,12 +674,14 @@ function field_pressed(i, e) {
     if (clicked_box.contains([i, e]) != 0) {
       button_color(document.getElementById("r" + clicked_box[1][0] + ",c" + clicked_box[1][1]));
       button_color(document.getElementById("r" + clicked_box[2][0] + ",c" + clicked_box[2][1]));
-      clicked_box = [clicked_box[0]];
+      let save = clicked_box[0];
+      clickedBoxClear();
+      clickedBoxAdd(save);
     } else {
       clicked_box.forEach((data) => {
         button_color(document.getElementById("r" + data[0] + ",c" + data[1]));
       });
-      clicked_box = [];
+      clickedBoxClear();
       box.forEach((data) => {
         togglebtn(document.getElementById(data), false);
       });
@@ -444,58 +693,19 @@ function field_pressed(i, e) {
   // text(r.getrandomnumbs().get(i * columns + e) + "", column_width * (e + site_distance) + X_offset + column_width / 2 + x, column_height * (i + site_distance / 2) + column_height / 2);
 }
 
-// function draw() {
-//   if (draw <= 0) {
-//     if (!buttons_init) {
-//       buttons_init = true;
-//       initButtons(buttons_init);
-//     }
-//     initButtons(false);
+function init_label_list(b) {
+  let abc = [];
+  if (b && ((rows < columns) ? columns : rows) < 26) {
+    abc = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+  } else {
+    for (let i = 0; i < ((rows < columns) ? columns : rows); i++) {
+      abc = [...abc, ((i + 1) + "")];
+    }
+  }
+  return abc;
+}
 
-//     //row+column numbers
-
-//     let abc = [];
-//     let x = 0;
-//     let tc;
-//     //x-buttons
-//     let maxx = 0;
-//     let xb;
-//     if (labelbuttons.size() > 0) { xb = labelbuttons.get(0); maxx = xb.size(); } else { xb = []; maxx = columns; }
-//     abc = init_label_list(false);
-//     for (let i = 0; i < maxx; i++) {
-//       tc = "#FFFFFF"; clicked_box.forEach((clb) => { if ((getCoordinatesForIndex(clb).getX() - 1 == i)) { if (clicked_box.size() == 1) { tc = pending_color; } else { tc = right_color; } } });
-//       if (labeledbool) { x = (column_width * (i + 0.5 + site_distance) + X_offset); } else { x = column_width * (i + site_distance) + X_offset; }
-//       if (label_init) { xb.add(new button(x + column_width / 4, column_height * (site_distance / 4), column_width / 2, column_height, abc.get(i) + "", tc, g.backgroundColor, ts)); } else { if (x_buttons.contains(xb.get(i)) && clicked_box.size() < 1) { tc = "#28B05C"; } xb.get(i).update(x + column_width / 4, column_height * (site_distance / 4), column_width / 2, column_height, abc.get(i) + "", ts, tc); }
-//     }
-//     if (label_init) { labelbuttons.add(xb); }
-//     //y-buttons
-//     let maxy = 0; let yb;
-//     if (labelbuttons.size() > 1) { yb = labelbuttons.get(1); maxy = yb.size(); } else { yb = []; maxy = rows; }
-//     if (labeledint == 1 && rows <= 24) { abc = init_label_list(true); } else { abc = init_label_list(false); }
-//     for (let i = 0; i < maxy; i++) {
-//       tc = "#FFFFFF"; clicked_box.forEach((clb) => { if ((getCoordinatesForIndex(clb).getY() - 1 == i)) { if (clicked_box.size() == 1) { tc = pending_color; } else { tc = right_color; } } });
-//       if (labeledbool) { x = (column_width * (site_distance) + X_offset); } else { x = (column_width * ((columns + 0.2 + site_distance)) + X_offset); }
-//       if (label_init) { yb.add(new button(x - column_width / 8, column_height * (i + site_distance / 2), column_width / 2, column_height, abc.get(i) + "", tc, g.backgroundColor, ts)); } else { if (y_buttons.contains(yb.get(i)) && clicked_box.size() < 1) { tc = "#28B05C"; } yb.get(i).update(x - column_width / 8, column_height * (i + site_distance / 2), column_width / 2, column_height, abc.get(i) + "", ts, tc); }
-//     }
-//     if (label_init) { label_init = false; labelbuttons.add(yb); }
-
-//     labelbuttons.forEach((ab) => { ab.forEach((b) => { b.drawMe(); }); });
-//     if (labeledint == 2) { if (labeledbool) { text("y", column_width * (site_distance * 0.9) + X_offset, column_height * (0 + site_distance / 2) + column_height / 2); text("x", column_width * (site_distance) + X_offset + column_width / 2, column_height * site_distance / 2 - column_height / 2); } else { text("y", column_width * (columns + site_distance + 0.4) + X_offset + column_width / 2.5, column_height * (0 + site_distance / 2) + column_height / 2); text("x", column_width * (site_distance - 0.5) + X_offset + column_width / 2, column_height * site_distance / 2 - column_height / 2); } }
-
-//     if (!minimalistic) {
-//       buttons.forEach((b) => { b.drawMe(); });
-//     } else { buttons.get(7).drawMe(); buttons.get(10).drawMe(); }
-//     if (r.getthreadfin()) { draw = 3; } else { draw = 5; }
-//   } else { draw -= 1; }
-// }
-
-function init_label_list(b) { let abc = []; if (b) { let alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']; alphabet.forEach((c) => { abc.add(c + ""); }); } else { for (let i = 0; i < ((rows < columns) ? columns : rows); i++) { abc.add(((i + 1) + "")); } } return abc; }
-
-function reset_action(b) { if (b) { if (r2 != null) { r2.stopthread(); r2 = null; } if (r != null) { r.stopthread(); initpregen(); r = null; } } clicked_box.removeAll(clicked_box); x_buttons.clear(); y_buttons.clear(); if (r != null) { r.stopthread(); } if (r2 != null) { r = r2; r2 = null; initpregen(); } else { initpregen(); r = r2; r2 = null; } }
-
-function initpregen() { if (r2 == null || r2 == r) { r2 = new init_numbers(0); r2.rand(); } }
-
-function setclicked_box(array) { clicked_box = array; }
+function setclicked_box(array) { clickedBoxClear(); array.forEach((data) => { clickedBoxAdd(data); }); }
 
 function show_help() {
   if (help) {
@@ -506,7 +716,8 @@ function show_help() {
     });
     document.getElementById("calculation_list").innerHTML = null;
   } else {
-    clicked_box = [];
+    document.getElementById("calculation_list").innerHTML = null;
+    clickedBoxClear();
     box.forEach((data) => {
       togglebtn(document.getElementById(data), true);
     });
@@ -603,12 +814,21 @@ function help_calc(one_, sec_, thi_) {
   });
 }
 
-function rerand() { r.rerand(); document.getElementById("current_rand").innerHTML = r.getcurrent_random_numb(); }
+function rerand() {
+  r.rerand(); document.getElementById("current_rand").innerHTML = r.getcurrent_random_numb();
+}
 
-function reset() { location.reload(); }
+function reset() {
+  let seed = r.getRanHex(4);
+  let s = location.toString().substring(0, location.toString().indexOf("seed=") + 5) + seed;
+  if (location.toString().lastIndexOf('&') > location.toString().indexOf("seed=")) {
+    s += location.toString().substring(location.toString().lastIndexOf("&"), location.toString().length);
+  }
+  location.href = s;
+}
 
 function dark_switch() {
-  clicked_box = [];
+  clickedBoxClear();
   document.getElementById("calculation_list").innerHTML = null;
   helps = 0;
   help = false;
@@ -621,39 +841,22 @@ function dark_switch() {
     document.getElementsByClassName("container-fluid")[0].style.backgroundColor = "#FFFFFF";
     Array.prototype.forEach.call(document.getElementsByClassName("footer"), (data) => { data.style.color = "#000000" });
     document.getElementById("darkmode_b").innerHTML = "&#xf186;";
+    document.getElementById("seed").style.color = "#000000";
+    document.getElementById("seed_label").style.color = "#000000";
   } else {
     black = true;
     objects.forEach((data) => { button_color(data); });
-    document.getElementsByClassName("container-fluid")[0].style.backgroundColor = "#000000";
+    document.getElementsByClassName("container-fluid")[0].style.backgroundColor = darkmode_black;
     Array.prototype.forEach.call(document.getElementsByClassName("footer"), (data) => { data.style.color = "#FFFFFF" });
     document.getElementById("darkmode_b").innerHTML = "&#xf185;";
     document.getElementById("calculation_list").innerHTML = null;
+    document.getElementById("seed").style.color = "#FFFFFF";
+    document.getElementById("seed_label").style.color = "#FFFFFF";
   }
 }
-function opensettings() { /* TODO*/ }
-
-/*
- 0. zero
- 1.-row
- 2.+row
- 3.-column
- 4.+column
- 5.reset
- 6.reroll
- 7.random number field
- 8.label
- 9.seed
- 10.minimalistic
- */
 
 class init_numbers {
   constructor(seed, trio) {
-    // this.t;
-    // this.p;
-    this.min_plays = 30;
-    // this.threadfin;
-    // this.progress = 0;
-
     this.trio = trio;
 
     // grid
@@ -674,26 +877,25 @@ class init_numbers {
     this.gen;
   }
 
-  reset() {
-    this.seed = 0;
-    this.found = false;
-    rand();
-  }
+  getRanHex = size => {
+    let result = [];
+    let hexRef = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
 
-  add_usedrandnumbs(i) {
-    if (possible_numbs.contains(i))
-      possible_numbs.remove(new Integer(i));
+    for (let n = 0; n < size; n++) {
+      result.push(hexRef[Math.floor(Math.random() * 16)]);
+    }
+    return result.join('');
   }
 
   rerand() {
-    clicked_box = [];
+    clickedBoxClear();
     document.getElementById("calculation_list").innerHTML = null;
     helps = 0;
     help = false;
     box.forEach((data) => {
       togglebtn(document.getElementById(data), false);
     });
-    this.trio.setclicked_box([]);
+    this.trio.clickedBoxClear();
     this.current_random_numb = this.new_current_random_numb();
     if (this.current_random_numb == null || this.current_random_numb <= 0) {
       this.rerand();
@@ -702,8 +904,14 @@ class init_numbers {
 
   rand() {
     if (this.seed == 0) {
-      this.seed = (Math.random() * 10000 * Math.random());
+      this.seed = this.getRanHex(4);
+      if (location.toString().indexOf('?') == -1) {
+        location.href = location + "?seed=" + this.seed;
+      } else {
+        location.href = location + "&seed=" + this.seed;
+      }
     }
+    document.getElementById("seed").innerHTML = this.trio.Hex_r_seed;
     this.possible_numbs = [];
     this.random_numbs = this.gen_random_numbs(rows, columns);
     if (this.trio.extreme_calc) {
@@ -714,108 +922,10 @@ class init_numbers {
         this.possible_numbs = [...this.possible_numbs, i];
       }
       this.getrandom_numb();
-      this.clicked_box = [];
+      this.trio.clickedBoxClear();
     }
     this.current_random_numb = this.new_current_random_numb();
     return this.current_random_numb;
-  }
-
-  start_numb() {
-    let index = Math.round(Math.random() * rows * columns);
-    let s = this.calculations_list[Math.round(Math.random() * this.calculations_list.length)];
-    let direction = (Math.random() * 8);
-    let e = -1;
-    let one = this.random_numbs[index];
-    let sec = 1;
-    let thi = 1;
-    switch (direction) {
-      case 1:
-        if (index % rows < 8) {
-          sec = this.random_numbs[index + 1];
-          thi = this.random_numbs[index + 2];
-        } else {
-          this.start_numb();
-        }
-        break;
-      case 2:
-        if (index % rows < 9 && index % columns < 8) {
-          sec = this.random_numbs[index + columns + 1];
-          thi = this.random_numbs[index + columns * 2 + 2];
-        } else {
-          this.start_numb();
-        }
-        break;
-      case 3:
-        if (index % columns < 8) {
-          sec = this.random_numbs[index + columns];
-          thi = this.random_numbs[index + columns * 2];
-        } else {
-          this.start_numb();
-        }
-        break;
-      case 4:
-        if (index % rows > 2 && index % columns < 8) {
-          sec = this.random_numbs[index + columns - 1];
-          thi = this.random_numbs[index + columns * 2 - 2];
-        } else {
-          this.start_numb();
-        }
-        break;
-      case 5:
-        if (index % rows > 2) {
-          sec = this.random_numbs[index - 1];
-          thi = this.random_numbs[index - 2];
-        } else {
-          this.start_numb();
-        }
-        break;
-      case 6:
-        if (index % rows > 2 && index % columns > 2) {
-          sec = this.random_numbs[index - columns - 1];
-          thi = this.random_numbs[index - columns * 2 - 2];
-        } else {
-          this.start_numb();
-        }
-        break;
-      case 7:
-        if (index % columns > 2) {
-          sec = this.random_numbs[index - columns];
-          thi = this.random_numbs[index - columns * 2];
-        } else {
-          this.start_numb();
-        }
-        break;
-      case 8:
-        if (index % rows > 8 && index % columns > 2) {
-          sec = this.random_numbs[index - columns + 1];
-          thi = this.random_numbs[index - columns * 2 + 2];
-        } else {
-          this.start_numb();
-        }
-        break;
-      default:
-        if (index % rows < 8) {
-          sec = this.random_numbs[index + 1];
-          thi = this.random_numbs[index + 2];
-        } else {
-          this.start_numb();
-        }
-        break;
-    }
-    // System.out.println("10: " + index + ", " + one + ", " + sec + ", " + thi + ", " + s);
-    if (s.charAt(0) == '/' && sec == 0) {
-      this.start_numb();
-    } else if (s.charAt(1) == '/' && thi == 0) {
-      this.start_numb();
-    }
-    // never use eval if with user input
-    e = (eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi));
-    if (e <= this.getmin() && this.e >= this.getmax()) {
-      e = -1;
-    }
-    if (e > 0) {
-      this.current_random_numb = e;
-    }
   }
 
   new_current_random_numb() {
@@ -856,22 +966,6 @@ class init_numbers {
     return save;
   }
 
-  setSeed(seed) {
-    this.seed = seed;
-  }
-
-  getSeed() {
-    return this.seed;
-  }
-
-  setfound(found) {
-    this.found_nothing = found;
-  }
-
-  getfound() {
-    return this.found_nothing;
-  }
-
   getrandomnumbs() {
     return this.random_numbs;
   }
@@ -898,10 +992,6 @@ class init_numbers {
     return this.min;
   }
 
-  getminplays() {
-    return this.min_plays;
-  }
-
   getmax() {
     return this.max;
   }
@@ -926,13 +1016,9 @@ class possiblenumbs {
     this.check();
     if (this.possible.length > this.n.getmax() - this.n.getmin()) {
       this.n.setpossiblenumbs([]);
-      // this.trio.initpregen();
     } else {
       this.n.setpossiblenumbs(this.possible);
       this.n.getrandom_numb();
-      // this.trio.initpregen();
-      // System.out.println("Thread finished in: " + (System.currentTimeMillis() - m) / 1000 + " sec and found: "
-      //   + n.getpossiblenumbs().size() + " possibilities");
     }
   }
 
@@ -1244,10 +1330,8 @@ class Random {
   }
 };
 
-// Warn if overriding existing method
 if (Array.prototype.equals)
   console.warn("Overriding existing Array.prototype.equals. Possible causes: New API defines the method, there's a framework conflict or you've got double inclusions in your code.");
-// attach the .equals method to Array's prototype to call it on any array
 Array.prototype.equals = function (array) {
   // if the other array is a falsy value, return
   if (!array)
@@ -1271,13 +1355,10 @@ Array.prototype.equals = function (array) {
   }
   return true;
 }
-// Hide method from for-in loops
 Object.defineProperty(Array.prototype, "equals", { enumerable: false });
 
-// Warn if overriding existing method
 if (Array.prototype.contains)
   console.warn("Overriding existing Array.prototype.contains. Possible causes: New API defines the method, there's a framework conflict or you've got double inclusions in your code.");
-// attach the .equals method to Array's prototype to call it on any array
 Array.prototype.contains = function (array) {
   if (this.length == 0)
     return -1;
@@ -1323,5 +1404,4 @@ Array.prototype.contains = function (array) {
 
   return -1;
 }
-// Hide method from for-in loops
 Object.defineProperty(Array.prototype, "contains", { enumerable: false });
