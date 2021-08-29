@@ -125,6 +125,22 @@ function modal() {
 
   // When the user clicks the button, open the modal 
   btn_settings.onclick = function () {
+    if (black) {
+      document.getElementById("settings_body").style.backgroundColor = darkmode_black;
+      document.getElementById("row_count").style.color = "#FFFFFF";
+      document.getElementById("col_count").style.color = "#FFFFFF";
+      Array.prototype.forEach.call(document.getElementsByClassName("titel"), (data) => {
+        data.style.color = "#FFFFFF";
+      });
+    } else {
+      document.getElementById("settings_body").style.backgroundColor = "#FFFFFF";
+      document.getElementById("row_count").style.color = "#000000";
+      document.getElementById("col_count").style.color = "#000000";
+      Array.prototype.forEach.call(document.getElementsByClassName("titel"), (data) => {
+        data.style.color = "#000000";
+      });
+    }
+
     settings.style.display = "block";
     button_styles(document.getElementById("row+"), "80%", "40%");
     button_styles(document.getElementById("row-"), "80%", "40%");
@@ -133,6 +149,7 @@ function modal() {
 
     document.getElementById("row_count").innerHTML = rows;
     document.getElementById("col_count").innerHTML = columns;
+
 
     if (xlabeled === true || xlabeled === "true") {
       document.getElementById("x123").checked = false;
@@ -162,7 +179,7 @@ function modal() {
   // When the user clicks anywhere outside of the modal, close it
   window.onclick = function (event) {
     if (event.target == settings) {
-      close_settings();
+      close_settings(settings);
     } else if (event.target == instruction) {
       instruction.style.display = "none";
     }
@@ -999,7 +1016,6 @@ class init_numbers {
   getcurrent_random_numb() {
     return this.current_random_numb;
   }
-
 }
 
 class possiblenumbs {

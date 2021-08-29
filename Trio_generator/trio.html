@@ -89,7 +89,7 @@
 
     .modal-header {
       padding: 2px 16px;
-      background-color: #5cb85c;
+      background-color: #65C965;
       color: white;
     }
 
@@ -99,7 +99,7 @@
 
     .modal-footer {
       padding: 2px 16px;
-      background-color: #5cb85c;
+      background-color: #65C965;
       color: white;
     }
   </style>
@@ -126,7 +126,7 @@
     <div id="instructions_modal" class="modal">
 
       <!-- Modal content -->
-      <div class="modal-content">
+      <div id="instructions_body" class="modal-content">
         <div class="modal-header">
           <h3>Instructions</h3>
           <span class="close" id="instructions_close">&times;</span>
@@ -144,7 +144,7 @@
     <div id="settings_modal" class="modal">
 
       <!-- Modal content -->
-      <div class="modal-content">
+      <div id="settings_body" class="modal-content">
         <div class="modal-header">
           <h3>Settings</h3>
           <span class="close" id="settings_close">&times;</span>
@@ -153,7 +153,7 @@
         <div class="modal-body">
           <div class="row">
             <div class="col-lg-6">
-              <p>rows</p>
+              <p class="titel">rows</p>
             </div>
             <div class="col-lg-3">
               <p id="row_count"></p>
@@ -165,7 +165,7 @@
           </div>
           <div class="row">
             <div class="col-lg-6">
-              <p>columns</p>
+              <p class="titel">columns</p>
             </div>
             <div class="col-lg-3">
               <p id="col_count"></p>
@@ -177,29 +177,29 @@
           </div>
           <div class="row">
             <div class="col-lg-6">
-              <p>xcords</p>
+              <p class="titel">xcords</p>
             </div>
             <div class="col-lg-6">
                 <input type="radio" id="xabc" name="xcord" value="abc">
-                <label for="abc">ABC</label>
+                <label class="titel" for="abc">ABC</label>
                 <input type="radio" id="x123" name="xcord" value="123">
-                <label for="123">123</label>
+                <label class="titel" for="123">123</label>
             </div>
           </div>
           <div class="row">
             <div class="col-lg-6">
-              <p>ycords</p>
+              <p class="titel">ycords</p>
             </div>
             <div class="col-lg-6">
                 <input type="radio" id="yabc" name="ycord" value="abc">
-                <label for="abc">ABC</label>
+                <label class="titel" for="abc">ABC</label>
                 <input type="radio" id="y123" name="ycord" value="123">
-                <label for="123">123</label>
+                <label class="titel" for="123">123</label>
             </div>
           </div>
           <div class="row">
             <div class="col-lg-6">
-              <p>seed</p>
+              <p class="titel">seed</p>
             </div>
             <div class="col-lg-6">
                 <input id="seed_field">
