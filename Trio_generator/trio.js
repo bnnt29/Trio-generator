@@ -146,9 +146,13 @@ function modal() {
 
     settings.style.display = "block";
     button_styles(document.getElementById("row+"), "80%", "40%");
+    document.getElementById("row+").style.fontSize = "150%";
     button_styles(document.getElementById("row-"), "80%", "40%");
+    document.getElementById("row-").style.fontSize = "150%";
     button_styles(document.getElementById("col+"), "80%", "40%");
+    document.getElementById("col+").style.fontSize = "150%";
     button_styles(document.getElementById("col-"), "80%", "40%");
+    document.getElementById("col-").style.fontSize = "150%";
 
     document.getElementById("row_count").innerHTML = rows;
     document.getElementById("col_count").innerHTML = columns;
@@ -173,6 +177,8 @@ function modal() {
   document.getElementById("seed_field").placeholder = Hex_r_seed;
 
   button_styles(document.getElementById("reset_url_b"), "100%", "100%");
+  document.getElementById("reset_url_b").style.fontSize = "150%";
+  document.getElementById("reset_url_b").style.minHeight = "10px";
 
   // When the user clicks on <span> (x), close the modal
   span_settings.onclick = function () {
@@ -404,6 +410,7 @@ function button_styles(b, height, width) {
   if (objects.indexOf(b) == -1) {
     objects = [...objects, b];
   }
+  b.style.fontSize = "200%";
   b.style.paddingLeft = 0;
   b.style.paddingRight = 0;
   if (height <= 0 || width <= 0) {
@@ -415,7 +422,8 @@ function button_styles(b, height, width) {
   b.style.fontSize = "90 vmin";
   // b.style.minHeight = 0;
   b.style.outline = false;
-  b.style.minWidth = 0;
+  b.style.minWidth = "5px";
+  b.style.minHeight = "35px";
   b.style.whiteSpace = "nowrap";
   b.style.overflow = "hidden";
   b.style.height = height;
@@ -425,7 +433,7 @@ function button_styles(b, height, width) {
   b.style.borderRadius = "12px";
   b.style.margin = "0.1%";
   if (black) {
-    b.style.backgroundColor = "#000000";
+    b.style.backgroundColor = darkmode_black;
     b.style.borderColor = "#FFFFFF";
     b.style.color = "#FFFFFF";
   } else {
@@ -437,11 +445,9 @@ function button_styles(b, height, width) {
 
 function button_color(b) {
   if (b.id != "") {
-    9
     if (b.getAttribute("value") != null) {
       if (black) {
         b.style.backgroundColor = darkmode_black;
-        b.style.borderColor = "#FFFFFF";
         b.style.color = "#FFFFFF";
         b.style.border = "none";
       } else {
@@ -484,7 +490,7 @@ function togglebtn(b, bol) {
     }
   } else {
     if (black) {
-      b.style.backgroundColor = "#000000";
+      b.style.backgroundColor = darkmode_black;
       b.style.borderColor = "#FFFFFF";
       b.style.color = "#FFFFFF";
     } else {
@@ -893,6 +899,7 @@ function dark_switch() {
     document.getElementById("darkmode_b").innerHTML = "&#xf186;";
     document.getElementById("seed").style.color = "#000000";
     document.getElementById("seed_label").style.color = "#000000";
+    document.getElementById("calculation_list").innerHTML = null;
   } else {
     black = true;
     objects.forEach((data) => { button_color(data); });
