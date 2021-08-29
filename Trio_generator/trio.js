@@ -50,6 +50,9 @@ function setup() {
   if (urlp['darkmode'] === "true") {
     dark_switch();
   }
+  Array.prototype.forEach.call(document.getElementsByClassName("clear_b"), (data) => {
+    data.onclick = function () { clickedBoxClear(); }
+  });
 }
 
 function clicked_row(i) {
@@ -289,6 +292,7 @@ function gen_html_fields() {
   let width = (100 / ((columns + 1) * 1.025)) + "%";
   let row = document.createElement("div");
   row.classList.add("row");
+  row.style.margin = "0.1%";
   row.style.justifyContent = "center";
   row.style.height = (100 / (rows + 1)) / 2 + "%";
   document.getElementById("container").appendChild(row);
@@ -323,6 +327,7 @@ function gen_html_fields() {
     let row = document.createElement("div");
     row.classList.add("row");
     row.id = "r" + i;
+    row.style.margin = "0.1%";
     row.style.justifyContent = "center";
     row.style.height = height;
     b = document.createElement("button");
@@ -342,6 +347,7 @@ function gen_html_fields() {
       b.setAttribute("value", r.getrandomnumbs()[i * columns + e] + "");
       b.setAttribute("r", i);
       b.setAttribute("c", e);
+      b.style.padding = "1px";
       b.onclick = function () { field_pressed(i, e); }
       b.innerHTML = r.getrandomnumbs()[i * columns + e] + "";
       button_styles(b, "100%", width);
@@ -408,12 +414,16 @@ function button_styles(b, height, width) {
   }
   b.style.fontSize = "90 vmin";
   // b.style.minHeight = 0;
+  b.style.outline = false;
   b.style.minWidth = 0;
   b.style.whiteSpace = "nowrap";
   b.style.overflow = "hidden";
   b.style.height = height;
   b.style.width = width;
-  b.style.borderRadius = "20%";
+  b.style.border = "solid";
+  b.style.borderWidth = "2px"
+  b.style.borderRadius = "12px";
+  b.style.margin = "0.1%";
   if (black) {
     b.style.backgroundColor = "#000000";
     b.style.borderColor = "#FFFFFF";
@@ -426,14 +436,37 @@ function button_styles(b, height, width) {
 }
 
 function button_color(b) {
-  if (black) {
-    b.style.backgroundColor = darkmode_black;
-    b.style.borderColor = "#FFFFFF";
-    b.style.color = "#FFFFFF";
+  if (b.id != "") {
+    9
+    if (b.getAttribute("value") != null) {
+      if (black) {
+        b.style.backgroundColor = darkmode_black;
+        b.style.borderColor = "#FFFFFF";
+        b.style.color = "#FFFFFF";
+        b.style.border = "none";
+      } else {
+        b.style.border = "solid";
+        b.style.backgroundColor = "#FFFFFF";
+        b.style.borderColor = "#000000";
+        b.style.color = "#000000";
+        b.style.borderWidth = "2px"
+        b.style.borderRadius = "12px";
+      }
+    } else {
+      if (black) {
+        b.style.backgroundColor = darkmode_black;
+        b.style.color = "#FFFFFF";
+      } else {
+        b.style.backgroundColor = "#FFFFFF";
+        b.style.color = "#000000";
+      }
+    }
   } else {
-    b.style.backgroundColor = "#FFFFFF";
-    b.style.borderColor = "#000000";
-    b.style.color = "#000000";
+    if (black) {
+      b.style.backgroundColor = "#000000";
+    } else {
+      b.style.backgroundColor = "#FFFFFF";
+    }
   }
 }
 
@@ -863,7 +896,7 @@ function dark_switch() {
   } else {
     black = true;
     objects.forEach((data) => { button_color(data); });
-    document.getElementsByClassName("container-fluid")[0].style.backgroundColor = darkmode_black;
+    document.getElementsByClassName("container-fluid")[0].style.backgroundColor = "#000000";
     Array.prototype.forEach.call(document.getElementsByClassName("footer"), (data) => { data.style.color = "#FFFFFF" });
     document.getElementById("darkmode_b").innerHTML = "&#xf185;";
     document.getElementById("calculation_list").innerHTML = null;
