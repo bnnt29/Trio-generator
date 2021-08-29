@@ -51,57 +51,87 @@ function setup() {
     dark_switch();
   }
   Array.prototype.forEach.call(document.getElementsByClassName("clear_b"), (data) => {
-    data.onclick = function () { clickedBoxClear(); }
+    data.onclick = function () {
+      clickedBoxClear(); if (help) { show_help(); } else {
+        box.forEach((data) => {
+          togglebtn(document.getElementById(data), false);
+        });
+      }
+    }
   });
 }
 
 function clicked_row(i) {
-  document.getElementById("cord_r" + i).style.backgroundColor = "#F8A000"
-  if (clicked_box.length == 0) {
-    if (clickedcol == -1) {
-      clickedrow = i;
-    } else {
-      field_pressed(i, clickedcol);
+  if (clickedrow == -1) {
+    document.getElementById("cord_r" + i).style.backgroundColor = "#F8A000";
+    if (clicked_box.length == 0) {
+      if (clickedcol == -1) {
+        clickedrow = i;
+      } else {
+        field_pressed(i, clickedcol);
+        clickedrow = -1;
+        clickedcol = -1;
+      }
+    } else if (clicked_box.length < 2) {
+      field_pressed(i, clicked_box[0][1]);
       clickedrow = -1;
       clickedcol = -1;
-    }
-  } else if (clicked_box.length < 2) {
-    field_pressed(i, clicked_box[0][1]);
-    clickedrow = -1;
-    clickedcol = -1;
-  } else {
-    if (i != clicked_box[0][0]) {
-      let save = clicked_box[0];
-      clickedBoxClear();
-      field_pressed(save[0], save[1]);
     } else {
-      clickedBoxClear();
+      if (i != clicked_box[0][0]) {
+        let save = clicked_box[0];
+        clickedBoxClear();
+        field_pressed(save[0], save[1]);
+      } else {
+        clickedBoxClear();
+        box.forEach((data) => {
+          togglebtn(document.getElementById(data), false);
+        });
+      }
     }
+  } else if (i == clickedrow) {
+    button_color(document.getElementById("cord_r" + i));
+    clickedrow = -1;
+  } else {
+    button_color(document.getElementById("cord_r" + clickedrow));
+    clickedrow = -1;
+    clicked_row(i);
   }
 }
 
 function clicked_column(e) {
-  document.getElementById("cord_c" + e).style.backgroundColor = "#F8A000"
-  if (clicked_box.length == 0) {
-    if (clickedrow == -1) {
-      clickedcol = e;
-    } else {
-      field_pressed(clickedrow, e);
+  if (clickedcol == -1) {
+    document.getElementById("cord_c" + e).style.backgroundColor = "#F8A000"
+    if (clicked_box.length == 0) {
+      if (clickedrow == -1) {
+        clickedcol = e;
+      } else {
+        field_pressed(clickedrow, e);
+        clickedrow = -1;
+        clickedcol = -1;
+      }
+    } else if (clicked_box.length < 2) {
+      field_pressed(clicked_box[0][0], e);
       clickedrow = -1;
       clickedcol = -1;
+    } else {
+      if (e != clicked_box[0][1]) {
+        let save = clicked_box[0];
+        clickedBoxClear();
+        field_pressed(save[0], save[1]);
+      } else {
+        clickedBoxClear();
+        box.forEach((data) => {
+          togglebtn(document.getElementById(data), false);
+        });
+      }
     }
-  } else if (clicked_box.length < 2) {
-    field_pressed(clicked_box[0][0], e);
-    clickedrow = -1;
+  } else if (e == clickedcol) {
+    button_color(document.getElementById("cord_c" + e));
     clickedcol = -1;
   } else {
-    if (e != clicked_box[0][1]) {
-      let save = clicked_box[0];
-      clickedBoxClear();
-      field_pressed(save[0], save[1]);
-    } else {
-      clickedBoxClear();
-    }
+    button_color(document.getElementById("cord_c" + clickedcol));
+    clickedcol = -1;
+    clicked_column(e);
   }
 }
 
@@ -423,7 +453,7 @@ function button_styles(b, height, width) {
   // b.style.minHeight = 0;
   b.style.outline = false;
   b.style.minWidth = "5px";
-  b.style.minHeight = "35px";
+  b.style.minHeight = "38px";
   b.style.whiteSpace = "nowrap";
   b.style.overflow = "hidden";
   b.style.height = height;
@@ -510,9 +540,6 @@ function clickedBoxAdd(e) {
 }
 
 function clickedBoxClear() {
-  box.forEach((data) => {
-    togglebtn(document.getElementById(data), false);
-  });
   document.getElementById("calculation_list").innerHTML = null;
   clicked_box = [];
   clicked_row_column(true, clicked_rows, false, "#FFFFFF", pending_color);
@@ -600,6 +627,7 @@ function field_pressed(i, e) {
             } else {
               p.style.color = wrong_color;
             }
+            p.style.fontSize = "100%";
           }
           if (right) {
             b.style.backgroundColor = right_color; b.style.color = '#000000';
@@ -732,7 +760,7 @@ function field_pressed(i, e) {
       button_color(document.getElementById("r" + clicked_box[2][0] + ",c" + clicked_box[2][1]));
       let save = clicked_box[0];
       clickedBoxClear();
-      clickedBoxAdd(save);
+      field_pressed(save[0], save[1]);
     } else {
       clicked_box.forEach((data) => {
         button_color(document.getElementById("r" + data[0] + ",c" + data[1]));
@@ -778,7 +806,6 @@ function show_help() {
       togglebtn(document.getElementById(data), true);
     });
     help = true;
-    let success = false;
     for (let i = 0; i < rows; i++) {
       for (let e = 0; e < columns; e++) {
         let index = "r" + i + ",c" + e;
