@@ -1,4 +1,4 @@
-urlp = []; if (location.toString().indexOf('?') != -1) { s = location.toString().split('?'); s = s[1].split('&'); for (i = 0; i < s.length; i++) { u = s[i].split('='); urlp[u[0]] = u[1]; } }
+var urlp = []; if (location.toString().indexOf('?') != -1) { s = location.toString().split('?'); s = s[1].split('&'); for (i = 0; i < s.length; i++) { u = s[i].split('='); urlp[u[0]] = u[1]; } }
 //label
 var xlabeled = urlp['xcord'] || false;
 var ylabeled = urlp['ycord'] || true;
@@ -22,8 +22,8 @@ var clicked_columns = [];
 var Hex_r_seed = urlp['seed'] || "0000";
 
 //grid_setup
-var rows = parseInt(urlp['rows']) || 10; //Zeilen
-var columns = parseInt(urlp['columns']) || 10; //Spalten
+var rows = ((parseInt(urlp['rows']) == null || parseInt(urlp['rows']) == "" || !Number.isNaN(parseInt(urlp['rows']))) ? (parseInt(urlp['rows']) <= 100 ? parseInt(urlp['rows']) : 100) : 10) || 10; //Zeilen
+var columns = ((parseInt(urlp['columns']) == null || parseInt(urlp['columns']) == "" || !Number.isNaN(parseInt(parseInt(urlp['columns'])))) ? (parseInt(urlp['columns']) <= 100 ? parseInt(urlp['columns']) : 100) : 10) || 10; //Spalten
 var prerow = rows;
 var precol = columns;
 var clickedrow = -1;
@@ -44,7 +44,7 @@ function setup() {
     location.href = s;
   }
   r = new init_numbers(parseInt(Hex_r_seed, 16), this);
-  let rands = r.rand();
+  r.rand();
   gen_html_fields();
   modal();
   if (urlp['darkmode'] === "true") {
@@ -59,6 +59,8 @@ function setup() {
       }
     }
   });
+  document.getElementById("wait").style.display = "none";
+  document.getElementsByClassName("container-fluid")[0].style.display = "block";
 }
 
 function clicked_row(i) {
@@ -207,7 +209,8 @@ function modal() {
   document.getElementById("seed_field").placeholder = Hex_r_seed;
 
   button_styles(document.getElementById("reset_url_b"), "100%", "100%");
-  document.getElementById("reset_url_b").style.fontSize = "150%";
+  document.getElementById("reset_url_b").style.fontSize = "100%";
+  document.getElementById("reset_url_b").style.minWidth = "190px";
   document.getElementById("reset_url_b").style.minHeight = "10px";
 
   // When the user clicks on <span> (x), close the modal
@@ -325,7 +328,7 @@ function gen_html_fields() {
     x = win.innerWidth || docElem.clientWidth || body.clientWidth,
     y = win.innerHeight || docElem.clientHeight || body.clientHeight;
   let height = (100 / (rows + 1)) + "%";
-  let width = (100 / ((columns + 1) * 1.025)) + "%";
+  let width = ((100 / ((columns + 1) * 1.025))) - 0.2 + "%";
   let row = document.createElement("div");
   row.classList.add("row");
   row.style.margin = "0.1%";
@@ -337,7 +340,7 @@ function gen_html_fields() {
   col.style.justifyContent = "center";
   col.style.height = "50%";
   b = document.createElement("button");
-  button_styles(b, "100%", (100 / ((columns + 1) * 1.025)) / 1.7 + "%");
+  button_styles(b, "100%", ((100 / ((columns + 1) * 1.025)) / 1.7) - 0.2 + "%");
   b.style.border = "none";
   b.style.outline = "none"
   col.appendChild(b);
@@ -400,17 +403,22 @@ function other_buttons() {
   let width = (100 / (columns * 1.025)) + "%";
   b = document.getElementById("current_rand");
   button_styles(b, height, width);
+  b.style.minWidth = "72px";
   b.style.width = "100%";
   b.style.height = height;
   r.getrandom_numb();
   b.innerHTML = r.getcurrent_random_numb();
   b = document.getElementById("reroll_b");
   button_styles(b, height, width);
+  b.style.fontSize = "89%";
+  b.style.minWidth = "72px";
   b.style.width = "100%";
   b.style.height = (100 / (rows)) / 3 + "%";
   b.style.marginTop = "1rem";
   b = document.getElementById("reset_b");
   button_styles(b, height, width);
+  b.style.fontSize = "89%";
+  b.style.minWidth = "72px";
   b.style.width = "100%";
   b.style.height = (100 / (rows)) / 3 + "%";
   b.style.marginTop = "1rem";
@@ -449,11 +457,10 @@ function button_styles(b, height, width) {
     b.style.borderLeftWidth = 0;
     b.style.borderRightWidth = 0;
   }
-  b.style.fontSize = "90 vmin";
   // b.style.minHeight = 0;
   b.style.outline = false;
   b.style.minWidth = "5px";
-  b.style.minHeight = "38px";
+  b.style.minHeight = "37px";
   b.style.whiteSpace = "nowrap";
   b.style.overflow = "hidden";
   b.style.height = height;
@@ -1091,6 +1098,7 @@ class possiblenumbs {
     this.n = r;
     this.stop = false;
     this.calcs = c;
+    this.length = this.calcs.length;
     this.trio = tri;
     // var m = System.currentTimeMillis();
   }
@@ -1109,30 +1117,26 @@ class possiblenumbs {
     let one = this.n.random_numbs[one_];
     let sec = this.n.random_numbs[sec_];
     let thi = this.n.random_numbs[thi_];
-    this.calcs.forEach((s) => {
+    for (let i = 0; i < this.length; i++) {
+      let s = this.calcs[i];
       if (s.charAt(0) == '/' && sec == 0) {
         return;
       } else if (s.charAt(1) == '/' && thi == 0) {
         return;
       }
-      // never use eval if with user input
-      let e = eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi + "");
-      if (e != Number.parseFloat(e).toFixed(0)) { return; }
-      if (e > this.n.getmin() && e < this.n.getmax()) {
-        this.possible = [...this.possible, e];
-      }
-    });
+      let e = eval(one + s.charAt(0) + sec + s.charAt(1) + thi);
+      if (e != Number.parseInt(e)) return;
+      if (!(e > this.n.getmin() && e < this.n.getmax())) return;
+      this.possible = [...this.possible, e];
+    }
   }
 
   check() {
-    let clomuns_t2 = columns << 1;
+    let clomuns_t2 = columns * 2;
     for (let i = 0; i < rows; i++) {
       let index_ = i * columns;
       for (let e = 0; e < columns; e++) {
-        if (this.stop)
-          return;
         let index = index_ + e;
-
         if (i > 2 && i < rows - 2 && e > 2 && e < columns - 2) {
           this.possibilities(index, index + 1, index + 2);
           this.possibilities(index, index - 1, index - 2);
