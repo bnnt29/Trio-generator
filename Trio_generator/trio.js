@@ -4,6 +4,9 @@ var xlabeled = urlp['xcord'] || false;
 var ylabeled = urlp['ycord'] || true;
 
 var darkmode = false;
+var used_calcs = [];
+var font_size = ((parseInt(urlp['font_size']) == null || parseInt(urlp['font_size']) == "" || !Number.isNaN(parseInt(urlp['font_size']))) ? (parseInt(urlp['font_size']) <= 100 ? ((parseInt(urlp['font_size']) >= 0) ? parseInt(urlp['font_size']) : 0) : 100) : 50) || 50;
+var prefont = font_size;
 
 //colors
 var right_color = "#00FF00";
@@ -22,8 +25,8 @@ var clicked_columns = [];
 var Hex_r_seed = urlp['seed'] || "0000";
 
 //grid_setup
-var rows = ((parseInt(urlp['rows']) == null || parseInt(urlp['rows']) == "" || !Number.isNaN(parseInt(urlp['rows']))) ? (parseInt(urlp['rows']) <= 100 ? parseInt(urlp['rows']) : 100) : 10) || 10; //Zeilen
-var columns = ((parseInt(urlp['columns']) == null || parseInt(urlp['columns']) == "" || !Number.isNaN(parseInt(parseInt(urlp['columns'])))) ? (parseInt(urlp['columns']) <= 100 ? parseInt(urlp['columns']) : 100) : 10) || 10; //Spalten
+var rows = ((parseInt(urlp['rows']) == null || parseInt(urlp['rows']) == "" || !Number.isNaN(parseInt(urlp['rows']))) ? (parseInt(urlp['rows']) <= 100 ? ((parseInt(urlp['rows']) >= 3) ? parseInt(urlp['rows']) : 3) : 100) : 10) || 10; //Zeilen
+var columns = ((parseInt(urlp['columns']) == null || parseInt(urlp['columns']) == "" || !Number.isNaN(parseInt(parseInt(urlp['columns'])))) ? (parseInt(urlp['columns']) <= 100 ? ((parseInt(urlp['columns']) >= 3) ? parseInt(urlp['columns']) : 3) : 100) : 10) || 10; //Spalten
 var prerow = rows;
 var precol = columns;
 var clickedrow = -1;
@@ -164,6 +167,7 @@ function modal() {
       document.getElementById("settings_body").style.backgroundColor = darkmode_black;
       document.getElementById("row_count").style.color = "#FFFFFF";
       document.getElementById("col_count").style.color = "#FFFFFF";
+      document.getElementById("font_size").style.color = "#FFFFFF";
       Array.prototype.forEach.call(document.getElementsByClassName("titel"), (data) => {
         data.style.color = "#FFFFFF";
       });
@@ -171,6 +175,7 @@ function modal() {
       document.getElementById("settings_body").style.backgroundColor = "#FFFFFF";
       document.getElementById("row_count").style.color = "#000000";
       document.getElementById("col_count").style.color = "#000000";
+      document.getElementById("font_size").style.color = "#000000";
       Array.prototype.forEach.call(document.getElementsByClassName("titel"), (data) => {
         data.style.color = "#000000";
       });
@@ -185,10 +190,14 @@ function modal() {
     document.getElementById("col+").style.fontSize = "150%";
     button_styles(document.getElementById("col-"), "80%", "40%");
     document.getElementById("col-").style.fontSize = "150%";
+    button_styles(document.getElementById("font+"), "80%", "40%");
+    document.getElementById("font+").style.fontSize = "150%";
+    button_styles(document.getElementById("font-"), "80%", "40%");
+    document.getElementById("font-").style.fontSize = "150%";
 
     document.getElementById("row_count").innerHTML = rows;
     document.getElementById("col_count").innerHTML = columns;
-
+    document.getElementById("font_size").innerHTML = font_size + "%";
 
     if (xlabeled === true || xlabeled === "true") {
       document.getElementById("x123").checked = false;
@@ -247,7 +256,7 @@ function close_settings(settings) {
     yl = false;
   }
   if (location.toString().indexOf('&') == -1) {
-    if (!(10 == prerow && 10 == precol && document.getElementById("seed_field").value == "" && xl == false && yl == true)) {
+    if (!(10 == prerow && 10 == precol && 50 == prefont && document.getElementById("seed_field").value == "" && xl == false && yl == true)) {
       let s = location.toString().substring(0, location.toString().indexOf('?') + 1);
       if (document.getElementById("seed_field").value != "") {
         s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
@@ -261,6 +270,10 @@ function close_settings(settings) {
       if (precol != 10) {
         s += '&'
         s += "columns=" + precol;
+      }
+      if (prefont != 50) {
+        s += '&'
+        s += "font_size=" + prefont;
       }
       if (xl != false) {
         s += '&'
@@ -273,7 +286,7 @@ function close_settings(settings) {
       location.href = s;
     }
   } else {
-    if (!(rows == prerow && columns == precol && document.getElementById("seed_field").value == "" && xl == xlabeled && yl == ylabeled)) {
+    if (!(rows == prerow && columns == precol && prefont == font_size && document.getElementById("seed_field").value == "" && xl == xlabeled && yl == ylabeled)) {
       let s = location.toString().substring(0, location.toString().indexOf('?') + 1);
       if (document.getElementById("seed_field").value != "") {
         s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
@@ -287,6 +300,10 @@ function close_settings(settings) {
       if (precol != 10) {
         s += '&'
         s += "columns=" + precol;
+      }
+      if (prefont != 50) {
+        s += '&'
+        s += "font_size=" + prefont;
       }
       if (xl != false) {
         s += '&'
@@ -303,20 +320,45 @@ function close_settings(settings) {
 
 function row(a) {
   if (a === '+') {
-    prerow += 1;
+    if (prerow < 100) {
+      prerow += 1;
+    }
   } else if (a === '-') {
-    prerow -= 1;
+    if (prerow > 3) {
+      prerow -= 1;
+    }
   }
   document.getElementById("row_count").innerHTML = prerow;
 }
 
 function col(a) {
   if (a === '+') {
-    precol += 1;
+    if (precol < 100) {
+      precol += 1;
+    }
   } else if (a === '-') {
-    precol -= 1;
+    if (precol > 3) {
+      precol -= 1;
+    }
   }
   document.getElementById("col_count").innerHTML = precol;
+}
+
+function font(a) {
+  if (a === '+') {
+    if (prefont <= 95) {
+      prefont += 5;
+    } else {
+      prefont = 100;
+    }
+  } else if (a === '-') {
+    if (prefont >= 6) {
+      prefont -= 5;
+    } else {
+      prefont = 1;
+    }
+  }
+  document.getElementById("font_size").innerHTML = prefont + "%";
 }
 
 function gen_html_fields() {
@@ -332,18 +374,16 @@ function gen_html_fields() {
   let row = document.createElement("div");
   row.classList.add("row");
   row.style.margin = "0.1%";
+  row.style.marginBottom = "0.5%";
   row.style.justifyContent = "center";
   row.style.height = (100 / (rows + 1)) / 2 + "%";
   document.getElementById("container").appendChild(row);
-  let col = document.createElement("div");
-  col.classList.add("col");
-  col.style.justifyContent = "center";
-  col.style.height = "50%";
   b = document.createElement("button");
   button_styles(b, "100%", ((100 / ((columns + 1) * 1.025)) / 1.7) - 0.2 + "%");
   b.style.border = "none";
   b.style.outline = "none"
-  col.appendChild(b);
+  b.id = "placeholder";
+  b.title = "placeholder";
   row.appendChild(b);
   for (let i = 0; i < columns; i++) {
     let col = document.createElement("div");
@@ -448,7 +488,12 @@ function button_styles(b, height, width) {
   if (objects.indexOf(b) == -1) {
     objects = [...objects, b];
   }
-  b.style.fontSize = "200%";
+  if (b.getAttribute("value") != null || b.id == "current_rand") {
+    b.style.fontSize = font_size * 4 + "%";
+    console.log(font_size * 4 + ", " + font_size);
+  } else {
+    b.style.fontSize = 200 + "%";
+  }
   b.style.paddingLeft = 0;
   b.style.paddingRight = 0;
   if (height <= 0 || width <= 0) {
@@ -480,8 +525,16 @@ function button_styles(b, height, width) {
   }
 }
 
+function highlight_toggle(b, bool) {
+  if (bool) {
+    b.style.backgroundColor = "#F8A000";
+  } else {
+    button_color(b);
+  }
+}
+
 function button_color(b) {
-  if (b.id != "") {
+  if (b.id != "" && b.id != "placeholder") {
     if (b.getAttribute("value") != null) {
       if (black) {
         b.style.backgroundColor = darkmode_black;
@@ -496,12 +549,22 @@ function button_color(b) {
         b.style.borderRadius = "12px";
       }
     } else {
-      if (black) {
-        b.style.backgroundColor = darkmode_black;
-        b.style.color = "#FFFFFF";
+      if (b.getAttribute("c") != null || b.getAttribute("r") != null) {
+        if (black) {
+          b.style.backgroundColor = "#000000";
+          b.style.color = "#FFFFFF";
+        } else {
+          b.style.backgroundColor = "#FFFFFF";
+          b.style.color = "#000000";
+        }
       } else {
-        b.style.backgroundColor = "#FFFFFF";
-        b.style.color = "#000000";
+        if (black) {
+          b.style.backgroundColor = darkmode_black;
+          b.style.color = "#FFFFFF";
+        } else {
+          b.style.backgroundColor = "#FFFFFF";
+          b.style.color = "#000000";
+        }
       }
     }
   } else {
@@ -622,7 +685,6 @@ function field_pressed(i, e) {
             r.calculations = [...r.calculations, s];
             let p = document.createElement("p");
             if (s.charAt(0) == '/' && sec == 0 || s.charAt(1) == '/' && thi == 0) { continue; }
-            p.innerHTML = one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi;
             p.style.color = wrong_color;
             p.style.textAlign = "center";
             calcs.appendChild(p);
@@ -807,6 +869,7 @@ function show_help() {
     });
     document.getElementById("calculation_list").innerHTML = null;
   } else {
+    used_calcs = [];
     document.getElementById("calculation_list").innerHTML = null;
     clickedBoxClear();
     box.forEach((data) => {
@@ -827,37 +890,85 @@ function show_help() {
           help_calc(index, "r" + (i + 1) + ",c" + (e - 1), "r" + (i + 2) + ",c" + (e - 2));
         } else {
           if (i < 2) {
-            help_calc(index, "r" + (i + 1) + ",c" + e, "r" + (i + 2) + ",c" + e);
-            if (e > 2 && e < columns - 2) {
-              help_calc(index, "r" + i + ",c" + (e + 1), "r" + i + ",c" + (e + 2));
-              help_calc(index, "r" + i + ",c" + (e - 1), "r" + i + ",c" + (e - 2));
-              help_calc(index, "r" + (i + 1) + ",c" + (e + 1), "r" + (i + 2) + ",c" + (e + 2));
-              help_calc(index, "r" + (i + 1) + ",c" + (e - 1), "r" + (i + 2) + ",c" + (e - 2));
+            if ((rows > 3 && i < 2) || (rows == 3 && i < 1)) {
+              help_calc(index, "r" + (i + 1) + ",c" + e, "r" + (i + 2) + ",c" + e);
+              if (e > 2 && e < columns - 2) {
+                help_calc(index, "r" + i + ",c" + (e + 1), "r" + i + ",c" + (e + 2));
+                help_calc(index, "r" + i + ",c" + (e - 1), "r" + i + ",c" + (e - 2));
+                help_calc(index, "r" + (i + 1) + ",c" + (e + 1), "r" + (i + 2) + ",c" + (e + 2));
+                help_calc(index, "r" + (i + 1) + ",c" + (e - 1), "r" + (i + 2) + ",c" + (e - 2));
+              } else {
+                if (e < 2) {
+                  if ((columns > 3 && e < 2) || (columns == 3 && e < 1)) {
+                    help_calc(index, "r" + (i + 1) + ",c" + (e + 1), "r" + (i + 2) + ",c" + (e + 2));
+                  }
+                } else if (e > columns - 2 && columns > 3) {
+                  if ((rows > 3 && e >= columns - 2) || (rows == 3 && e >= columns - 1)) {
+                    help_calc(index, "r" + (i + 1) + ",c" + (e - 1), "r" + (i + 2) + ",c" + (e - 2));
+                  }
+                }
+              }
             }
           } else if (i > rows - 2) {
-            help_calc(index, "r" + (i - 1) + ",c" + e, "r" + (i - 2) + ",c" + e);
-            if (e > 2 && e < columns - 2) {
-              help_calc(index, "r" + i + ",c" + (e + 1), "r" + i + ",c" + (e + 2));
-              help_calc(index, "r" + i + ",c" + (e - 1), "r" + i + ",c" + (e - 2));
-              help_calc(index, "r" + (i - 1) + ",c" + (e + 1), "r" + (i - 2) + ",c" + (e + 2));
-              help_calc(index, "r" + (i - 1) + ",c" + (e - 1), "r" + (i - 2) + ",c" + (e - 2));
+            if ((rows > 3 && i >= rows - 2) || (rows == 3 && i >= rows - 1)) {
+              help_calc(index, "r" + (i - 1) + ",c" + e, "r" + (i - 2) + ",c" + e);
+              if (e > 2 && e < columns - 2) {
+                help_calc(index, "r" + i + ",c" + (e + 1), "r" + i + ",c" + (e + 2));
+                help_calc(index, "r" + i + ",c" + (e - 1), "r" + i + ",c" + (e - 2));
+                help_calc(index, "r" + (i - 1) + ",c" + (e + 1), "r" + (i - 2) + ",c" + (e + 2));
+                help_calc(index, "r" + (i - 1) + ",c" + (e - 1), "r" + (i - 2) + ",c" + (e - 2));
+              } else {
+                if (e < 2) {
+                  if ((columns > 3 && e < 2) || (columns == 3 && e < 1)) {
+                    help_calc(index, "r" + (i - 1) + ",c" + (e + 1), "r" + (i - 2) + ",c" + (e + 2));
+                  }
+                } else if (e > columns - 2 && columns > 3) {
+                  if ((rows > 3 && e >= columns - 2) || (rows == 3 && e >= columns - 1)) {
+                    help_calc(index, "r" + (i - 1) + ",c" + (e - 1), "r" + (i - 2) + ",c" + (e - 2));
+                  }
+                }
+              }
             }
           }
           if (e < 2) {
-            help_calc(index, "r" + i + ",c" + (e + 1), "r" + i + ",c" + (e + 2));
-            if (i > 2 && i < rows - 2) {
-              help_calc(index, "r" + (i - 1) + ",c" + e, "r" + (i - 2) + ",c" + e);
-              help_calc(index, "r" + (i + 1) + ",c" + e, "r" + (i + 2) + ",c" + e);
-              help_calc(index, "r" + (i - 1) + ",c" + (e + 1), "r" + (i - 2) + ",c" + (e + 2));
-              help_calc(index, "r" + (i + 1) + ",c" + (e + 1), "r" + (i + 2) + ",c" + (e + 2));
+            if ((columns > 3 && e < 2) || (columns == 3 && e < 1)) {
+              help_calc(index, "r" + i + ",c" + (e + 1), "r" + i + ",c" + (e + 2));
+              if (i > 2 && i < rows - 2) {
+                help_calc(index, "r" + (i - 1) + ",c" + e, "r" + (i - 2) + ",c" + e);
+                help_calc(index, "r" + (i + 1) + ",c" + e, "r" + (i + 2) + ",c" + e);
+                help_calc(index, "r" + (i - 1) + ",c" + (e + 1), "r" + (i - 2) + ",c" + (e + 2));
+                help_calc(index, "r" + (i + 1) + ",c" + (e + 1), "r" + (i + 2) + ",c" + (e + 2));
+              } else {
+                if (i < 2) {
+                  if ((rows > 3 && i < 2) || (rows == 3 && i < 1)) {
+                    help_calc(index, "r" + (i + 1) + ",c" + (e + 1), "r" + (i + 2) + ",c" + (e + 2));
+                  }
+                } else if (i > rows - 2) {
+                  if ((rows > 3 && i >= rows - 2) || (rows == 3 && i >= rows - 1)) {
+                    help_calc(index, "r" + (i - 1) + ",c" + (e + 1), "r" + (i - 2) + ",c" + (e + 2));
+                  }
+                }
+              }
             }
           } else if (e > columns - 2) {
-            help_calc(index, "r" + i + ",c" + (e - 1), "r" + i + ",c" + (e - 2));
-            if (i > 2 && i < rows - 2) {
-              help_calc(index, "r" + (i - 1) + ",c" + e, "r" + (i - 2) + ",c" + e);
-              help_calc(index, "r" + (i + 1) + ",c" + e, "r" + (i + 2) + ",c" + e);
-              help_calc(index, "r" + (i - 1) + ",c" + (e - 1), "r" + (i - 2) + ",c" + (e - 2));
-              help_calc(index, "r" + (i + 1) + ",c" + (e - 1), "r" + (i + 2) + ",c" + (e - 2));
+            if ((rows > 3 && e >= columns - 2) || (rows == 3 && e >= columns - 1)) {
+              help_calc(index, "r" + i + ",c" + (e - 1), "r" + i + ",c" + (e - 2));
+              if (i > 2 && i < rows - 2) {
+                help_calc(index, "r" + (i - 1) + ",c" + e, "r" + (i - 2) + ",c" + e);
+                help_calc(index, "r" + (i + 1) + ",c" + e, "r" + (i + 2) + ",c" + e);
+                help_calc(index, "r" + (i - 1) + ",c" + (e - 1), "r" + (i - 2) + ",c" + (e - 2));
+                help_calc(index, "r" + (i + 1) + ",c" + (e - 1), "r" + (i + 2) + ",c" + (e - 2));
+              } else {
+                if (i < 2) {
+                  if ((rows > 3 && i < 2) || (rows == 3 && i < 1)) {
+                    help_calc(index, "r" + (i + 1) + ",c" + (e - 1), "r" + (i + 2) + ",c" + (e - 2));
+                  }
+                } else if (i > rows - 2) {
+                  if ((rows > 3 && i >= rows - 2) || (rows == 3 && i >= rows - 1)) {
+                    help_calc(index, "r" + (i - 1) + ",c" + (e - 1), "r" + (i - 2) + ",c" + (e - 2));
+                  }
+                }
+              }
             }
           }
         }
@@ -870,15 +981,16 @@ function help_calc(one_, sec_, thi_) {
   let one = document.getElementById(one_).getAttribute("value");
   let sec = document.getElementById(sec_).getAttribute("value");
   let thi = document.getElementById(thi_).getAttribute("value");
-  r.calculations_list.forEach((s) => {
+  for (let i = 0; i < r.calculations_list.length; i++) {
+    let s = r.calculations_list[i];
     if (s.charAt(0) == '/' && sec == 0) {
-      return;
+      continue;
     } else if (s.charAt(1) == '/' && thi == 0) {
-      return;
+      continue;
     }
     // never use eval if with user input
     let e = eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi + "");
-    if (e != Number.parseFloat(e).toFixed(0)) { return; }
+    if (e != Number.parseFloat(e).toFixed(0)) { continue; }
     if (e > r.getmin() && e < r.getmax()) {
       if (e == r.current_random_numb) {
         document.getElementById(one_).style.backgroundColor = right_color;
@@ -887,9 +999,19 @@ function help_calc(one_, sec_, thi_) {
         document.getElementById(sec_).style.color = '#000000';
         document.getElementById(thi_).style.backgroundColor = right_color;
         document.getElementById(thi_).style.color = '#000000';
-        if (helps <= 20) {
+        var win = window,
+          docElem = document.documentElement,
+          body = document.getElementsByTagName('body')[0],
+          y = win.innerHeight || docElem.clientHeight || body.clientHeight;
+        if (helps < 20 && (y - 310 - (helps * 30)) >= 30) {
           let p = document.createElement("p");
-          p.innerHTML = one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi + "";
+          let t = 'x/y: ' + init_label_list(xlabeled)[(parseInt(document.getElementById(one_).getAttribute('c')))] + "/" + init_label_list(ylabeled)[(parseInt(document.getElementById(one_).getAttribute('r')))] + ', ' + init_label_list(xlabeled)[(parseInt(document.getElementById(sec_).getAttribute('c')))] + "/" + init_label_list(ylabeled)[(parseInt(document.getElementById(sec_).getAttribute('r')))] + ', ' + init_label_list(xlabeled)[(parseInt(document.getElementById(thi_).getAttribute('c')))] + "/" + init_label_list(ylabeled)[(parseInt(document.getElementById(thi_).getAttribute('r')))];
+          if (used_calcs.contains(t) > -1) { continue; }
+          used_calcs = [...used_calcs, t];
+          p.innerHTML = one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi;
+          p.onmouseover = function () { this.style.color = "#F8A000"; highlight_toggle(document.getElementById(one_), true); highlight_toggle(document.getElementById(sec_), true); highlight_toggle(document.getElementById(thi_), true); };
+          p.onmouseout = function () { if (black) { this.style.color = "#FFFFFF" } else { this.style.color = "#000000" } document.getElementById(one_).style.backgroundColor = right_color; document.getElementById(sec_).style.backgroundColor = right_color; document.getElementById(thi_).style.backgroundColor = right_color; };
+          p.style.textDecoration = "none";
           document.getElementById("calculation_list").appendChild(p);
           if (black) {
             p.style.color = "#FFFFFF";
@@ -901,7 +1023,7 @@ function help_calc(one_, sec_, thi_) {
         }
       }
     }
-  });
+  }
 }
 
 function rerand() {
@@ -911,9 +1033,7 @@ function rerand() {
 function reset() {
   let seed = r.getRanHex(4);
   let s = location.toString().substring(0, location.toString().indexOf("seed=") + 5) + seed;
-  if (location.toString().lastIndexOf('&') > location.toString().indexOf("seed=")) {
-    s += location.toString().substring(location.toString().lastIndexOf("&"), location.toString().length);
-  }
+  s += location.toString().substring(location.toString().indexOf("seed=") + 5 + seed.length, location.toString().length);
   location.href = s;
 }
 
@@ -1034,13 +1154,16 @@ class init_numbers {
         if (this.possible_numbs.length >= 1 && (this.possible_numbs[0] > this.min && this.possible_numbs[0] < this.max)) {
           return this.possible_numbs.get(0);
         } else {
+          document.getElementById("finish").style.display = "block";
           this.found_nothing = true;
-          return ((Math.random() * (this.max - this.min) + this.min));
+          return (Math.round(Math.random() * (this.max - this.min) + this.min));
         }
       }
       this.found_nothing = false;
       return this.possible_numbs[i];
     } else {
+      document.getElementById("finish").style.display = "block";
+      this.found_nothing = true;
       return (Math.round((Math.random() * (this.max - this.min) + this.min)));
     }
   }
@@ -1120,13 +1243,13 @@ class possiblenumbs {
     for (let i = 0; i < this.length; i++) {
       let s = this.calcs[i];
       if (s.charAt(0) == '/' && sec == 0) {
-        return;
+        continue;
       } else if (s.charAt(1) == '/' && thi == 0) {
-        return;
+        continue;
       }
       let e = eval(one + s.charAt(0) + sec + s.charAt(1) + thi);
-      if (e != Number.parseInt(e)) return;
-      if (!(e > this.n.getmin() && e < this.n.getmax())) return;
+      if (e != Number.parseInt(e)) continue;
+      if (!(e > this.n.getmin() && e < this.n.getmax())) continue;
       this.possible = [...this.possible, e];
     }
   }
@@ -1148,37 +1271,85 @@ class possiblenumbs {
           this.possibilities(index, index + columns - 1, index + clomuns_t2 - 2);
         } else {
           if (i < 2) {
-            this.possibilities(index, index + columns, index + clomuns_t2);
-            if (e > 2 && e < columns - 2) {
-              this.possibilities(index, index + 1, index + 2);
-              this.possibilities(index, index - 1, index - 2);
-              this.possibilities(index, index + columns + 1, index + clomuns_t2 + 2);
-              this.possibilities(index, index + columns - 1, index + clomuns_t2 - 2);
+            if ((rows > 3 && i < 2) || (rows == 3 && i < 1)) {
+              this.possibilities(index, index + columns, index + clomuns_t2);
+              if (e > 2 && e < columns - 2) {
+                this.possibilities(index, index + 1, index + 2);
+                this.possibilities(index, index - 1, index - 2);
+                this.possibilities(index, index + columns + 1, index + clomuns_t2 + 2);
+                this.possibilities(index, index + columns - 1, index + clomuns_t2 - 2);
+              } else {
+                if (e < 2) {
+                  if ((columns > 3 && e < 2) || (columns == 3 && e < 1)) {
+                    this.possibilities(index, index + columns + 1, index + clomuns_t2 + 2);
+                  }
+                } else if (e > columns - 2) {
+                  if ((columns > 3 && e >= columns - 2) || (columns == 3 && e >= columns - 1)) {
+                    this.possibilities(index, index + columns - 1, index + clomuns_t2 - 2);
+                  }
+                }
+              }
             }
           } else if (i > rows - 2) {
-            this.possibilities(index, index - columns, index - clomuns_t2);
-            if (e > 2 && e < columns - 2) {
-              this.possibilities(index, index + 1, index + 2);
-              this.possibilities(index, index - 1, index - 2);
-              this.possibilities(index, index - columns + 1, index - clomuns_t2 + 2);
-              this.possibilities(index, index - columns - 1, index - clomuns_t2 - 2);
+            if ((rows > 3 && i >= rows - 2) || (rows == 3 && i >= rows - 1)) {
+              this.possibilities(index, index - columns, index - clomuns_t2);
+              if (e > 2 && e < columns - 2) {
+                this.possibilities(index, index + 1, index + 2);
+                this.possibilities(index, index - 1, index - 2);
+                this.possibilities(index, index - columns + 1, index - clomuns_t2 + 2);
+                this.possibilities(index, index - columns - 1, index - clomuns_t2 - 2);
+              } else {
+                if (e < 2) {
+                  if ((columns > 3 && e < 2) || (columns == 3 && e < 1)) {
+                    this.possibilities(index, index - columns + 1, index - clomuns_t2 + 2);
+                  }
+                } else if (e > columns - 2) {
+                  if ((columns > 3 && e >= columns - 2) || (columns == 3 && e >= columns - 1)) {
+                    this.possibilities(index, index - columns - 1, index - clomuns_t2 - 2);
+                  }
+                }
+              }
             }
           }
           if (e < 2) {
-            this.possibilities(index, index + 1, index + 2);
-            if (i > 2 && i < rows - 2) {
-              this.possibilities(index, index - columns, index - clomuns_t2);
-              this.possibilities(index, index + columns, index + clomuns_t2);
-              this.possibilities(index, index - columns + 1, index - clomuns_t2 + 2);
-              this.possibilities(index, index + columns + 1, index + clomuns_t2 + 2);
+            if ((columns > 3 && e < 2) || (columns == 3 && e < 1)) {
+              this.possibilities(index, index + 1, index + 2);
+              if (i > 2 && i < rows - 2) {
+                this.possibilities(index, index - columns, index - clomuns_t2);
+                this.possibilities(index, index + columns, index + clomuns_t2);
+                this.possibilities(index, index - columns + 1, index - clomuns_t2 + 2);
+                this.possibilities(index, index + columns + 1, index + clomuns_t2 + 2);
+              } else {
+                if (i < 2) {
+                  if ((rows > 3 && i < 2) || (rows == 3 && i < 1)) {
+                    this.possibilities(index, index + columns + 1, index + clomuns_t2 + 2);
+                  }
+                } else if (i > rows - 2) {
+                  if ((rows > 3 && i >= rows - 2) || (rows == 3 && i >= rows - 1)) {
+                    this.possibilities(index, index - columns + 1, index - clomuns_t2 + 2);
+                  }
+                }
+              }
             }
           } else if (e > columns - 2) {
-            this.possibilities(index, index - 1, index - 2);
-            if (i > 2 && i < rows - 2) {
-              this.possibilities(index, index - columns, index - clomuns_t2);
-              this.possibilities(index, index + columns, index + clomuns_t2);
-              this.possibilities(index, index - columns - 1, index - clomuns_t2 - 2);
-              this.possibilities(index, index + columns - 1, index + clomuns_t2 - 2);
+            if ((rows > 3 && e >= columns - 2) || (rows == 3 && e >= columns - 1)) {
+              this.possibilities(index, index - 1, index - 2);
+              if (i > 2 && i < rows - 2) {
+                this.possibilities(index, index - columns, index - clomuns_t2);
+                this.possibilities(index, index + columns, index + clomuns_t2);
+                this.possibilities(index, index - columns - 1, index - clomuns_t2 - 2);
+                this.possibilities(index, index + columns - 1, index + clomuns_t2 - 2);
+              } else {
+                if (i < 2) {
+                  if ((rows > 3 && i < 2) || (rows == 3 && i < 1)) {
+                    this.possibilities(index, index + columns - 1, index + clomuns_t2 - 2);
+                  }
+                } else if (i > rows - 2) {
+                  if ((rows > 3 && i >= rows - 2) || (rows == 3 && i >= rows - 1)) {
+                    this.possibilities(index, index - columns - 1, index - clomuns_t2 - 2);
+                  }
+                }
+              }
             }
           }
         }
