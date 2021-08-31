@@ -688,7 +688,6 @@ function field_pressed(i, e) {
             p.style.textAlign = "center";
             p.innerHTML=one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi;
             p.appendChild
-            console.log(p.innerHTML);
             calcs.appendChild(p);
             //never use eval if with user input   
             out = (eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi));
