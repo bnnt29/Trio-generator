@@ -189,69 +189,120 @@
         </div>
         <div class="modal-body">
           <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-3">
               <p class="titel" style="text-align: center;">Zeilen</p>
             </div>
             <div class="col-lg-3">
-              <p id="row_count"></p>
+              <p id="row_count" style="text-align: center;"></p>
             </div>
-            <div class="col-lg-3">
-              <button id="row+" onclick="row('+')">+</button>
-              <button id="row-" onclick="row('-')">-</button>
+            <div class="col-lg-6">
+              <button id="row+" onclick="row('+')" style="text-align: center;">+</button>
+              <button id="row-" onclick="row('-')" style="text-align: center;">-</button>
             </div>
           </div>
           <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-3">
               <p class="titel" style="text-align: center;">Spalten</p>
             </div>
             <div class="col-lg-3">
-              <p id="col_count"></p>
+              <p id="col_count" style="text-align: center;"></p>
             </div>
-            <div class="col-lg-3">
-              <button id="col+" onclick="col('+')">+</button>
-              <button id="col-" onclick="col('-')">-</button>
+            <div class="col-lg-6">
+              <button id="col+" onclick="col('+')" style="text-align: center;">+</button>
+              <button id="col-" onclick="col('-')" style="text-align: center;">-</button>
             </div>
           </div>
-          <div class="row">
-            <div class="col-lg-6">
+          <div class="row" style="margin-bottom: 1rem;">
+            <div class="col-lg-3">
               <p class="titel" style="text-align: center;">X-Koordinate</p>
             </div>
-            <div class="col-lg-6">
-                <input type="radio" id="xabc" name="xcord" value="abc">
-                <label class="titel" for="abc">ABC</label>
-                <input type="radio" id="x123" name="xcord" value="123">
-                <label class="titel" for="123">123</label>
+            <div class="col-lg-3">
+            </div>
+            <div class="col-lg-6" style="width: 20%; margin: 0 auto;">
+                <input type="radio" id="xabc" name="xcord" value="abc" style="text-align: center;">
+                <label class="titel" for="abc" style="text-align: center;">ABC</label>
+                <input type="radio" id="x123" name="xcord" value="123" style="text-align: center;">
+                <label class="titel" for="123" style="text-align: center;">123</label>
             </div>
           </div>
-          <div class="row">
-            <div class="col-lg-6">
+          <div class="row" style="margin-bottom: 1rem;">
+            <div class="col-lg-3">
               <p class="titel" style="text-align: center;">Y-Koordinate</p>
             </div>
-            <div class="col-lg-6">
-                <input type="radio" id="yabc" name="ycord" value="abc">
-                <label class="titel" for="abc">ABC</label>
-                <input type="radio" id="y123" name="ycord" value="123">
-                <label class="titel" for="123">123</label>
+            <div class="col-lg-3">
+            </div>
+            <div class="col-lg-6" style="width: 20%; margin: 0 auto;">
+                <input type="radio" id="yabc" name="ycord" value="abc" style="text-align: center;">
+                <label class="titel" for="abc" style="text-align: center;">ABC</label>
+                <input type="radio" id="y123" name="ycord" value="123" style="text-align: center;">
+                <label class="titel" for="123" style="text-align: center;">123</label>
             </div>
           </div>
-          <div class="row">
-            <div class="col-lg-6">
+          <div class="row" style="margin-bottom: 2rem;">
+            <div class="col-lg-3">
               <p class="titel" style="text-align: center;">seed</p>
             </div>
-            <div class="col-lg-6">
-                <input id="seed_field">
+            <div class="col-lg-3">
+              <p id="current_seed" style="text-align: center;"></p>
+            </div>
+            <div class="col-lg-6" style="width: 30%; margin: 0 auto;">
+                <input id="seed_field" style="text-align: center;">
             </div>
           </div>
-          <div class="row">
-            <div class="col-lg-6">
+          <div class="row" style="margin-bottom: 1rem;">
+            <div class="col-lg-3">
               <p class="titel" style="text-align: center;">Text größe</p>
             </div>
             <div class="col-lg-3">
-              <p id="font_size"></p>
+              <p id="font_size" style="text-align: center;"></p>
+            </div>
+            <div class="col-lg-6">
+              <button id="font+" onclick="font('+')" style="text-align: center;">+</button>
+              <button id="font-" onclick="font('-')" style="text-align: center;">-</button>
+            </div>
+          </div>
+          <div class="row" style="margin-bottom: 1rem;">
+            <div class="col-lg-3">
+              <p class="titel" style="text-align: center;">Schwierigkeit <abbr
+                  title="Je groeßer die Zahl, desto kleiner ist die hoechste gesuchte Zahl (Je kleiner die Schwierigkeit, desto Schwieriger)">
+                  ? </abbr>
+              </p>
             </div>
             <div class="col-lg-3">
-              <button id="font+" onclick="font('+')">+</button>
-              <button id="font-" onclick="font('-')">-</button>
+              <p id="mode_count" style="text-align: center;"></p>
+            </div>
+            <div class="col-lg-6">
+              <button id="mode+" onclick="mode_set('+')" style="text-align: center;">+</button>
+              <button id="mode-" onclick="mode_set('-')" style="text-align: center;">-</button>
+            </div>
+          </div>
+          <div class="row" style="margin-bottom: 1rem;">
+            <div class="col-lg-3">
+              <p class="titel" style="text-align: center;">Rechenarten</p>
+            </div>
+            <div class="col-lg-3">
+            </div>
+            <div class="col-lg-6" style="justify-content: center;">
+              <div class="row">
+                <div class="col-lg-4" style="width: 15%; margin: 0 auto;">
+                  <input type="checkbox" id="*+" name="*+" value="*+">
+                  <label for="*+" style="margin-right: 2rem;"> * und +</label><br>
+                  <input type="checkbox" id="*-" name="*-" value="*-">
+                  <label for="*-" style="margin-right: 2rem;"> * und -</label>
+                </div>
+                <div class="col-lg-4" style="width: 15%; margin: 0 auto;">
+                  <input type="checkbox" id="/+" name="/+" value="/+" style="text-align: center;">
+                  <label for="/+" style="margin-right: 2rem;" style="text-align: center;"> / und +</label><br>
+                  <input type="checkbox" id="/-" name="/-" value="/-" style="text-align: center;">
+                  <label for="/-" style="margin-right: 2rem;" style="text-align: center;"> / und -</label>
+                </div>
+                <div class="col-lg-4" style="width: 15%; margin: 0 auto;">
+                  <input type="checkbox" id="*/" name="*/" value="*/" style="text-align: center;">
+                  <label for="*/" style="margin-right: 2rem;" style="text-align: center;"> * und /</label><br>
+                  <input type="checkbox" id="+-" name="+-" value="+-" style="text-align: center;">
+                  <label for="+-" style="margin-right: 2rem;" style="text-align: center;"> + und -</label>
+                </div>
+              </div>
             </div>
           </div>
           <div class="row" style="justify-content: center; align-items: center;">
@@ -318,8 +369,10 @@
               </div>
             </div>
             <div class="row clear_b"
-              style="justify-content: center; height: 100%; display: flex; flex-direction: column; max-height: inherit; width: 100%; margin-bottom: 1rem;margin-top: 1rem; padding-right: 0px; margin-right: 0px;">
+              style="justify-content: center; height: 100%; max-height: inherit; width: 100%; margin-bottom: 1rem;margin-top: 1rem; padding-right: 0px; margin-right: 0px;">
               <div id="calculation_list" class="col-lg-12">
+                <p id="no_calcs" style="color: #FF0000; display: none;">Mit den aktuellen Einstellungen ist aufgrund
+                  keiner ausgewählten Rechenart kein Spiel möglich</p>
 
               </div>
             </div>

@@ -1,11 +1,12 @@
-var urlp = []; if (location.toString().indexOf('?') != -1) { s = location.toString().split('?'); s = s[1].split('&'); for (i = 0; i < s.length; i++) { u = s[i].split('='); urlp[u[0]] = u[1]; } }
+var urlp = []; if (location.toString().indexOf('?') != -1) { s = location.toString().split('?'); s = s[1].split('&'); for (i = 0; i < s.length; i++) { if (s[i].indexOf('=') != -1) { u = s[i].split('='); urlp[u[0]] = u[1]; } else { urlp[s[i]] = ""; } } }
 //label
 var xlabeled = urlp['xcord'] || false;
 var ylabeled = urlp['ycord'] || true;
 
 var darkmode = false;
 var used_calcs = [];
-var font_size = ((parseInt(urlp['font_size']) == null || parseInt(urlp['font_size']) == "" || !Number.isNaN(parseInt(urlp['font_size']))) ? (parseInt(urlp['font_size']) <= 100 ? ((parseInt(urlp['font_size']) >= 0) ? parseInt(urlp['font_size']) : 0) : 100) : 50) || 50;
+var calculation_bools = ((urlp['calcs'] != null || urlp['calcs'] != "") ? urlp['calcs'] : "111111") || "111111";
+var font_size = ((parseInt(urlp['font_size']) == null || parseInt(urlp['font_size']) == "" || !Number.isNaN(parseInt(urlp['font_size']))) ? (parseInt(urlp['font_size']) <= 100 ? ((parseInt(urlp['font_size']) >= 0) ? parseInt(urlp['font_size']) : 0) : 100) : 40) || 40;
 var prefont = font_size;
 
 //colors
@@ -13,6 +14,9 @@ var right_color = "#00FF00";
 var wrong_color = "#FF0000";
 var pending_color = "#0000FF";
 var darkmode_black = "#141414";
+
+var mode = ((parseInt(urlp['mode']) == null || parseInt(urlp['mode']) == "" || !Number.isNaN(parseInt(parseInt(urlp['mode'])))) ? (parseInt(urlp['mode']) <= 5 ? ((parseInt(urlp['mode']) >= 1) ? parseInt(urlp['mode']) : 1) : 5) : 2) || 2;
+var premode = mode;
 
 //numbers
 var extreme_calc = true;
@@ -50,7 +54,7 @@ function setup() {
   r.rand();
   gen_html_fields();
   modal();
-  if (urlp['darkmode'] === "true") {
+  if (urlp['darkmode'] === "") {
     dark_switch();
   }
   Array.prototype.forEach.call(document.getElementsByClassName("clear_b"), (data) => {
@@ -86,6 +90,9 @@ function clicked_row(i) {
         let save = clicked_box[0];
         clickedBoxClear();
         field_pressed(save[0], save[1]);
+        if (!(i == clicked_box[0][0] + 1 || i == clicked_box[0][0] + 2 || i == clicked_box[0][0] - 1 || i == clicked_box[0][0] - 2)) {
+          clicked_column(i);
+        }
       } else {
         clickedBoxClear();
         box.forEach((data) => {
@@ -123,6 +130,9 @@ function clicked_column(e) {
         let save = clicked_box[0];
         clickedBoxClear();
         field_pressed(save[0], save[1]);
+        if (!(e == clicked_box[0][1] + 1 || e == clicked_box[0][1] + 2 || e == clicked_box[0][1] - 1 || e == clicked_box[0][1] - 2)) {
+          clicked_column(e);
+        }
       } else {
         clickedBoxClear();
         box.forEach((data) => {
@@ -182,22 +192,28 @@ function modal() {
     }
 
     settings.style.display = "block";
-    button_styles(document.getElementById("row+"), "80%", "40%");
+    button_styles(document.getElementById("row+"), "80%", "48%");
     document.getElementById("row+").style.fontSize = "150%";
-    button_styles(document.getElementById("row-"), "80%", "40%");
+    button_styles(document.getElementById("row-"), "80%", "48%");
     document.getElementById("row-").style.fontSize = "150%";
-    button_styles(document.getElementById("col+"), "80%", "40%");
+    button_styles(document.getElementById("col+"), "80%", "48%");
     document.getElementById("col+").style.fontSize = "150%";
-    button_styles(document.getElementById("col-"), "80%", "40%");
+    button_styles(document.getElementById("col-"), "80%", "48%");
     document.getElementById("col-").style.fontSize = "150%";
-    button_styles(document.getElementById("font+"), "80%", "40%");
+    button_styles(document.getElementById("font+"), "80%", "48%");
     document.getElementById("font+").style.fontSize = "150%";
-    button_styles(document.getElementById("font-"), "80%", "40%");
+    button_styles(document.getElementById("font-"), "80%", "48%");
     document.getElementById("font-").style.fontSize = "150%";
+    button_styles(document.getElementById("mode+"), "80%", "48%");
+    document.getElementById("mode+").style.fontSize = "150%";
+    button_styles(document.getElementById("mode-"), "80%", "48%");
+    document.getElementById("mode-").style.fontSize = "150%";
 
-    document.getElementById("row_count").innerHTML = rows;
-    document.getElementById("col_count").innerHTML = columns;
-    document.getElementById("font_size").innerHTML = font_size + "%";
+    document.getElementById("row_count").innerHTML = prerow;
+    document.getElementById("col_count").innerHTML = precol;
+    document.getElementById("font_size").innerHTML = prefont + "%";
+    document.getElementById("mode_count").innerHTML = premode;
+    document.getElementById("current_seed").innerHTML = Hex_r_seed
 
     if (xlabeled === true || xlabeled === "true") {
       document.getElementById("x123").checked = false;
@@ -212,6 +228,9 @@ function modal() {
     } else {
       document.getElementById("yabc").checked = false;
       document.getElementById("y123").checked = true;
+    }
+    for (let o = 0; o < r.getcalculationlist().length; o += 2) {
+      document.getElementById(r.getcalculationlist()[o]).checked = true;
     }
   }
 
@@ -255,8 +274,17 @@ function close_settings(settings) {
   } else if (document.getElementById("y123").checked) {
     yl = false;
   }
+
+  let u = "";
+  for (let i = 0; i < r.getprecalcs().length; i += 2) {
+    if (document.getElementById(r.getprecalcs()[i]).checked) {
+      u += "1";
+    } else {
+      u += "0";
+    }
+  }
   if (location.toString().indexOf('&') == -1) {
-    if (!(10 == prerow && 10 == precol && 50 == prefont && document.getElementById("seed_field").value == "" && xl == false && yl == true)) {
+    if (!(10 == prerow && 10 == precol && 2 == premode && u === "111111" && 40 == prefont && document.getElementById("seed_field").value == "" && xl == false && yl == true)) {
       let s = location.toString().substring(0, location.toString().indexOf('?') + 1);
       if (document.getElementById("seed_field").value != "") {
         s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
@@ -271,9 +299,17 @@ function close_settings(settings) {
         s += '&'
         s += "columns=" + precol;
       }
-      if (prefont != 50) {
+      if (premode != 2) {
+        s += '&'
+        s += "mode=" + premode;
+      }
+      if (prefont != 40) {
         s += '&'
         s += "font_size=" + prefont;
+      }
+      if (u != "111111") {
+        s += '&'
+        s += "calcs=" + u;
       }
       if (xl != false) {
         s += '&'
@@ -286,7 +322,7 @@ function close_settings(settings) {
       location.href = s;
     }
   } else {
-    if (!(rows == prerow && columns == precol && prefont == font_size && document.getElementById("seed_field").value == "" && xl == xlabeled && yl == ylabeled)) {
+    if (!(rows == prerow && columns == precol && u === calculation_bools && mode == premode && prefont == font_size && document.getElementById("seed_field").value == "" && xl == xlabeled && yl == ylabeled)) {
       let s = location.toString().substring(0, location.toString().indexOf('?') + 1);
       if (document.getElementById("seed_field").value != "") {
         s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
@@ -301,9 +337,17 @@ function close_settings(settings) {
         s += '&'
         s += "columns=" + precol;
       }
-      if (prefont != 50) {
+      if (premode != 2) {
+        s += '&'
+        s += "mode=" + premode;
+      }
+      if (prefont != 40) {
         s += '&'
         s += "font_size=" + prefont;
+      }
+      if (u != "111111") {
+        s += '&'
+        s += "calcs=" + u;
       }
       if (xl != false) {
         s += '&'
@@ -359,6 +403,19 @@ function font(a) {
     }
   }
   document.getElementById("font_size").innerHTML = prefont + "%";
+}
+
+function mode_set(a) {
+  if (a === '+') {
+    if (premode < 5) {
+      premode += 1;
+    }
+  } else if (a === '-') {
+    if (premode > 1) {
+      premode -= 1;
+    }
+  }
+  document.getElementById("mode_count").innerHTML = premode;
 }
 
 function gen_html_fields() {
@@ -444,6 +501,8 @@ function other_buttons() {
   b = document.getElementById("current_rand");
   button_styles(b, height, width);
   b.style.minWidth = "72px";
+  b.style.maxHeight = (100 / (columns * 1.025)) * 5 + "px";
+  b.style.minHeight = "35px";
   b.style.width = "100%";
   b.style.height = height;
   r.getrandom_numb();
@@ -489,7 +548,7 @@ function button_styles(b, height, width) {
     objects = [...objects, b];
   }
   if (b.getAttribute("value") != null || b.id == "current_rand") {
-    b.style.fontSize = font_size * 4 + "%";
+    b.style.fontSize = font_size * 5 + "%";
   } else {
     b.style.fontSize = 200 + "%";
   }
@@ -577,7 +636,16 @@ function button_color(b) {
 
 function togglebtn(b, bol) {
   b.disabled = bol;
+  b.onclick = function () { field_pressed((b.getAttribute("r")), (b.getAttribute("c"))); }
   if (bol) {
+    b.onclick = function () {
+      clickedBoxClear(); if (help) { show_help(); } else {
+        box.forEach((data) => {
+          togglebtn(document.getElementById(data), false);
+        });
+      }
+    }
+    b.disabled = false;
     if (black) {
       b.style.backgroundColor = "#333333";
       b.style.borderColor = "#666666";
@@ -662,7 +730,12 @@ function clicked_row_column(r, clicked, activate, color, backgroundColor) {
   });
 }
 
-function field_pressed(i, e) {
+function field_pressed(o, u) {
+  if (help) {
+    show_help();
+  }
+  let i = parseInt(o);
+  let e = parseInt(u);
   let b = document.getElementById("r" + i + ",c" + e);
   document.getElementById("calculation_list").innerHTML = "";
   let right = false;
@@ -676,47 +749,45 @@ function field_pressed(i, e) {
         let sec = document.getElementById("r" + clicked_box[1][0] + ",c" + clicked_box[1][1]).getAttribute("value");
         let thi = document.getElementById("r" + clicked_box[2][0] + ",c" + clicked_box[2][1]).getAttribute("value");
         //(1*2+3, 1+2*3, 1/2+3, 1+2/3, 1*2-3, 1-2*3, 1/2-3, 1-2/3)
-        if (1 > 0) {
-          let calcs = document.getElementById("calculation_list");
-          for (let o = 0; o < possibilities.length; o++) {
-            let out = -1;
-            let s = possibilities[o];
-            r.calculations = [...r.calculations, s];
-            let p = document.createElement("p");
-            if (s.charAt(0) == '/' && sec == 0 || s.charAt(1) == '/' && thi == 0) { continue; }
-            p.style.color = wrong_color;
-            p.style.textAlign = "center";
-            p.innerHTML=one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi;
-            p.appendChild
-            calcs.appendChild(p);
-            //never use eval if with user input   
-            out = (eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi));
-            if (out == r.getcurrent_random_numb()) {
-              p.style.color = right_color;
-              right = true;
-            } else {
-              p.style.color = wrong_color;
-            }
-            p.style.fontSize = "100%";
-          }
-          if (right) {
-            b.style.backgroundColor = right_color; b.style.color = '#000000';
-            clicked_box.forEach((data) => {
-              document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = right_color;
-              document.getElementById("r" + data[0] + ",c" + data[1]).style.color = '#000000';
-            });
-            clicked_row_column(true, clicked_rows, true, '#000000', right_color);
-            clicked_row_column(false, clicked_columns, true, '#000000', right_color);
+        let calcs = document.getElementById("calculation_list");
+        for (let o = 0; o < possibilities.length; o++) {
+          let out = -1;
+          let s = possibilities[o];
+          r.calculations = [...r.calculations, s];
+          let p = document.createElement("p");
+          if (s.charAt(0) == '/' && sec == 0 || s.charAt(1) == '/' && thi == 0) { continue; }
+          p.style.color = wrong_color;
+          p.style.textAlign = "center";
+          p.innerHTML = one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi;
+          p.appendChild
+          calcs.appendChild(p);
+          //never use eval if with user input   
+          out = (eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi));
+          if (out == r.getcurrent_random_numb()) {
+            p.style.color = right_color;
+            right = true;
           } else {
-            b.style.backgroundColor = wrong_color;
-            b.style.color = '#FFFFFF';
-            clicked_box.forEach((data) => {
-              document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = wrong_color;
-              document.getElementById("r" + data[0] + ",c" + data[1]).style.color = '#FFFFFF';
-            });
-            clicked_row_column(true, clicked_rows, true, '#FFFFFF', wrong_color);
-            clicked_row_column(false, clicked_columns, true, '#FFFFFF', wrong_color);
+            p.style.color = wrong_color;
           }
+          p.style.fontSize = "100%";
+        }
+        if (right) {
+          b.style.backgroundColor = right_color; b.style.color = '#000000';
+          clicked_box.forEach((data) => {
+            document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = right_color;
+            document.getElementById("r" + data[0] + ",c" + data[1]).style.color = '#000000';
+          });
+          clicked_row_column(true, clicked_rows, true, '#000000', right_color);
+          clicked_row_column(false, clicked_columns, true, '#000000', right_color);
+        } else {
+          b.style.backgroundColor = wrong_color;
+          b.style.color = '#FFFFFF';
+          clicked_box.forEach((data) => {
+            document.getElementById("r" + data[0] + ",c" + data[1]).style.backgroundColor = wrong_color;
+            document.getElementById("r" + data[0] + ",c" + data[1]).style.color = '#FFFFFF';
+          });
+          clicked_row_column(true, clicked_rows, true, '#FFFFFF', wrong_color);
+          clicked_row_column(false, clicked_columns, true, '#FFFFFF', wrong_color);
         }
       } else {
         b.style.backgroundColor = pending_color;
@@ -1067,6 +1138,10 @@ function dark_switch() {
   }
 }
 
+function setextreme_calc(c) {
+  extreme_calc = c;
+}
+
 class init_numbers {
   constructor(seed, trio) {
     this.trio = trio;
@@ -1075,11 +1150,12 @@ class init_numbers {
     this.grid_min = 0;
     this.grid_max = 10;
     this.min = this.grid_min + 1;
-    this.max = (this.grid_max - 1) * (this.grid_max - 1) + this.grid_max - 1;
+    this.max = ((this.grid_max - 1) * (this.grid_max - 1) + this.grid_max - 1) - ((this.trio.mode - 1) * 10);
 
     // numbers
     this.possible_numbs = [];
-    this.calculations_list = ["*+", "+*", "/+", "+/", "*-", "-*", "/-", "-/", "*/", "/*", "+-", "-+"];
+    this.precalculations_list = ["*+", "+*", "/+", "+/", "*-", "-*", "/-", "-/", "*/", "/*", "+-", "-+"];
+    this.calculations_list = [];
     this.calculations = [];
     this.random_numbs = [];
     this.current_random_numb;
@@ -1115,6 +1191,17 @@ class init_numbers {
   }
 
   rand() {
+    let e = 0;
+    for (let i = 0; i < (this.precalculations_list.length / 2); i++) {
+      if (this.trio.calculation_bools.split("")[i] === "1") {
+        this.calculations_list = [...this.calculations_list, this.precalculations_list[e], this.precalculations_list[e + 1]];
+      }
+      e += 2;
+    }
+    if (this.calculations_list.length <= 0) {
+      document.getElementById("no_calcs").style.display = "block";
+      this.trio.setextreme_calc(false);
+    }
     if (this.seed == 0) {
       this.seed = this.getRanHex(4);
       if (location.toString().indexOf('?') == -1) {
@@ -1136,6 +1223,7 @@ class init_numbers {
       this.getrandom_numb();
       this.trio.clickedBoxClear();
     }
+
     this.current_random_numb = this.new_current_random_numb();
     return this.current_random_numb;
   }
@@ -1153,11 +1241,11 @@ class init_numbers {
       let i = Math.round(Math.random() * (this.possible_numbs.length - 1));
       if (i < 0) {
         if (this.possible_numbs.length >= 1 && (this.possible_numbs[0] > this.min && this.possible_numbs[0] < this.max)) {
-          return this.possible_numbs.get(0);
+          return this.possible_numbs[0];
         } else {
           document.getElementById("finish").style.display = "block";
           this.found_nothing = true;
-          return (Math.round(Math.random() * (this.max - this.min) + this.min));
+          return (Math.round((Math.random() * this.max)));
         }
       }
       this.found_nothing = false;
@@ -1165,7 +1253,7 @@ class init_numbers {
     } else {
       document.getElementById("finish").style.display = "block";
       this.found_nothing = true;
-      return (Math.round((Math.random() * (this.max - this.min) + this.min)));
+      return (Math.round((Math.random() * this.max)));
     }
   }
 
@@ -1183,6 +1271,10 @@ class init_numbers {
 
   getrandomnumbs() {
     return this.random_numbs;
+  }
+
+  getprecalcs() {
+    return this.precalculations_list;
   }
 
   getpossiblenumbs() {
@@ -1213,6 +1305,10 @@ class init_numbers {
 
   getcurrent_random_numb() {
     return this.current_random_numb;
+  }
+
+  getseed() {
+    return this.seed;
   }
 }
 
