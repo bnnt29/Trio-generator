@@ -651,7 +651,7 @@ function clicked_row_column(r, clicked, activate, color, backgroundColor) {
         b.style.color = color;
       } else {
         if (black) {
-          b.style.backgroundColor = darkmode_black;
+          b.style.backgroundColor = "#000000";
           b.style.color = "#FFFFFF";
         } else {
           b.style.backgroundColor = "#FFFFFF";
