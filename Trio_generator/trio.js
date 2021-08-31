@@ -490,7 +490,6 @@ function button_styles(b, height, width) {
   }
   if (b.getAttribute("value") != null || b.id == "current_rand") {
     b.style.fontSize = font_size * 4 + "%";
-    console.log(font_size * 4 + ", " + font_size);
   } else {
     b.style.fontSize = 200 + "%";
   }
@@ -687,8 +686,11 @@ function field_pressed(i, e) {
             if (s.charAt(0) == '/' && sec == 0 || s.charAt(1) == '/' && thi == 0) { continue; }
             p.style.color = wrong_color;
             p.style.textAlign = "center";
+            p.innerHTML=one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi;
+            p.appendChild
+            console.log(p.innerHTML);
             calcs.appendChild(p);
-            //never use eval if with user input
+            //never use eval if with user input   
             out = (eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi));
             if (out == r.getcurrent_random_numb()) {
               p.style.color = right_color;
