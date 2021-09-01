@@ -181,22 +181,24 @@ function modal() {
         col.classList.add("col-lg-3");
         col.style.width = "15%";
         col.style.margin = "0 auto";
-        for (let e = i; e < 4 * (i / 4 + 1); e += 2) {
-          let input = document.createElement("input");
-          input.setAttribute("type", "checkbox");
-          input.id = r.getprecalcs()[e];
-          input.name = r.getprecalcs()[e];
-          input.value = r.getprecalcs()[e];
-          col.appendChild(input);
-          let label = document.createElement("label");
-          label.style.marginLeft = "1rem";
-          label.id = "l_" + r.getprecalcs()[e];
-          label.for = r.getprecalcs()[e];
-          label.style.marginRight = "2rem";
-          label.innerHTML = r.getprecalcs()[e].charAt(0) + " und " + r.getprecalcs()[e].charAt(1);
-          col.appendChild(label);
-          if (e < 4 * (i / 4 + 1)) {
-            col.appendChild(document.createElement("br"));
+        for (let e = i; e < (((4 * (i / 4 + 1)) > r.getprecalcs().length) ? r.getprecalcs().length : (4 * (i / 4 + 1))); e += 2) {
+          if (r.getprecalcs().length > e + 1) {
+            let input = document.createElement("input");
+            input.setAttribute("type", "checkbox");
+            input.id = r.getprecalcs()[e];
+            input.name = r.getprecalcs()[e];
+            input.value = r.getprecalcs()[e];
+            col.appendChild(input);
+            let label = document.createElement("label");
+            label.style.marginLeft = "1rem";
+            label.id = "l_" + r.getprecalcs()[e];
+            label.for = r.getprecalcs()[e];
+            label.style.marginRight = "2rem";
+            label.innerHTML = r.getprecalcs()[e].charAt(0) + " und " + r.getprecalcs()[e].charAt(1);
+            col.appendChild(label);
+            if (e < 4 * (i / 4 + 1)) {
+              col.appendChild(document.createElement("br"));
+            }
           }
         }
         document.getElementById("calcs_container").appendChild(col);
@@ -214,7 +216,9 @@ function modal() {
         data.style.color = "#FFFFFF";
       });
       for (let i = 0; i < r.getprecalcs().length; i += 2) {
-        document.getElementById("l_" + r.getprecalcs()[i]).style.color = "#FFFFFF";
+        if (r.getprecalcs().length > i + 1) {
+          document.getElementById("l_" + r.getprecalcs()[i]).style.color = "#FFFFFF";
+        }
       }
     } else {
       document.getElementById("settings_body").style.backgroundColor = "#FFFFFF";
@@ -227,7 +231,9 @@ function modal() {
         data.style.color = "#000000";
       });
       for (let i = 0; i < r.getprecalcs().length; i += 2) {
-        document.getElementById(r.getprecalcs()[i]).style.color = "#000000";
+        if (r.getprecalcs().length > i + 1) {
+          document.getElementById(r.getprecalcs()[i]).style.color = "#000000";
+        }
       }
     }
 
@@ -270,7 +276,9 @@ function modal() {
       document.getElementById("y123").checked = true;
     }
     for (let o = 0; o < r.getcalculationlist().length; o += 2) {
-      document.getElementById(r.getcalculationlist()[o]).checked = true;
+      if (r.getprecalcs().length > o + 1) {
+        document.getElementById(r.getcalculationlist()[o]).checked = true;
+      }
     }
   }
 
@@ -314,17 +322,20 @@ function close_settings(settings) {
   } else if (document.getElementById("y123").checked) {
     yl = false;
   }
-
+  let c = "";
+  for (let i = 0; i < r.getprecalcs().length; i += 2) { if (r.getprecalcs().length > i + 1) { c += "1"; } }
   let u = "";
   for (let i = 0; i < r.getprecalcs().length; i += 2) {
-    if (document.getElementById(r.getprecalcs()[i]).checked) {
-      u += "1";
-    } else {
-      u += "0";
+    if (r.getprecalcs().length > i + 1) {
+      if (document.getElementById(r.getprecalcs()[i]).checked) {
+        u += "1";
+      } else {
+        u += "0";
+      }
     }
   }
   if (location.toString().indexOf('&') == -1) {
-    if (!(10 == prerow && 10 == precol && 2 == premode && u === "111111" && 40 == prefont && document.getElementById("seed_field").value == "" && xl == false && yl == true)) {
+    if (!(10 == prerow && 10 == precol && 2 == premode && u === c && 40 == prefont && document.getElementById("seed_field").value == "" && xl == false && yl == true)) {
       let s = location.toString().substring(0, location.toString().indexOf('?') + 1);
       if (document.getElementById("seed_field").value != "") {
         s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
@@ -347,7 +358,7 @@ function close_settings(settings) {
         s += '&'
         s += "font_size=" + prefont;
       }
-      if (u != "111111") {
+      if (u != c) {
         s += '&'
         s += "calcs=" + u;
       }
@@ -385,7 +396,7 @@ function close_settings(settings) {
         s += '&'
         s += "font_size=" + prefont;
       }
-      if (u != "111111") {
+      if (u != c) {
         s += '&'
         s += "calcs=" + u;
       }
@@ -718,6 +729,9 @@ function clickedBoxAdd(e) {
 }
 
 function clickedBoxClear() {
+  if (help) {
+    show_help();
+  }
   document.getElementById("calculation_list").innerHTML = null;
   clicked_box = [];
   clicked_row_column(true, clicked_rows, false, "#FFFFFF", pending_color);
@@ -810,7 +824,18 @@ function field_pressed(o, u) {
           } else {
             p.style.color = wrong_color;
           }
-          p.style.fontSize = "100%";
+          p.style.fontSize = "140%";
+          if (font_size <= 20) {
+            p.style.fontSize = font_size * 4 + "%";
+          } else if (font_size <= 40) {
+            p.style.fontSize = font_size * 3.5 + "%";
+          } else if (font_size <= 60) {
+            p.style.fontSize = font_size * 3 + "%";
+          } else if (font_size <= 80) {
+            p.style.fontSize = font_size * 2.5 + "%";
+          } else if (font_size <= 100) {
+            p.style.fontSize = font_size * 2 + "%";
+          }
         }
         if (right) {
           b.style.backgroundColor = right_color; b.style.color = '#000000';
@@ -978,6 +1003,8 @@ function show_help() {
     help = false;
     helps = 0;
     box.forEach((data) => {
+      document.getElementById(data).onmouseover = function () { };
+      document.getElementById(data).onmouseout = function () { };
       togglebtn(document.getElementById(data), false);
     });
     document.getElementById("calculation_list").innerHTML = null;
@@ -1122,8 +1149,14 @@ function help_calc(one_, sec_, thi_) {
           if (used_calcs.contains(t) > -1) { continue; }
           used_calcs = [...used_calcs, t];
           p.innerHTML = one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi;
+          document.getElementById(one_).onmouseover = function () { p.style.color = "#F8A000"; highlight_toggle(document.getElementById(one_), true); highlight_toggle(document.getElementById(sec_), true); highlight_toggle(document.getElementById(thi_), true); };
+          document.getElementById(one_).onmouseout = function () { if (black) { p.style.color = "#FFFFFF"; } else { p.style.color = "#000000" } document.getElementById(one_).style.backgroundColor = right_color; document.getElementById(sec_).style.backgroundColor = right_color; document.getElementById(thi_).style.backgroundColor = right_color; };
+          document.getElementById(sec_).onmouseover = function () { p.style.color = "#F8A000"; highlight_toggle(document.getElementById(one_), true); highlight_toggle(document.getElementById(sec_), true); highlight_toggle(document.getElementById(thi_), true); };
+          document.getElementById(sec_).onmouseout = function () { if (black) { p.style.color = "#FFFFFF"; } else { p.style.color = "#000000" } document.getElementById(one_).style.backgroundColor = right_color; document.getElementById(sec_).style.backgroundColor = right_color; document.getElementById(thi_).style.backgroundColor = right_color; };
+          document.getElementById(thi_).onmouseover = function () { p.style.color = "#F8A000"; highlight_toggle(document.getElementById(one_), true); highlight_toggle(document.getElementById(sec_), true); highlight_toggle(document.getElementById(thi_), true); };
+          document.getElementById(thi_).onmouseout = function () { if (black) { p.style.color = "#FFFFFF"; } else { p.style.color = "#000000" } document.getElementById(one_).style.backgroundColor = right_color; document.getElementById(sec_).style.backgroundColor = right_color; document.getElementById(thi_).style.backgroundColor = right_color; };
           p.onmouseover = function () { this.style.color = "#F8A000"; highlight_toggle(document.getElementById(one_), true); highlight_toggle(document.getElementById(sec_), true); highlight_toggle(document.getElementById(thi_), true); };
-          p.onmouseout = function () { if (black) { this.style.color = "#FFFFFF" } else { this.style.color = "#000000" } document.getElementById(one_).style.backgroundColor = right_color; document.getElementById(sec_).style.backgroundColor = right_color; document.getElementById(thi_).style.backgroundColor = right_color; };
+          p.onmouseout = function () { if (black) { this.style.color = "#FFFFFF"; } else { this.style.color = "#000000" } document.getElementById(one_).style.backgroundColor = right_color; document.getElementById(sec_).style.backgroundColor = right_color; document.getElementById(thi_).style.backgroundColor = right_color; };
           p.style.textDecoration = "none";
           document.getElementById("calculation_list").appendChild(p);
           if (black) {
@@ -1132,7 +1165,26 @@ function help_calc(one_, sec_, thi_) {
             p.style.color = "#000000";
           }
           p.style.textAlign = "center";
+          p.style.fontSize = "140%";
+          if (font_size <= 20) {
+            p.style.fontSize = font_size * 3.5 + "%";
+          } else if (font_size <= 40) {
+            p.style.fontSize = font_size * 3 + "%";
+          } else if (font_size <= 60) {
+            p.style.fontSize = font_size * 2.5 + "%";
+          } else if (font_size <= 80) {
+            p.style.fontSize = font_size * 2 + "%";
+          } else if (font_size <= 100) {
+            p.style.fontSize = font_size * 1.5 + "%";
+          }
           helps += 1;
+        } else {
+          document.getElementById(one_).onmouseover = function () { highlight_toggle(document.getElementById(one_), true); highlight_toggle(document.getElementById(sec_), true); highlight_toggle(document.getElementById(thi_), true); };
+          document.getElementById(one_).onmouseout = function () { document.getElementById(one_).style.backgroundColor = right_color; document.getElementById(sec_).style.backgroundColor = right_color; document.getElementById(thi_).style.backgroundColor = right_color; };
+          document.getElementById(sec_).onmouseover = function () { highlight_toggle(document.getElementById(one_), true); highlight_toggle(document.getElementById(sec_), true); highlight_toggle(document.getElementById(thi_), true); };
+          document.getElementById(sec_).onmouseout = function () { document.getElementById(one_).style.backgroundColor = right_color; document.getElementById(sec_).style.backgroundColor = right_color; document.getElementById(thi_).style.backgroundColor = right_color; };
+          document.getElementById(thi_).onmouseover = function () { highlight_toggle(document.getElementById(one_), true); highlight_toggle(document.getElementById(sec_), true); highlight_toggle(document.getElementById(thi_), true); };
+          document.getElementById(thi_).onmouseout = function () { document.getElementById(one_).style.backgroundColor = right_color; document.getElementById(sec_).style.backgroundColor = right_color; document.getElementById(thi_).style.backgroundColor = right_color; };
         }
       }
     }
@@ -1151,10 +1203,12 @@ function reset() {
 }
 
 function dark_switch() {
+  if (help) {
+    show_help();
+  }
   clickedBoxClear();
   document.getElementById("calculation_list").innerHTML = null;
   helps = 0;
-  help = false;
   box.forEach((data) => {
     togglebtn(document.getElementById(data), false);
   });
@@ -1217,10 +1271,12 @@ class init_numbers {
   }
 
   rerand() {
-    clickedBoxClear();
+    if (this.trio.help) {
+      this.trio.show_help();
+    }
+    this.trio.clickedBoxClear();
     document.getElementById("calculation_list").innerHTML = null;
     helps = 0;
-    help = false;
     box.forEach((data) => {
       togglebtn(document.getElementById(data), false);
     });
@@ -1235,7 +1291,9 @@ class init_numbers {
     let e = 0;
     for (let i = 0; i < (this.precalculations_list.length / 2); i++) {
       if (this.trio.calculation_bools.split("")[i] === "1") {
-        this.calculations_list = [...this.calculations_list, this.precalculations_list[e], this.precalculations_list[e + 1]];
+        if (this.precalculations_list.length > e + 1) {
+          this.calculations_list = [...this.calculations_list, this.precalculations_list[e], this.precalculations_list[e + 1]];
+        }
       }
       e += 2;
     }
@@ -1252,6 +1310,7 @@ class init_numbers {
       }
     }
     document.getElementById("seed").innerHTML = this.trio.Hex_r_seed;
+    document.getElementById("seed").style.fontSize = "120%"
     this.possible_numbs = [];
     this.random_numbs = this.gen_random_numbs(rows, columns);
     if (this.trio.extreme_calc) {
@@ -1264,7 +1323,6 @@ class init_numbers {
       this.getrandom_numb();
       this.trio.clickedBoxClear();
     }
-
     this.current_random_numb = this.new_current_random_numb();
     return this.current_random_numb;
   }
