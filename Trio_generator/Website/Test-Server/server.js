@@ -32,7 +32,7 @@ function fserverhandler(req, res) {
                 if (page == path || page + '.html' == path) {
                     if (!pageset) {
                         pageset = true;
-                        fs.readFile(__dirname + '/' + page + '.html', function (error, data) {
+                        fs.readFile(__dirname + '/../' + page + '.html', function (error, data) {
                             if (error) console.error(error);
                             res.writeHead(200, {
                                 'Content-Type': 'text/html'
@@ -53,7 +53,7 @@ function fserverhandler(req, res) {
 
     if (req.url.indexOf('.js') != -1 && !used) { //req.url has the pathname, check if it conatins '.js'
         used = true;
-        fs.readFile(__dirname + '/' + path, function (err, data) {
+        fs.readFile(__dirname + '/../' + path, function (err, data) {
             if (err) console.log(err);
             res.writeHead(200, { 'Content-Type': 'text/javascript' });
             res.write(data);
@@ -63,7 +63,7 @@ function fserverhandler(req, res) {
 
     if (req.url.indexOf('.css') != -1 && !used) { //req.url has the pathname, check if it conatins '.css'
         used = true;
-        fs.readFile(__dirname + '/' + path, function (err, data) {
+        fs.readFile(__dirname + '/../' + path, function (err, data) {
             if (err) console.log(err);
             res.writeHead(200, { 'Content-Type': 'text/css' });
             res.write(data);

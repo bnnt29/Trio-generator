@@ -17,6 +17,7 @@ var darkmode_black = "#141414";
 
 var mode = ((parseInt(urlp['mode']) == null || parseInt(urlp['mode']) == "" || !Number.isNaN(parseInt(parseInt(urlp['mode'])))) ? (parseInt(urlp['mode']) <= 5 ? ((parseInt(urlp['mode']) >= 1) ? parseInt(urlp['mode']) : 1) : 5) : 2) || 2;
 var premode = mode;
+var setmodalcalcs = false;
 
 //numbers
 var extreme_calc = true;
@@ -173,22 +174,61 @@ function modal() {
 
   // When the user clicks the button, open the modal 
   btn_settings.onclick = function () {
+    if (!setmodalcalcs) {
+      setmodalcalcs = true;
+      for (let i = 0; i < r.getprecalcs().length; i += 4) {
+        let col = document.createElement("div");
+        col.classList.add("col-lg-3");
+        col.style.width = "15%";
+        col.style.margin = "0 auto";
+        for (let e = i; e < 4 * (i / 4 + 1); e += 2) {
+          let input = document.createElement("input");
+          input.setAttribute("type", "checkbox");
+          input.id = r.getprecalcs()[e];
+          input.name = r.getprecalcs()[e];
+          input.value = r.getprecalcs()[e];
+          col.appendChild(input);
+          let label = document.createElement("label");
+          label.style.marginLeft = "1rem";
+          label.id = "l_" + r.getprecalcs()[e];
+          label.for = r.getprecalcs()[e];
+          label.style.marginRight = "2rem";
+          label.innerHTML = r.getprecalcs()[e].charAt(0) + " und " + r.getprecalcs()[e].charAt(1);
+          col.appendChild(label);
+          if (e < 4 * (i / 4 + 1)) {
+            col.appendChild(document.createElement("br"));
+          }
+        }
+        document.getElementById("calcs_container").appendChild(col);
+      }
+    }
+
     if (black) {
       document.getElementById("settings_body").style.backgroundColor = darkmode_black;
       document.getElementById("row_count").style.color = "#FFFFFF";
       document.getElementById("col_count").style.color = "#FFFFFF";
       document.getElementById("font_size").style.color = "#FFFFFF";
+      document.getElementById("current_seed").style.color = "#FFFFFF";
+      document.getElementById("mode_count").style.color = "#FFFFFF";
       Array.prototype.forEach.call(document.getElementsByClassName("titel"), (data) => {
         data.style.color = "#FFFFFF";
       });
+      for (let i = 0; i < r.getprecalcs().length; i += 2) {
+        document.getElementById("l_" + r.getprecalcs()[i]).style.color = "#FFFFFF";
+      }
     } else {
       document.getElementById("settings_body").style.backgroundColor = "#FFFFFF";
       document.getElementById("row_count").style.color = "#000000";
       document.getElementById("col_count").style.color = "#000000";
       document.getElementById("font_size").style.color = "#000000";
+      document.getElementById("current_seed").style.color = "#000000";
+      document.getElementById("mode_count").style.color = "#000000";
       Array.prototype.forEach.call(document.getElementsByClassName("titel"), (data) => {
         data.style.color = "#000000";
       });
+      for (let i = 0; i < r.getprecalcs().length; i += 2) {
+        document.getElementById(r.getprecalcs()[i]).style.color = "#000000";
+      }
     }
 
     settings.style.display = "block";
@@ -481,6 +521,7 @@ function gen_html_fields() {
       b.id = "r" + i + ",c" + e;
       box = [...box, "r" + i + ",c" + e];
       b.setAttribute("value", r.getrandomnumbs()[i * columns + e] + "");
+      b.setAttribute("type", "button");
       b.setAttribute("r", i);
       b.setAttribute("c", e);
       b.style.padding = "1px";
@@ -499,12 +540,12 @@ function other_buttons() {
   let height = (100 / (rows)) + "%";
   let width = (100 / (columns * 1.025)) + "%";
   b = document.getElementById("current_rand");
-  button_styles(b, height, width);
+  button_styles(b, height * 2, width);
   b.style.minWidth = "72px";
-  b.style.maxHeight = (100 / (columns * 1.025)) * 5 + "px";
+  b.style.maxHeight = (100 / (columns * 1.025)) * 20 + "px";
   b.style.minHeight = "35px";
   b.style.width = "100%";
-  b.style.height = height;
+  b.style.height = height * 2;
   r.getrandom_numb();
   b.innerHTML = r.getcurrent_random_numb();
   b = document.getElementById("reroll_b");
