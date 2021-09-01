@@ -335,7 +335,7 @@ function close_settings(settings) {
     }
   }
   if (location.toString().indexOf('&') == -1) {
-    if (!(10 == prerow && 10 == precol && 2 == premode && u === c && 40 == prefont && document.getElementById("seed_field").value == "" && xl == false && yl == true)) {
+    if (!(10 == prerow && 10 == precol && 2 == premode && u === c && 40 == prefont && document.getElementById("seed_field").value == "" && !xl && yl)) {
       let s = location.toString().substring(0, location.toString().indexOf('?') + 1);
       if (document.getElementById("seed_field").value != "") {
         s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
@@ -373,7 +373,7 @@ function close_settings(settings) {
       location.href = s;
     }
   } else {
-    if (!(rows == prerow && columns == precol && u === calculation_bools && mode == premode && prefont == font_size && document.getElementById("seed_field").value == "" && xl == xlabeled && yl == ylabeled)) {
+    if (!(rows == prerow && columns == precol && u === calculation_bools && mode == premode && prefont == font_size && document.getElementById("seed_field").value == "" && ((xl).toString() === (xlabeled).toString()) && (yl).toString() === (ylabeled).toString())) {
       let s = location.toString().substring(0, location.toString().indexOf('?') + 1);
       if (document.getElementById("seed_field").value != "") {
         s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
