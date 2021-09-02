@@ -1289,12 +1289,14 @@ class init_numbers {
   rand() {
     let e = 0;
     for (let i = 0; i < (this.precalculations_list.length / 2); i++) {
-      if (this.trio.calculation_bools.split("")[i] === "1") {
-        if (this.precalculations_list.length > e + 1) {
-          this.calculations_list = [...this.calculations_list, this.precalculations_list[e], this.precalculations_list[e + 1]];
+      if (this.trio.calculation_bools.length > i) {
+        if (this.trio.calculation_bools.split("")[i] === "1") {
+          if (this.precalculations_list.length > e + 1) {
+            this.calculations_list = [...this.calculations_list, this.precalculations_list[e], this.precalculations_list[e + 1]];
+          }
         }
+        e += 2;
       }
-      e += 2;
     }
     if (this.calculations_list.length <= 0) {
       document.getElementById("no_calcs").style.display = "block";
