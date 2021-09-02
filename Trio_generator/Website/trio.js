@@ -813,8 +813,7 @@ function field_pressed(o, u) {
           if (s.charAt(0) == '/' && sec == 0 || s.charAt(1) == '/' && thi == 0) { continue; }
           p.style.color = wrong_color;
           p.style.textAlign = "center";
-          p.innerHTML = one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi;
-          p.appendChild
+          p.innerHTML = "<nobr>" + one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi + "</nobr>";
           calcs.appendChild(p);
           //never use eval if with user input   
           out = (eval(one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi));
@@ -1148,7 +1147,7 @@ function help_calc(one_, sec_, thi_) {
           let t = 'x/y: ' + init_label_list(xlabeled)[(parseInt(document.getElementById(one_).getAttribute('c')))] + "/" + init_label_list(ylabeled)[(parseInt(document.getElementById(one_).getAttribute('r')))] + ', ' + init_label_list(xlabeled)[(parseInt(document.getElementById(sec_).getAttribute('c')))] + "/" + init_label_list(ylabeled)[(parseInt(document.getElementById(sec_).getAttribute('r')))] + ', ' + init_label_list(xlabeled)[(parseInt(document.getElementById(thi_).getAttribute('c')))] + "/" + init_label_list(ylabeled)[(parseInt(document.getElementById(thi_).getAttribute('r')))];
           if (used_calcs.contains(t) > -1) { continue; }
           used_calcs = [...used_calcs, t];
-          p.innerHTML = one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi;
+          p.innerHTML = "<nobr>" + one + (s.charAt(0) + "") + sec + (s.charAt(1) + "") + thi + "</nobr>";
           document.getElementById(one_).onmouseover = function () { p.style.color = "#F8A000"; highlight_toggle(document.getElementById(one_), true); highlight_toggle(document.getElementById(sec_), true); highlight_toggle(document.getElementById(thi_), true); };
           document.getElementById(one_).onmouseout = function () { if (black) { p.style.color = "#FFFFFF"; } else { p.style.color = "#000000" } document.getElementById(one_).style.backgroundColor = right_color; document.getElementById(sec_).style.backgroundColor = right_color; document.getElementById(thi_).style.backgroundColor = right_color; };
           document.getElementById(sec_).onmouseover = function () { p.style.color = "#F8A000"; highlight_toggle(document.getElementById(one_), true); highlight_toggle(document.getElementById(sec_), true); highlight_toggle(document.getElementById(thi_), true); };
@@ -1167,15 +1166,15 @@ function help_calc(one_, sec_, thi_) {
           p.style.textAlign = "center";
           p.style.fontSize = "140%";
           if (font_size <= 20) {
-            p.style.fontSize = font_size * 3.5 + "%";
+            p.style.fontSize = font_size * 4 + "%";
           } else if (font_size <= 40) {
-            p.style.fontSize = font_size * 3 + "%";
+            p.style.fontSize = font_size * 3.5 + "%";
           } else if (font_size <= 60) {
-            p.style.fontSize = font_size * 2.5 + "%";
+            p.style.fontSize = font_size * 3 + "%";
           } else if (font_size <= 80) {
-            p.style.fontSize = font_size * 2 + "%";
+            p.style.fontSize = font_size * 2.5 + "%";
           } else if (font_size <= 100) {
-            p.style.fontSize = font_size * 1.5 + "%";
+            p.style.fontSize = font_size * 2 + "%";
           }
           helps += 1;
         } else {
