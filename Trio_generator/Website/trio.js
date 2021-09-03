@@ -9,6 +9,12 @@ var calculation_bools = ((urlp['calcs'] != null || urlp['calcs'] != "") ? urlp['
 var font_size = ((parseInt(urlp['font_size']) == null || parseInt(urlp['font_size']) == "" || !Number.isNaN(parseInt(urlp['font_size']))) ? (parseInt(urlp['font_size']) <= 100 ? ((parseInt(urlp['font_size']) >= 0) ? parseInt(urlp['font_size']) : 0) : 100) : 40) || 40;
 var prefont = font_size;
 
+var teams = ((parseInt(urlp['teams']) == null || parseInt(urlp['teams']) == "" || !Number.isNaN(parseInt(urlp['teams']))) ? (parseInt(urlp['teams']) <= 4 ? ((parseInt(urlp['teams']) >= 0) ? parseInt(urlp['teams']) : 0) : 4) : 0) || 0;
+var team_names = (urlp['names'] != null) ? ((urlp['names'].indexOf('$') != -1) ? urlp['names'].split('$') : []) : [];
+team_names = team_names.splice(0, team_names.length - 1);
+var team_count = [];
+var preteams = teams;
+
 //colors
 var right_color = "#00FF00";
 var wrong_color = "#FF0000";
@@ -69,6 +75,103 @@ function setup() {
   });
   document.getElementById("wait").style.display = "none";
   document.getElementsByClassName("container-fluid")[0].style.display = "block";
+
+  teamssetup();
+}
+
+function teamssetup() {
+  if (teams >= 2) {
+    for (let i = 1; i <= teams; i++) {
+      let col1 = document.createElement("div");
+      col1.classList.add("col-lg-" + (12 / teams));
+      col1.style.border = "solid";
+      col1.style.borderTop = "none";
+      col1.style.borderBottom = "none";
+      if (i > 1) {
+        col1.style.borderLeft = "3%";
+      } else {
+        col1.style.borderLeft = "none";
+      }
+      col1.style.borderRight = "none";
+      col1.style.padding = "0px";
+      col1.style.margin = "0px";
+      let row1 = document.createElement("div");
+      row1.classList.add("row");
+      row1.setAttribute("onclick", "teampoints('+'," + (i - 1) + ")");
+      col1.appendChild(row1);
+      document.getElementById("points").appendChild(col1);
+      col2 = document.createElement("div");
+      col2.classList.add("col-lg-12");
+      p1 = document.createElement("p");
+      if (i > team_names.length || team_names[i - 1] == null || team_names[i - 1] == "") {
+        p1.innerHTML = "Team " + i;
+      } else {
+        p1.innerHTML = team_names[i - 1];
+      }
+      if (black) {
+        p1.style.color = "#FFFFFF";
+        col2.style.borderColor = "#FFFFFF";
+      } else {
+        p1.style.color = "#000000";
+        col2.style.borderColor = "#000000";
+      }
+      p1.style.textAlign = "center";
+      p1.classList.add("footer");
+      col2.appendChild(p1);
+      row1.appendChild(col2);
+      row2 = document.createElement("div");
+      row2.setAttribute("onclick", "teampoints('+'," + (i - 1) + ")");
+      row2.classList.add("row");
+      row2.style.height = "50px";
+      col3 = document.createElement("div");
+      col3.classList.add("col-lg-12");
+      let p2 = document.createElement("p");
+      p2.classList.add("footer");
+      p2.id = "team" + i;
+      if (i <= team_count.length) {
+        p2.innerHTML = team_count[i - 1];
+      } else {
+        team_count[i - 1] = 0;
+        p2.innerHTML = team_count[i - 1] + "";
+      }
+      if (black) {
+        p2.style.color = "#FFFFFF";
+        col3.style.borderColor = "#FFFFFF";
+      } else {
+        p2.style.color = "#000000";
+        col3.style.borderColor = "#000000";
+      }
+      p2.style.textAlign = "center";
+      col3.appendChild(p2);
+      row2.appendChild(col3);
+      col1.appendChild(row2);
+      let row3 = document.createElement("div");
+      row3.classList.add("row");
+      let col4 = document.createElement("div");
+      col4.classList.add("col-lg-12");
+      let b = document.createElement("button");
+      b.innerHTML = "-";
+      objects = [...objects, b];
+      b.setAttribute("team", i);
+      b.onclick = function () { teampoints("-", (i - 1)); }
+      b.style.textAlign = "center";
+      button_styles(b, "10%", "100%");
+      button_color(b);
+      col4.align = "center";
+      col4.appendChild(b);
+      row3.appendChild(col4);
+      col1.appendChild(row3);
+    }
+  }
+}
+
+function teampoints(e, i) {
+  if (e === "+") {
+    team_count[i] += 1;
+  } else if (e === "-" && team_count[i] > 0) {
+    team_count[i] -= 1;
+  }
+  document.getElementById("team" + (i + 1)).innerHTML = team_count[i];
 }
 
 function clicked_row(i) {
@@ -174,6 +277,19 @@ function modal() {
 
   // When the user clicks the button, open the modal 
   btn_settings.onclick = function () {
+    if (teams >= 2) {
+      document.getElementById("teams_checkbox").checked = true
+      preteams = teams;
+      Array.prototype.forEach.call(document.getElementsByClassName("team_element"), (data) => {
+        data.style.display = "block";
+      });
+      Array.prototype.forEach.call(document.getElementsByClassName("team_element_b"), (data) => {
+        data.style.display = "inline-block";
+      });
+      addfields(true);
+
+      document.getElementById("teams_count").innerHTML = preteams;
+    }
     if (!setmodalcalcs) {
       setmodalcalcs = true;
       for (let i = 0; i < r.getprecalcs().length; i += 4) {
@@ -254,6 +370,10 @@ function modal() {
     document.getElementById("mode+").style.fontSize = "150%";
     button_styles(document.getElementById("mode-"), "80%", "48%");
     document.getElementById("mode-").style.fontSize = "150%";
+    button_styles(document.getElementById("teams+"), "80%", "48%");
+    document.getElementById("teams+").style.fontSize = "150%";
+    button_styles(document.getElementById("teams-"), "80%", "48%");
+    document.getElementById("teams-").style.fontSize = "150%";
 
     document.getElementById("row_count").innerHTML = prerow;
     document.getElementById("col_count").innerHTML = precol;
@@ -280,6 +400,7 @@ function modal() {
         document.getElementById(r.getcalculationlist()[o]).checked = true;
       }
     }
+    addfields(true);
   }
 
   document.getElementById("seed_field").placeholder = Hex_r_seed;
@@ -302,6 +423,68 @@ function modal() {
       instruction.style.display = "none";
     }
   }
+}
+
+function addfields(a) {
+  document.getElementById("names_container").innerHTML = null;
+  if (a) {
+    for (let o = 0; o < preteams; o++) {
+      let input = document.createElement("input");
+      if (team_names.length <= o || team_names[o] == null || team_names[o] == "") {
+        input.placeholder = "Team " + (o + 1);
+        input.id = "name" + "Team " + (o + 1);
+      } else {
+        input.placeholder = team_names[o];
+        input.id = "name" + team_names[o];
+      }
+      input.style.width = 100 / preteams + "%";
+      document.getElementById("names_container").appendChild(input);
+    }
+  } else {
+    document.getElementById("names_container").innerHTML = null;
+  }
+}
+
+function teamsco(a) {
+  if (a === '+' && preteams < 4) {
+    preteams += 1;
+    addfields(true);
+  } else if (a === '-' && preteams > 2) {
+    preteams -= 1;
+    addfields(true);
+  } else if (a === '-' && preteams <= 2) {
+    toggleteam();
+  }
+  document.getElementById("teams_count").innerHTML = preteams;
+}
+
+function toggleteam() {
+  if (teams >= 2) {
+    teams = 0;
+    preteams = teams;
+    team_count = [];
+    team_names = [];
+    Array.prototype.forEach.call(document.getElementsByClassName("team_element"), (data) => {
+      data.style.display = "none";
+    });
+    Array.prototype.forEach.call(document.getElementsByClassName("team_element_b"), (data) => {
+      data.style.display = "none";
+    });
+    document.getElementById("teams_checkbox").checked = false;
+    addfields(false);
+  } else {
+    document.getElementById("teams_checkbox").checked = true;
+    teams = 2;
+    preteams = teams;
+    Array.prototype.forEach.call(document.getElementsByClassName("team_element"), (data) => {
+      data.style.display = "block";
+    });
+    Array.prototype.forEach.call(document.getElementsByClassName("team_element_b"), (data) => {
+      data.style.display = "inline-block";
+    });
+    addfields(true);
+  }
+  document.getElementById("teams_count").innerHTML = preteams;
 }
 
 function reset_url() {
@@ -334,8 +517,25 @@ function close_settings(settings) {
       }
     }
   }
+  let b = [];
+  for (let i = 0; i < preteams; i++) {
+    if (i >= team_names.length || team_names[i] == null || team_names[i] == "") {
+      b = [...b, document.getElementById("name" + "Team " + (i + 1)).value];
+    } else {
+      b = [...b, document.getElementById("name" + team_names[i]).value];
+    }
+  }
+  for (let i = 0; i < b.length; i++) {
+    if (b[i] == null || b[i] == "" || b[i] == '$') {
+      if (team_names[i] == null || team_names[i] == "") {
+        b[i] = "";
+      } else {
+        b[i] = team_names[i];
+      }
+    }
+  }
   if (location.toString().indexOf('&') == -1) {
-    if (!(10 == prerow && 10 == precol && 2 == premode && u === c && 40 == prefont && document.getElementById("seed_field").value == "" && !xl && yl)) {
+    if (!(10 == prerow && 10 == precol && 2 == premode && u === c && b.length == 0 && preteams == 0 && 40 == prefont && document.getElementById("seed_field").value == "" && !xl && yl)) {
       let s = location.toString().substring(0, location.toString().indexOf('?') + 1);
       if (document.getElementById("seed_field").value != "") {
         s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
@@ -369,11 +569,22 @@ function close_settings(settings) {
       if (yl != true) {
         s += '&'
         s += "ycord=" + yl;
+      }
+      if (preteams != 0) {
+        s += '&'
+        s += "teams=" + preteams;
+      }
+      if (b.length != 0) {
+        s += '&';
+        s += "names=";
+        b.forEach((data) => {
+          s += data + "$";
+        });
       }
       location.href = s;
     }
   } else {
-    if (!(rows == prerow && columns == precol && u === calculation_bools && mode == premode && prefont == font_size && document.getElementById("seed_field").value == "" && ((xl).toString() === (xlabeled).toString()) && (yl).toString() === (ylabeled).toString())) {
+    if (!(rows == prerow && columns == precol && u === calculation_bools && [b].contains(team_names) != -1 && preteams == teams && mode == premode && prefont == font_size && document.getElementById("seed_field").value == "" && ((xl).toString() === (xlabeled).toString()) && (yl).toString() === (ylabeled).toString())) {
       let s = location.toString().substring(0, location.toString().indexOf('?') + 1);
       if (document.getElementById("seed_field").value != "") {
         s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
@@ -407,6 +618,17 @@ function close_settings(settings) {
       if (yl != true) {
         s += '&'
         s += "ycord=" + yl;
+      }
+      if (preteams != 0) {
+        s += '&'
+        s += "teams=" + preteams;
+      }
+      if (b.length != 0) {
+        s += '&';
+        s += "names=";
+        b.forEach((data) => {
+          s += data + "$";
+        });
       }
       location.href = s;
     }
@@ -678,10 +900,20 @@ function button_color(b) {
       }
     }
   } else {
-    if (black) {
-      b.style.backgroundColor = "#000000";
+    if (b.getAttribute("team") != null) {
+      if (black) {
+        b.style.backgroundColor = darkmode_black;
+        b.style.color = "#FFFFFF";
+      } else {
+        b.style.backgroundColor = "#FFFFFF";
+        b.style.color = "#000000";
+      }
     } else {
-      b.style.backgroundColor = "#FFFFFF";
+      if (black) {
+        b.style.backgroundColor = "#000000";
+      } else {
+        b.style.backgroundColor = "#FFFFFF";
+      }
     }
   }
 }
@@ -792,11 +1024,11 @@ function field_pressed(o, u) {
   let i = parseInt(o);
   let e = parseInt(u);
   let b = document.getElementById("r" + i + ",c" + e);
-  document.getElementById("calculation_list").innerHTML = "";
   let right = false;
   let possibilities = r.getcalculationlist();
   if (clicked_box.contains([i, e]) == -1) {
     if (clicked_box.length < 3) {
+      document.getElementById("calculation_list").innerHTML = "";
       clickedBoxAdd([i, e]);
       if (clicked_box.length == 3) {
         sortclicked();
@@ -959,6 +1191,16 @@ function field_pressed(o, u) {
           }
         }
       }
+    } else {
+      let save = clicked_box;
+      if (help) { show_help(); } else {
+        box.forEach((data) => {
+          togglebtn(document.getElementById(data), false);
+        });
+      }
+      clickedBoxClear();
+      field_pressed(save[0][0], save[0][1]);
+      field_pressed(i, e);
     }
   } else {
     if (clicked_box.contains([i, e]) != 0) {
