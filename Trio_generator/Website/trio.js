@@ -1298,7 +1298,7 @@ function highlight_toggle(b, bool) {
 }
 
 function button_color(b) {
-  if (b.id != "" && b.id != "placeholder") {
+  if (b.id != "" && b.id != "placeholdert" && b.id != "placeholderb") {
     if (b.getAttribute("value") != null) {
       if (black) {
         b.style.backgroundColor = darkmode_black;
@@ -1898,10 +1898,13 @@ function rerand() {
   }
   r.rerand();
   if (color) {
-    Array.prototype.forEach.call(document.getElementsByClassName("body"), (data) => {
-      data.style.backgroundColor = "#F8A000";
-    });
+    document.getElementsByClassName("container-fluid")[0].style.backgroundColor = "#F8A000";
     setTimeout(() => {
+      if (black) {
+        document.getElementsByClassName("container-fluid")[0].style.backgroundColor = "#000000";
+      } else {
+        document.getElementsByClassName("container-fluid")[0].style.backgroundColor = "#FFFFFF";
+      }
       Array.prototype.forEach.call(document.getElementsByClassName("body"), (data) => {
         button_color(data);
       });
