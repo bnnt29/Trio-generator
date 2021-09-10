@@ -1205,7 +1205,7 @@ function other_buttons() {
   let width = (100 / (columns * 1.025)) + "%";
   b = document.getElementById("current_rand");
   button_styles(b, height * 2, width);
-  b.style.fontSize = font_size * 5 + 40 + "%";
+  b.style.fontSize = font_size * 5 + 30 + "%";
   b.style.minWidth = "72px";
   b.style.maxHeight = (100 / (columns * 1.025)) * 20 + "px";
   b.style.minHeight = "35px";
