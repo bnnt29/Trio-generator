@@ -122,7 +122,7 @@
   <title>Trio</title>
 </head>
 
-<body>
+<body class="body">
   <div id="wait" class="row">
     <div class="col-lg-12">
       <h2 style="text-align: center;">Bitte einen Moment Geduld. Die nötigen Informationen werden
@@ -297,16 +297,28 @@
           </div>
           <div class="row" style="margin-bottom: 1rem;">
             <div class="col-lg-3">
+              <p class="titel" style="text-align: center;">Würfel Indikatoren</p>
+            </div>
+            <div class="col-lg-3">
+            </div>
+            <div class="col-lg-3" style="text-align: center;">
+              <input type="checkbox" id="color_checkbox"> Farbe</input>
+            </div>
+            <div class="col-lg-3" style="text-align: center;">
+              <input type="checkbox" id="sound_checkbox"> Ton</input>
+            </div>
+          </div>
+          <div class="row" style="margin-bottom: 1rem;">
+            <div class="col-lg-3">
               <p class="titel" style="text-align: center;">Teams</p>
             </div>
             <div class="col-lg-3" style="text-align: center;">
               <input type="checkbox" id="teams_checkbox" onclick="toggleteam()"></input>
-              <p id="teams_count" class="team_element titel" style="display: none; margin: 1rem;">0</p>
             </div>
             <div class="col-lg-6">
-              <button id="teams+" class="team_element_b" onclick="teamsco('+')"
+              <button id="teams+" class="team_element" onclick="teamsco('+')"
                 style="text-align: center; display: none;">+</button>
-              <button id="teams-" class="team_element_b" onclick="teamsco('-')"
+              <button id="teams-" class="team_element" onclick="teamsco('-')"
                 style="text-align: center; display: none;">-</button>
             </div>
           </div>
@@ -315,11 +327,11 @@
               <p class="titel" style="text-align: center;">Team Namen</p>
             </div>
             <div class="col-lg-3">
+              <p id="teams_count" class="team_element titel" style="display: none; margin: 1rem; text-align: center;">0
+              </p>
             </div>
-            <div class="col-lg-6" style="justify-content: center;">
-              <div class="row" id="names_container">
+            <div class="col-lg-6" style="justify-content: center;" id="names_container">
 
-              </div>
             </div>
           </div>
           <div class="row" style="justify-content: center; align-items: center;">
@@ -389,7 +401,7 @@
               </div>
             </div>
             <div class="row clear_b"
-              style="justify-content: center; height: 100%; max-height: inherit; width: 100%; margin-bottom: 1rem;margin-top: 1rem; padding-right: 0px; margin-right: 0px;">
+              style="justify-content: center; height: 100%; max-height: inherit; width: 100%; margin-bottom: 1rem;margin-top: 1.5rem; padding-right: 0px; margin-right: 0px;">
               <div id="calculation_list" class="col-lg-12">
 
               </div>

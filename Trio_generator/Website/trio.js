@@ -3,6 +3,9 @@ var urlp = []; if (location.toString().indexOf('?') != -1) { s = location.toStri
 var xlabeled = urlp['xcord'] || false;
 var ylabeled = urlp['ycord'] || true;
 
+var sound = false;
+var color = false;
+
 var darkmode = false;
 var used_calcs = [];
 var calculation_bools = ((urlp['calcs'] != null || urlp['calcs'] != "") ? urlp['calcs'] : "111111") || "111111";
@@ -64,6 +67,12 @@ function setup() {
   if (urlp['darkmode'] === "") {
     dark_switch();
   }
+  if (urlp['sound'] === "") {
+    sound = true;
+  }
+  if (urlp['color'] === "") {
+    color = true;
+  }
   Array.prototype.forEach.call(document.getElementsByClassName("clear_b"), (data) => {
     data.onclick = function () {
       clickedBoxClear(); if (help) { show_help(); } else {
@@ -77,6 +86,362 @@ function setup() {
   document.getElementsByClassName("container-fluid")[0].style.display = "block";
 
   teamssetup();
+
+  document.addEventListener('keydown', (e) => {
+    switch (e.code) {
+      case "Escape":
+        clickedBoxClear(); if (help) { show_help(); } else {
+          box.forEach((data) => {
+            togglebtn(document.getElementById(data), false);
+          });
+        }
+        break;
+      case "Digit1" || "Numpad1":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+            clicked_row(0);
+          } else {
+            clicked_column(0);
+          }
+        }
+        break;
+      case "Digit2" || "Numpad2":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+            clicked_row(1);
+          } else {
+            clicked_column(1);
+          }
+        }
+        break;
+      case "Digit3" || "Numpad3":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+            clicked_row(2);
+          } else {
+            clicked_column(2);
+          }
+        }
+        break;
+      case "Digit4" || "Numpad4":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+            clicked_row(3);
+          } else {
+            clicked_column(3);
+          }
+        }
+        break;
+      case "Digit5" || "Numpad5":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+            clicked_row(4);
+          } else {
+            clicked_column(4);
+          }
+        }
+        break;
+      case "Digit6" || "Numpad6":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+            clicked_row(5);
+          } else {
+            clicked_column(5);
+          }
+        }
+        break;
+      case "Digit7" || "Numpad7":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+            clicked_row(6);
+          } else {
+            clicked_column(6);
+          }
+        }
+        break;
+      case "Digit8" || "Numpad8":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+            clicked_row(7);
+          } else {
+            clicked_column(7);
+          }
+        }
+        break;
+      case "Digit9" || "Numpad9":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+            clicked_row(8);
+          } else {
+            clicked_column(8);
+          }
+        }
+        break;
+      case "Digit0" || "Numpad0":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+            clicked_row(9);
+          } else {
+            clicked_column(9);
+          }
+        }
+        break;
+      case "KeyA":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(0);
+          } else {
+            clicked_column(0);
+          }
+        }
+        break;
+      case "KeyB":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(1);
+          } else {
+            clicked_column(1);
+          }
+        }
+        break;
+      case "KeyC":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(2);
+          } else {
+            clicked_column(2);
+          }
+        }
+        break;
+      case "KeyD":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(3);
+          } else {
+            clicked_column(3);
+          }
+        }
+        break;
+      case "KeyE":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(4);
+          } else {
+            clicked_column(4);
+          }
+        }
+        break;
+      case "KeyF":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(5);
+          } else {
+            clicked_column(5);
+          }
+        }
+        break;
+      case "KeyG":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(6);
+          } else {
+            clicked_column(6);
+          }
+        }
+        break;
+      case "KeyH":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(7);
+          } else {
+            clicked_column(7);
+          }
+        }
+        break;
+      case "KeyI":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(8);
+          } else {
+            clicked_column(8);
+          }
+        }
+        break;
+      case "KeyJ":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(9);
+          } else {
+            clicked_column(9);
+          }
+        }
+        break;
+      case "KeyK":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(10);
+          } else {
+            clicked_column(10);
+          }
+        }
+        break;
+      case "KeyL":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(11);
+          } else {
+            clicked_column(11);
+          }
+        }
+        break;
+      case "KeyM":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(12);
+          } else {
+            clicked_column(12);
+          }
+        }
+        break;
+      case "KeyN":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(13);
+          } else {
+            clicked_column(13);
+          }
+        }
+        break;
+      case "KeyO":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(14);
+          } else {
+            clicked_column(14);
+          }
+        }
+        break;
+      case "KeyP":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(15);
+          } else {
+            clicked_column(15);
+          }
+        }
+        break;
+      case "KeyQ":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(16);
+          } else {
+            clicked_column(16);
+          }
+        }
+        break;
+      case "KeyR":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(17);
+          } else {
+            clicked_column(17);
+          }
+        }
+        break;
+      case "KeyS":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(18);
+          } else {
+            clicked_column(18);
+          }
+        }
+        break;
+      case "KeyT":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(19);
+          } else {
+            clicked_column(19);
+          }
+        }
+        break;
+      case "KeyU":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(20);
+          } else {
+            clicked_column(20);
+          }
+        }
+        break;
+      case "KeyV":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(21);
+          } else {
+            clicked_column(21);
+          }
+        }
+        break;
+      case "KeyW":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(22);
+          } else {
+            clicked_column(22);
+          }
+        }
+        break;
+      case "KeyX":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(23);
+          } else {
+            clicked_column(23);
+          }
+        }
+        break;
+      case "KeyY":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(24);
+          } else {
+            clicked_column(24);
+          }
+        }
+        break;
+      case "KeyZ":
+        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+            clicked_row(25);
+          } else {
+            clicked_column(25);
+          }
+        }
+        break;
+      case "ArrowUp":
+        if (clicked_box.length > 0) {
+          field_pressed(clicked_box[0][0] - 1, clicked_box[0][1]);
+        }
+        break;
+      case "ArrowDown":
+        if (clicked_box.length > 0) {
+          field_pressed(clicked_box[0][0] + 1, clicked_box[0][1]);
+        }
+        break;
+      case "ArrowLeft":
+        if (clicked_box.length > 0) {
+          field_pressed(clicked_box[0][0], clicked_box[0][1] - 1);
+        }
+        break;
+      case "ArrowRight":
+        if (clicked_box.length > 0) {
+          field_pressed(clicked_box[0][0], clicked_box[0][1] + 1);
+        }
+        break;
+    }
+  });
 }
 
 function teamssetup() {
@@ -106,7 +471,7 @@ function teamssetup() {
       if (i > team_names.length || team_names[i - 1] == null || team_names[i - 1] == "") {
         p1.innerHTML = "Team " + i;
       } else {
-        p1.innerHTML = team_names[i - 1];
+        p1.innerHTML = team_names[i - 1].replaceAll('%20', ' ');
       }
       if (black) {
         p1.style.color = "#FFFFFF";
@@ -175,6 +540,9 @@ function teampoints(e, i) {
 }
 
 function clicked_row(i) {
+  if (i + 1 > rows || i < 0) {
+    return;
+  }
   if (clickedrow == -1) {
     document.getElementById("cord_r" + i).style.backgroundColor = "#F8A000";
     if (clicked_box.length == 0) {
@@ -215,8 +583,12 @@ function clicked_row(i) {
 }
 
 function clicked_column(e) {
+  if (e + 1 > columns || e < 0) {
+    return;
+  }
   if (clickedcol == -1) {
-    document.getElementById("cord_c" + e).style.backgroundColor = "#F8A000"
+    document.getElementById("cord_ct" + e).style.backgroundColor = "#F8A000"
+    document.getElementById("cord_cb" + e).style.backgroundColor = "#F8A000"
     if (clicked_box.length == 0) {
       if (clickedrow == -1) {
         clickedcol = e;
@@ -245,10 +617,12 @@ function clicked_column(e) {
       }
     }
   } else if (e == clickedcol) {
-    button_color(document.getElementById("cord_c" + e));
+    button_color(document.getElementById("cord_ct" + e));
+    button_color(document.getElementById("cord_cb" + e));
     clickedcol = -1;
   } else {
-    button_color(document.getElementById("cord_c" + clickedcol));
+    button_color(document.getElementById("cord_ct" + clickedcol));
+    button_color(document.getElementById("cord_cb" + clickedcol));
     clickedcol = -1;
     clicked_column(e);
   }
@@ -278,13 +652,10 @@ function modal() {
   // When the user clicks the button, open the modal 
   btn_settings.onclick = function () {
     if (teams >= 2) {
-      document.getElementById("teams_checkbox").checked = true
+      document.getElementById("teams_checkbox").checked = true;
       preteams = teams;
       Array.prototype.forEach.call(document.getElementsByClassName("team_element"), (data) => {
-        data.style.display = "block";
-      });
-      Array.prototype.forEach.call(document.getElementsByClassName("team_element_b"), (data) => {
-        data.style.display = "inline-block";
+        data.style.display = "";
       });
       addfields(true);
 
@@ -352,6 +723,9 @@ function modal() {
         }
       }
     }
+
+    document.getElementById("color_checkbox").checked = (color === true || color === "true" ? true : false);
+    document.getElementById("sound_checkbox").checked = (sound === true || sound === "true" ? true : false);
 
     settings.style.display = "block";
     button_styles(document.getElementById("row+"), "80%", "48%");
@@ -467,9 +841,6 @@ function toggleteam() {
     Array.prototype.forEach.call(document.getElementsByClassName("team_element"), (data) => {
       data.style.display = "none";
     });
-    Array.prototype.forEach.call(document.getElementsByClassName("team_element_b"), (data) => {
-      data.style.display = "none";
-    });
     document.getElementById("teams_checkbox").checked = false;
     addfields(false);
   } else {
@@ -477,10 +848,7 @@ function toggleteam() {
     teams = 2;
     preteams = teams;
     Array.prototype.forEach.call(document.getElementsByClassName("team_element"), (data) => {
-      data.style.display = "block";
-    });
-    Array.prototype.forEach.call(document.getElementsByClassName("team_element_b"), (data) => {
-      data.style.display = "inline-block";
+      data.style.display = "";
     });
     addfields(true);
   }
@@ -495,6 +863,8 @@ function close_settings(settings) {
   settings.style.display = "none";
   let yl;
   let xl;
+  let soundc = document.getElementById("sound_checkbox").checked;
+  let colorc = document.getElementById("color_checkbox").checked;
   if (document.getElementById("xabc").checked) {
     xl = true;
   } else if (document.getElementById("x123").checked) {
@@ -535,12 +905,20 @@ function close_settings(settings) {
     }
   }
   if (location.toString().indexOf('&') == -1) {
-    if (!(10 == prerow && 10 == precol && 2 == premode && u === c && b.length == 0 && preteams == 0 && 40 == prefont && document.getElementById("seed_field").value == "" && !xl && yl)) {
+    if (!(10 == prerow && 10 == precol && 2 == premode && u === c && !soundc && !colorc && b.length == 0 && preteams == 0 && 40 == prefont && document.getElementById("seed_field").value == "" && !xl && yl)) {
       let s = location.toString().substring(0, location.toString().indexOf('?') + 1);
       if (document.getElementById("seed_field").value != "") {
         s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
       } else {
         s += "seed=" + Hex_r_seed;
+      }
+      if (colorc) {
+        s += '&'
+        s += "color";
+      }
+      if (soundc) {
+        s += '&'
+        s += "sound";
       }
       if (prerow != 10) {
         s += '&'
@@ -584,12 +962,20 @@ function close_settings(settings) {
       location.href = s;
     }
   } else {
-    if (!(rows == prerow && columns == precol && u === calculation_bools && [b].contains(team_names) != -1 && preteams == teams && mode == premode && prefont == font_size && document.getElementById("seed_field").value == "" && ((xl).toString() === (xlabeled).toString()) && (yl).toString() === (ylabeled).toString())) {
+    if (!(rows == prerow && columns == precol && u === calculation_bools && sound === soundc && color === colorc && [b].contains(team_names) != -1 && preteams == teams && mode == premode && prefont == font_size && document.getElementById("seed_field").value == "" && ((xl).toString() === (xlabeled).toString()) && (yl).toString() === (ylabeled).toString())) {
       let s = location.toString().substring(0, location.toString().indexOf('?') + 1);
       if (document.getElementById("seed_field").value != "") {
         s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
       } else {
         s += "seed=" + Hex_r_seed;
+      }
+      if (colorc) {
+        s += '&'
+        s += "color";
+      }
+      if (soundc) {
+        s += '&'
+        s += "sound";
       }
       if (prerow != 10) {
         s += '&'
@@ -712,8 +1098,15 @@ function gen_html_fields() {
   button_styles(b, "100%", ((100 / ((columns + 1) * 1.025)) / 1.7) - 0.2 + "%");
   b.style.border = "none";
   b.style.outline = "none"
-  b.id = "placeholder";
-  b.title = "placeholder";
+  b.id = "placeholdert";
+  b.title = "placeholdert";
+  b.onclick = function () {
+    clickedBoxClear(); if (help) { show_help(); } else {
+      box.forEach((data) => {
+        togglebtn(document.getElementById(data), false);
+      });
+    }
+  }
   row.appendChild(b);
   for (let i = 0; i < columns; i++) {
     let col = document.createElement("div");
@@ -722,7 +1115,7 @@ function gen_html_fields() {
     col.style.height = "50%";
     b = document.createElement("button");
     let xlabel = init_label_list((xlabeled === true || xlabeled === "true" ? true : false));
-    b.id = "cord_c" + i;
+    b.id = "cord_ct" + i;
     b.setAttribute("c", i);
     b.onclick = function () { clicked_column(i); }
     b.innerHTML = xlabel[i];
@@ -766,6 +1159,44 @@ function gen_html_fields() {
     document.getElementById("container").appendChild(row);
     document.getElementById("container").style.height = y * 0.9 + "px";
   }
+  row = document.createElement("div");
+  row.classList.add("row");
+  row.style.margin = "0.1%";
+  row.style.marginBottom = "0.5%";
+  row.style.justifyContent = "center";
+  row.style.height = (100 / (rows + 1)) / 2 + "%";
+  document.getElementById("container").appendChild(row);
+  b = document.createElement("button");
+  button_styles(b, "100%", ((100 / ((columns + 1) * 1.025)) / 1.7) - 0.2 + "%");
+  b.style.border = "none";
+  b.style.outline = "none"
+  b.id = "placeholderb";
+  b.title = "placeholderb";
+  b.onclick = function () {
+    clickedBoxClear(); if (help) { show_help(); } else {
+      box.forEach((data) => {
+        togglebtn(document.getElementById(data), false);
+      });
+    }
+  }
+  row.appendChild(b);
+  for (let i = 0; i < columns; i++) {
+    let col = document.createElement("div");
+    col.classList.add("col");
+    col.style.justifyContent = "center";
+    col.style.height = "50%";
+    b = document.createElement("button");
+    let xlabel = init_label_list((xlabeled === true || xlabeled === "true" ? true : false));
+    b.id = "cord_cb" + i;
+    b.setAttribute("c", i);
+    b.onclick = function () { clicked_column(i); }
+    b.innerHTML = xlabel[i];
+    button_styles(b, "100%", width);
+    b.style.border = "none";
+    b.style.outline = "none"
+    col.appendChild(b);
+    row.appendChild(b);
+  }
   other_buttons();
 }
 
@@ -774,6 +1205,7 @@ function other_buttons() {
   let width = (100 / (columns * 1.025)) + "%";
   b = document.getElementById("current_rand");
   button_styles(b, height * 2, width);
+  b.style.fontSize = font_size * 5 + 40 + "%";
   b.style.minWidth = "72px";
   b.style.maxHeight = (100 / (columns * 1.025)) * 20 + "px";
   b.style.minHeight = "35px";
@@ -966,6 +1398,8 @@ function clickedBoxClear() {
   }
   document.getElementById("calculation_list").innerHTML = null;
   clicked_box = [];
+  clicked_column(clickedcol);
+  clicked_row(clickedrow);
   clicked_row_column(true, clicked_rows, false, "#FFFFFF", pending_color);
   clicked_row_column(false, clicked_columns, false, "#FFFFFF", pending_color);
   clicked_rows = [];
@@ -996,21 +1430,35 @@ function clicked_row_column(r, clicked, activate, color, backgroundColor) {
   clicked.forEach((i) => {
     if (i < columns && i >= 0) {
       let b;
+      let b1;
       if (r) {
         b = document.getElementById("cord_r" + i);
       } else {
-        b = document.getElementById("cord_c" + i);
+        b = document.getElementById("cord_ct" + i);
+        b1 = document.getElementById("cord_cb" + i);
       }
       if (activate) {
         b.style.backgroundColor = backgroundColor;
         b.style.color = color;
+        if (!r) {
+          b1.style.backgroundColor = backgroundColor;
+          b1.style.color = color;
+        }
       } else {
         if (black) {
           b.style.backgroundColor = "#000000";
           b.style.color = "#FFFFFF";
+          if (!r) {
+            b1.style.backgroundColor = "#000000";
+            b1.style.color = "#FFFFFF";
+          }
         } else {
           b.style.backgroundColor = "#FFFFFF";
           b.style.color = "#000000";
+          if (!r) {
+            b1.style.backgroundColor = "#FFFFFF";
+            b1.style.color = "#000000";
+          }
         }
       }
     }
@@ -1432,8 +1880,36 @@ function help_calc(one_, sec_, thi_) {
   }
 }
 
+function play() {
+  let context = new AudioContext();
+  let o = context.createOscillator();
+  let g = context.createGain();
+  let time = 1.3;
+  o.connect(g);
+  g.connect(context.destination);
+  o.start(0);
+  g.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + time);
+  o.stop(context.currentTime + time + 1);
+}
+
 function rerand() {
-  r.rerand(); document.getElementById("current_rand").innerHTML = r.getcurrent_random_numb();
+  if (sound) {
+    play();
+  }
+  r.rerand();
+  if (color) {
+    Array.prototype.forEach.call(document.getElementsByClassName("body"), (data) => {
+      data.style.backgroundColor = "#F8A000";
+    });
+    setTimeout(() => {
+      Array.prototype.forEach.call(document.getElementsByClassName("body"), (data) => {
+        button_color(data);
+      });
+      setTimeout(() => { document.getElementById("current_rand").innerHTML = r.getcurrent_random_numb(); }, 80);
+    }, 450);
+  } else {
+    setTimeout(() => { document.getElementById("current_rand").innerHTML = r.getcurrent_random_numb(); }, 150);
+  }
 }
 
 function reset() {
