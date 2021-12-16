@@ -104,6 +104,30 @@
       background-color: #65C965;
       color: white;
     }
+
+    .collapsible {
+      background-color: #65C965;
+      color: white;
+      cursor: pointer;
+      padding: 18px;
+      width: 100%;
+      border: none;
+      text-align: left;
+      outline: none;
+      font-size: 15px;
+    }
+
+    .active,
+    .collapsible:hover {
+      background-color: #85BF85;
+    }
+
+    .content {
+      padding: 0 18px;
+      display: none;
+      overflow: hidden;
+      background-color: #f1f1f1;
+    }
   </style>
 
   <!-- Required meta tags -->
@@ -333,11 +357,22 @@
               </p>
             </div>
             <div class="col-lg-6" style="justify-content: center;" id="names_container">
-
             </div>
           </div>
-          <div class="row" style="justify-content: center; align-items: center;">
-            <div class="col-lg-2">
+          <div class="row">
+            <div class="col">
+              <button type="button" id="collapsible_settings_body" class="collapsible">Sound Effekte</button>
+              <div id="sound container" class="content">
+
+              </div>
+            </div>
+          </div>
+          <div class="row" style="justify-content: center; align-items: center; margin-top: 2rem;">
+            <div class="col-lg-8">
+              <button id="save_url_b" style="text-align: center;">Einstellungen
+                speichern</button>
+            </div>
+            <div class="col-lg-4">
               <button id="reset_url_b" onclick="reset_url()" style="text-align: center;">Einstellungen
                 zurücksetzen</button>
             </div>
@@ -362,10 +397,13 @@
               Moment bitte</button>
             <button id="reroll_b" onclick="rerand()" style="min-height: 30px;">würfeln</button>
             <button id="reset_b" onclick="reset()" style="min-height: 30px;">neue Zahlen</button>
+            <button id="reset_points_b" onclick="reset_points()" style="min-height: 30px;">neue Punkte</button>
             <div class="row">
               <div class="col">
-                <p id="seed_label" style="text-align: center; margin-top: 1rem; ">seed:</p>
-                <p id="seed" style="text-align: center; margin-bottom: 2rem;"></p>
+                <butto onclick="copyclip()" style="border: none;">
+                  <p id="seed_label" style="text-align: center; margin-top: 1rem; ">seed:</p>
+                  <p id="seed" style="text-align: center; margin-bottom: 2rem;"></p>
+                </butto>
                 <p id="finish" style="color: #FF0000; margin-bottom: 4rem;display: none;">Alle möglichen Spiele gespielt
                 </p>
                 <p id="no_calcs" style="color: #FF0000; display: none;">Mit den aktuellen Einstellungen ist aufgrund

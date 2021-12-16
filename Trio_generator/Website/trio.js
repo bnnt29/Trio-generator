@@ -15,7 +15,8 @@ var prefont = font_size;
 var teams = ((parseInt(urlp['teams']) == null || parseInt(urlp['teams']) == "" || !Number.isNaN(parseInt(urlp['teams']))) ? (parseInt(urlp['teams']) <= 4 ? ((parseInt(urlp['teams']) >= 0) ? parseInt(urlp['teams']) : 0) : 4) : 0) || 0;
 var team_names = (urlp['names'] != null) ? ((urlp['names'].indexOf('$') != -1) ? urlp['names'].split('$') : []) : [];
 team_names = team_names.splice(0, team_names.length - 1);
-var team_count = [];
+var team_count = (urlp['points'] != null) ? ((urlp['points'].indexOf('$') != -1) ? urlp['points'].split('$').map(Number) : []) : [];
+
 var preteams = teams;
 
 //colors
@@ -50,9 +51,41 @@ var black = false;
 var help = false;
 var helps = 0;
 
+//audio
+var sounds = (urlp['sounds'] != null) ? ((urlp['sounds'].indexOf('$') != -1) ? urlp['sounds'].split('$') : []) : [];
+var events = ["Würfeln", "Rechnung - falsch", "Rechnung - richtig", "Sieges Bedingung", "Punkt"];
+var wincon = (urlp['sounds'] != null) ? ((urlp['sounds'].indexOf('$') != -1) ? urlp['sounds'].split('$')[0] : 10) : 10;
+
+var coll = document.getElementsByClassName("collapsible");
+
 var buttons_init = false;
 
+function play(path) {
+  new Audio(path).play();
+}
+
+function playindex(index) {
+  if (index >= 0 && index <= sounds.length) {
+    if (sounds[index] != null) {
+      if (sounds[index].indexOf(".mp3") != -1) {
+        play("Media/" + sounds[index]);
+      } else if (sounds[index] === "random") {
+        let files = loadFiles("Media/");
+        for (let i = 0; i < files.length; i++) {
+          if (!files[i].endsWith(".mp3")) {
+            files.splice(i, 1);
+          }
+        }
+        play("Media/" + files[Math.round(Math.random() * files.length)]);
+      } else if (sounds[index].indexOf("frequence") != -1) {
+        playstand(sounds[index].split('!')[1]);
+      }
+    }
+  }
+}
+
 function setup() {
+  sounds.splice(0, 1);
   if (Hex_r_seed.length > 4) {
     let s = location.toString().substring(0, location.toString().indexOf("seed=") + 5) + Hex_r_seed.substring(0, 4);
     if (location.toString().lastIndexOf('&') > location.toString().indexOf("seed=")) {
@@ -82,366 +115,580 @@ function setup() {
       }
     }
   });
-  document.getElementById("wait").style.display = "none";
-  document.getElementsByClassName("container-fluid")[0].style.display = "block";
+
+  if (teams != team_count.length) {
+    for (let i = team_count.length; i < preteams; i++) {
+      team_count[i] = 0;
+    }
+    team_count.splice(preteams, team_count.length - preteams);
+    let c;
+    for (let i = 0; i < r.getprecalcs().length; i += 2) { if (r.getprecalcs().length > i + 1) { c += "1"; } };
+    saveSettings(c, c, sound, color, team_names, xlabeled, ylabeled);
+  }
 
   teamssetup();
 
+  for (let i = 0; i < coll.length; i++) {
+    coll[i].addEventListener("click", function () {
+      this.classList.toggle("active");
+      var content = this.nextElementSibling;
+      if (content.style.display === "block") {
+        content.style.display = "none";
+      } else {
+        content.style.display = "block";
+      }
+    });
+  }
+
+  document.getElementById("wait").style.display = "none";
+  document.getElementsByClassName("container-fluid")[0].style.display = "block";
+
   document.addEventListener('keydown', (e) => {
-    switch (e.code) {
-      case "Escape":
-        clickedBoxClear(); if (help) { show_help(); } else {
-          box.forEach((data) => {
-            togglebtn(document.getElementById(data), false);
-          });
-        }
-        break;
-      case "Digit1" || "Numpad1":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
-            clicked_row(0);
-          } else {
-            clicked_column(0);
+    if (document.getElementById("instructions_modal").style.display === none) {
+      switch (e.code) {
+        case "Escape":
+          clickedBoxClear(); if (help) { show_help(); } else {
+            box.forEach((data) => {
+              togglebtn(document.getElementById(data), false);
+            });
           }
-        }
-        break;
-      case "Digit2" || "Numpad2":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
-            clicked_row(1);
-          } else {
-            clicked_column(1);
+          break;
+        case "Digit1" || "Numpad1":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+              clicked_row(0);
+            } else {
+              clicked_column(0);
+            }
           }
-        }
-        break;
-      case "Digit3" || "Numpad3":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
-            clicked_row(2);
-          } else {
-            clicked_column(2);
+          break;
+        case "Digit2" || "Numpad2":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+              clicked_row(1);
+            } else {
+              clicked_column(1);
+            }
           }
-        }
-        break;
-      case "Digit4" || "Numpad4":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
-            clicked_row(3);
-          } else {
-            clicked_column(3);
+          break;
+        case "Digit3" || "Numpad3":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+              clicked_row(2);
+            } else {
+              clicked_column(2);
+            }
           }
-        }
-        break;
-      case "Digit5" || "Numpad5":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
-            clicked_row(4);
-          } else {
-            clicked_column(4);
+          break;
+        case "Digit4" || "Numpad4":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+              clicked_row(3);
+            } else {
+              clicked_column(3);
+            }
           }
-        }
-        break;
-      case "Digit6" || "Numpad6":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
-            clicked_row(5);
-          } else {
-            clicked_column(5);
+          break;
+        case "Digit5" || "Numpad5":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+              clicked_row(4);
+            } else {
+              clicked_column(4);
+            }
           }
-        }
-        break;
-      case "Digit7" || "Numpad7":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
-            clicked_row(6);
-          } else {
-            clicked_column(6);
+          break;
+        case "Digit6" || "Numpad6":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+              clicked_row(5);
+            } else {
+              clicked_column(5);
+            }
           }
-        }
-        break;
-      case "Digit8" || "Numpad8":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
-            clicked_row(7);
-          } else {
-            clicked_column(7);
+          break;
+        case "Digit7" || "Numpad7":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+              clicked_row(6);
+            } else {
+              clicked_column(6);
+            }
           }
-        }
-        break;
-      case "Digit9" || "Numpad9":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
-            clicked_row(8);
-          } else {
-            clicked_column(8);
+          break;
+        case "Digit8" || "Numpad8":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+              clicked_row(7);
+            } else {
+              clicked_column(7);
+            }
           }
-        }
-        break;
-      case "Digit0" || "Numpad0":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((xlabeled === true || xlabeled === "true" ? true : false)) {
-            clicked_row(9);
-          } else {
-            clicked_column(9);
+          break;
+        case "Digit9" || "Numpad9":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+              clicked_row(8);
+            } else {
+              clicked_column(8);
+            }
           }
-        }
-        break;
-      case "KeyA":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(0);
-          } else {
-            clicked_column(0);
+          break;
+        case "Digit0" || "Numpad0":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((xlabeled === true || xlabeled === "true" ? true : false)) {
+              clicked_row(9);
+            } else {
+              clicked_column(9);
+            }
           }
-        }
-        break;
-      case "KeyB":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(1);
-          } else {
-            clicked_column(1);
+          break;
+        case "KeyA":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(0);
+            } else {
+              clicked_column(0);
+            }
           }
-        }
-        break;
-      case "KeyC":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(2);
-          } else {
-            clicked_column(2);
+          break;
+        case "KeyB":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(1);
+            } else {
+              clicked_column(1);
+            }
           }
-        }
-        break;
-      case "KeyD":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(3);
-          } else {
-            clicked_column(3);
+          break;
+        case "KeyC":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(2);
+            } else {
+              clicked_column(2);
+            }
           }
-        }
-        break;
-      case "KeyE":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(4);
-          } else {
-            clicked_column(4);
+          break;
+        case "KeyD":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(3);
+            } else {
+              clicked_column(3);
+            }
           }
-        }
-        break;
-      case "KeyF":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(5);
-          } else {
-            clicked_column(5);
+          break;
+        case "KeyE":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(4);
+            } else {
+              clicked_column(4);
+            }
           }
-        }
-        break;
-      case "KeyG":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(6);
-          } else {
-            clicked_column(6);
+          break;
+        case "KeyF":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(5);
+            } else {
+              clicked_column(5);
+            }
           }
-        }
-        break;
-      case "KeyH":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(7);
-          } else {
-            clicked_column(7);
+          break;
+        case "KeyG":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(6);
+            } else {
+              clicked_column(6);
+            }
           }
-        }
-        break;
-      case "KeyI":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(8);
-          } else {
-            clicked_column(8);
+          break;
+        case "KeyH":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(7);
+            } else {
+              clicked_column(7);
+            }
           }
-        }
-        break;
-      case "KeyJ":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(9);
-          } else {
-            clicked_column(9);
+          break;
+        case "KeyI":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(8);
+            } else {
+              clicked_column(8);
+            }
           }
-        }
-        break;
-      case "KeyK":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(10);
-          } else {
-            clicked_column(10);
+          break;
+        case "KeyJ":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(9);
+            } else {
+              clicked_column(9);
+            }
           }
-        }
-        break;
-      case "KeyL":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(11);
-          } else {
-            clicked_column(11);
+          break;
+        case "KeyK":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(10);
+            } else {
+              clicked_column(10);
+            }
           }
-        }
-        break;
-      case "KeyM":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(12);
-          } else {
-            clicked_column(12);
+          break;
+        case "KeyL":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(11);
+            } else {
+              clicked_column(11);
+            }
           }
-        }
-        break;
-      case "KeyN":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(13);
-          } else {
-            clicked_column(13);
+          break;
+        case "KeyM":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(12);
+            } else {
+              clicked_column(12);
+            }
           }
-        }
-        break;
-      case "KeyO":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(14);
-          } else {
-            clicked_column(14);
+          break;
+        case "KeyN":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(13);
+            } else {
+              clicked_column(13);
+            }
           }
-        }
-        break;
-      case "KeyP":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(15);
-          } else {
-            clicked_column(15);
+          break;
+        case "KeyO":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(14);
+            } else {
+              clicked_column(14);
+            }
           }
-        }
-        break;
-      case "KeyQ":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(16);
-          } else {
-            clicked_column(16);
+          break;
+        case "KeyP":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(15);
+            } else {
+              clicked_column(15);
+            }
           }
-        }
-        break;
-      case "KeyR":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(17);
-          } else {
-            clicked_column(17);
+          break;
+        case "KeyQ":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(16);
+            } else {
+              clicked_column(16);
+            }
           }
-        }
-        break;
-      case "KeyS":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(18);
-          } else {
-            clicked_column(18);
+          break;
+        case "KeyR":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(17);
+            } else {
+              clicked_column(17);
+            }
           }
-        }
-        break;
-      case "KeyT":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(19);
-          } else {
-            clicked_column(19);
+          break;
+        case "KeyS":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(18);
+            } else {
+              clicked_column(18);
+            }
           }
-        }
-        break;
-      case "KeyU":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(20);
-          } else {
-            clicked_column(20);
+          break;
+        case "KeyT":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(19);
+            } else {
+              clicked_column(19);
+            }
           }
-        }
-        break;
-      case "KeyV":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(21);
-          } else {
-            clicked_column(21);
+          break;
+        case "KeyU":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(20);
+            } else {
+              clicked_column(20);
+            }
           }
-        }
-        break;
-      case "KeyW":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(22);
-          } else {
-            clicked_column(22);
+          break;
+        case "KeyV":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(21);
+            } else {
+              clicked_column(21);
+            }
           }
-        }
-        break;
-      case "KeyX":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(23);
-          } else {
-            clicked_column(23);
+          break;
+        case "KeyW":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(22);
+            } else {
+              clicked_column(22);
+            }
           }
-        }
-        break;
-      case "KeyY":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(24);
-          } else {
-            clicked_column(24);
+          break;
+        case "KeyX":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(23);
+            } else {
+              clicked_column(23);
+            }
           }
-        }
-        break;
-      case "KeyZ":
-        if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
-          if ((ylabeled === true || ylabeled === "true" ? true : false)) {
-            clicked_row(25);
-          } else {
-            clicked_column(25);
+          break;
+        case "KeyY":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(24);
+            } else {
+              clicked_column(24);
+            }
           }
-        }
-        break;
-      case "ArrowUp":
-        if (clicked_box.length > 0) {
-          field_pressed(clicked_box[0][0] - 1, clicked_box[0][1]);
-        }
-        break;
-      case "ArrowDown":
-        if (clicked_box.length > 0) {
-          field_pressed(clicked_box[0][0] + 1, clicked_box[0][1]);
-        }
-        break;
-      case "ArrowLeft":
-        if (clicked_box.length > 0) {
-          field_pressed(clicked_box[0][0], clicked_box[0][1] - 1);
-        }
-        break;
-      case "ArrowRight":
-        if (clicked_box.length > 0) {
-          field_pressed(clicked_box[0][0], clicked_box[0][1] + 1);
-        }
-        break;
+          break;
+        case "KeyZ":
+          if (!(xlabeled === true || xlabeled === "true" ? true : false) === (ylabeled === true || ylabeled === "true" ? true : false)) {
+            if ((ylabeled === true || ylabeled === "true" ? true : false)) {
+              clicked_row(25);
+            } else {
+              clicked_column(25);
+            }
+          }
+          break;
+        case "ArrowUp":
+          if (clicked_box.length > 0) {
+            field_pressed(clicked_box[0][0] - 1, clicked_box[0][1]);
+          }
+          break;
+        case "ArrowDown":
+          if (clicked_box.length > 0) {
+            field_pressed(clicked_box[0][0] + 1, clicked_box[0][1]);
+          }
+          break;
+        case "ArrowLeft":
+          if (clicked_box.length > 0) {
+            field_pressed(clicked_box[0][0], clicked_box[0][1] - 1);
+          }
+          break;
+        case "ArrowRight":
+          if (clicked_box.length > 0) {
+            field_pressed(clicked_box[0][0], clicked_box[0][1] + 1);
+          }
+          break;
+      }
     }
   });
+}
+
+function copyclip() {
+  /* Get the text field */
+  var copyText = document.getElementById("seed");
+
+  /* Copy the text inside the text field */
+  navigator.clipboard.writeText(copyText.innerHTML);
+
+  /* Alert the copied text */
+  tempAlert("Copied the field seed: " + copyText.innerHTML, 1000);
+}
+
+function tempAlert(msg, duration) {
+  var el = document.createElement("div");
+  el.setAttribute("style", "position:absolute;top:33%;left:0%;background-color:white;");
+  el.innerHTML = msg;
+  setTimeout(function () {
+    el.parentNode.removeChild(el);
+  }, duration);
+  document.body.appendChild(el);
+}
+
+function loadFolder(folderPath) {
+  var result = null;
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.open("GET", folderPath, false);
+  xmlhttp.send();
+  if (xmlhttp.status == 200) {
+    result = xmlhttp.responseText;
+  }
+  return result;
+}
+
+function loadFiles(folderPath) {
+  let folder = loadFolder(folderPath);
+  let folderentries = folder.split("href=");
+  folderentries.splice(0, 6);
+  for (let i = 0; i < folderentries.length; i++) {
+    folderentries[i] = folderentries[i].split('"')[1];
+  }
+  return folderentries;
+}
+
+function soundsetup(teams) {
+  var files = loadFiles("Media/");
+  for (let i = 0; i < files.length; i++) {
+    if (!files[i].endsWith(".mp3")) {
+      files.splice(i, 1);
+    }
+  }
+  files.splice(0, 0, "------------");
+  files.splice(files.length, 0, "frequence");
+  files.splice(files.length, 0, "random");
+
+  let container = document.getElementById("sound container");
+  container.innerHTML = null;
+  for (let i = 0; i < teams; i++) {
+    events.splice(events.indexOf("Punkt") + i + 1, 0, "Punkt Team " + (i + 1));
+  }
+  events.forEach((data) => {
+    let row1 = document.createElement("div");
+    row1.classList.add("row");
+    row1.style.marginTop = "1rem";
+    let col1 = document.createElement("div");
+    col1.classList.add("col-lg-3");
+    let p1 = document.createElement("p");
+    p1.classList.add("titel");
+    p1.innerHTML = data;
+    col1.appendChild(p1);
+    p1.style.textAlign = "center";
+    let col2 = document.createElement("div");
+    col2.classList.add("col-lg-6");
+    col2.style.display = "block";
+    col2.style.textAlign = "left";
+    let sel = document.createElement("select");
+    sel.id = "sound_select_" + data;
+    sel.title = "sound " + data;
+    files.forEach((file) => {
+      let opt = document.createElement("option");
+      opt.value = file;
+      if (file.indexOf(".mp3") != -1) {
+        opt.innerHTML = file.substring(0, file.length - 4);
+      } else {
+        opt.innerHTML = file;
+      }
+      sel.appendChild(opt);
+    });
+    if (sounds.length > 0) {
+      let inde = files.indexOf(sounds[events.indexOf(data)].split('!')[0]);
+      if (inde <= 0) {
+        sel.value = "------------";
+      } else {
+        sel.value = files[inde];
+      }
+    } else {
+      sel.value = "------------";
+    }
+
+    let div = document.createElement("div");
+    div.style.display = "inline";
+
+    if (sel.value === "frequence") {
+      addinputforfreq(div, data);
+    }
+
+    sel.onchange = function () {
+      if (sel.value === "frequence") {
+        addinputforfreq(div, data);
+      } else {
+        div.innerHTML = null;
+      }
+    };
+
+    let col3 = document.createElement("div");
+    col3.classList.add("col-lg-3");
+    if (data === "Sieges Bedingung") {
+      let p = document.createElement("p");
+      p.innerHTML = "Punkte: ";
+      p.classList.add("titel");
+      col3.appendChild(p);
+      let input = document.createElement("input");
+      input.type = "number";
+      input.placeholder = wincon;
+      input.style.marginLeft = "1rem";
+      input.id = "wincon_input"
+      col3.appendChild(input);
+    }
+
+    let play1 = document.createElement("button");
+    play1.setAttribute("onclick", "playsel('" + data + "')");
+    play1.innerHTML = "&#9654";
+    play1.style.margin = "0.5rem";
+
+    col2.appendChild(sel);
+    col2.appendChild(play1);
+    col2.appendChild(div);
+    row1.appendChild(col1);
+    row1.appendChild(col3);
+    row1.appendChild(col2);
+    container.appendChild(row1);
+  });
+}
+
+function addinputforfreq(div, data) {
+  let input = document.createElement("input");
+  input.type = "range";
+  input.min = 20;
+  input.max = 3000;
+  input.width = "60%";
+  if (sounds.length > events.indexOf(data) && sounds[events.indexOf(data)].indexOf("frequence") != -1) {
+    input.value = sounds[events.indexOf(data)].split('!')[1];
+  } else {
+    input.value = 450;
+  }
+  input.style.marginLeft = "1rem";
+  input.id = "freq_input_" + data;
+  let p = document.createElement("p");
+  p.classList.add("titel");
+  p.innerHTML = "Frequenz (Hz): " + input.value;
+  if (black) {
+    p.style.color = "#FFFFFF";
+  } else {
+    p.style.color = "#000000";
+  }
+  input.onchange = function () {
+    p.innerHTML = "Frequenz (Hz): " + input.value;
+  }
+  div.appendChild(p);
+  div.appendChild(input);
+}
+
+function playsel(datas) {
+  let data = document.getElementById("sound_select_" + datas).value;
+  if (data.indexOf(".mp3") != -1) {
+    play("Media/" + data);
+  } else {
+    if (data === "frequence") {
+      playstand(document.getElementById("freq_input_" + datas).value);
+    } else if (data === "random") {
+      let files = loadFiles("Media/");
+      for (let i = 0; i < files.length; i++) {
+        if (!files[i].endsWith(".mp3")) {
+          files.splice(i, 1);
+        }
+      }
+      play("Media/" + files[Math.round(Math.random() * files.length)]);
+    }
+  }
 }
 
 function teamssetup() {
@@ -533,10 +780,41 @@ function teamssetup() {
 function teampoints(e, i) {
   if (e === "+") {
     team_count[i] += 1;
-  } else if (e === "-" && team_count[i] > 0) {
+    if (team_count[i] % wincon == 0) {
+      playindex(4);
+    } else {
+      playindex(5);
+      playindex(6 + i);
+    }
+  } else if (e === "-") {
     team_count[i] -= 1;
   }
+  refreshpoints(i);
+}
+
+function refreshpoints(i) {
   document.getElementById("team" + (i + 1)).innerHTML = team_count[i];
+  let s = location.toString().substring(location.toString().indexOf('/'), location.toString().indexOf('points=') + 7);
+  team_count.forEach((data) => {
+    s += data + "$";
+  });
+  s = s.substring(0, s.length - 1);
+  let u = location.toString().substring(location.toString().indexOf('points=') + 7, location.toString().length);
+  let e = u.indexOf("&");
+  if (e > 0) {
+    s += location.toString().substring(location.toString().indexOf('points=') + 7 + e, location.toString().length);
+  }
+  window.history.pushState("updated_Points", "Trio", "/" + s);
+}
+
+function reset_points() {
+  team_count = [];
+  for (let i = team_count.length; i < preteams; i++) {
+    team_count[i] = 0;
+  }
+  for (let i = 0; i < teams; i++) {
+    refreshpoints(i);
+  }
 }
 
 function clicked_row(i) {
@@ -629,6 +907,8 @@ function clicked_column(e) {
 }
 
 function modal() {
+
+  soundsetup(teams);
   //modal instructions
   var instruction = document.getElementById("instructions_modal");
   var btn_instruction = document.getElementById("instructions_b");
@@ -694,6 +974,7 @@ function modal() {
 
     if (black) {
       document.getElementById("settings_body").style.backgroundColor = darkmode_black;
+      document.getElementById("sound container").style.backgroundColor = darkmode_black;
       document.getElementById("row_count").style.color = "#FFFFFF";
       document.getElementById("col_count").style.color = "#FFFFFF";
       document.getElementById("font_size").style.color = "#FFFFFF";
@@ -709,6 +990,7 @@ function modal() {
       }
     } else {
       document.getElementById("settings_body").style.backgroundColor = "#FFFFFF";
+      document.getElementById("sound container").style.backgroundColor = "#FFFFFF";
       document.getElementById("row_count").style.color = "#000000";
       document.getElementById("col_count").style.color = "#000000";
       document.getElementById("font_size").style.color = "#000000";
@@ -780,10 +1062,20 @@ function modal() {
   document.getElementById("seed_field").placeholder = Hex_r_seed;
 
   button_styles(document.getElementById("reset_url_b"), "100%", "100%");
+  objects.splice(objects.indexOf("reset_url_b"), 1);
   document.getElementById("reset_url_b").style.fontSize = "100%";
   document.getElementById("reset_url_b").style.minWidth = "190px";
   document.getElementById("reset_url_b").style.minHeight = "10px";
-
+  document.getElementById("reset_url_b").style.backgroundColor = "#EE6565";
+  button_styles(document.getElementById("save_url_b"), "100%", "100%");
+  objects.splice(objects.indexOf("save_url_b"), 1);
+  document.getElementById("save_url_b").style.fontSize = "100%";
+  document.getElementById("save_url_b").style.minWidth = "190px";
+  document.getElementById("save_url_b").style.minHeight = "10px";
+  document.getElementById("save_url_b").style.backgroundColor = "#65EE65";
+  document.getElementById("save_url_b").onclick = function () {
+    close_settings(settings);
+  }
   // When the user clicks on <span> (x), close the modal
   span_settings.onclick = function () {
     close_settings(settings);
@@ -875,6 +1167,23 @@ function close_settings(settings) {
   } else if (document.getElementById("y123").checked) {
     yl = false;
   }
+  let sou = [];
+  let value = document.getElementById("wincon_input").value;
+  if (value == null || value == 0) {
+    value = 10;
+  }
+  sou.splice(0, 0, value);
+  events.forEach((eve) => {
+    let choose = document.getElementById("sound_select_" + eve).value;
+    if (choose.indexOf("-----") != -1) {
+      choose = "";
+    }
+    if (choose === "frequence") {
+      choose += '!';
+      choose += document.getElementById("freq_input_" + eve).value;
+    }
+    sou.splice(sou.length, 0, choose);
+  });
   let c = "";
   for (let i = 0; i < r.getprecalcs().length; i += 2) { if (r.getprecalcs().length > i + 1) { c += "1"; } }
   let u = "";
@@ -904,53 +1213,67 @@ function close_settings(settings) {
       }
     }
   }
+  saveSettings(u, c, soundc, colorc, b, xl, yl, sou);
+}
+
+function saveSettings(u, c, soundc, colorc, b, xl, yl, sou) {
+  let s = location.toString().substring(location.toString().indexOf('/'), location.toString().indexOf('?') + 1);
   if (location.toString().indexOf('&') == -1) {
-    if (!(10 == prerow && 10 == precol && 2 == premode && u === c && !soundc && !colorc && b.length == 0 && preteams == 0 && 40 == prefont && document.getElementById("seed_field").value == "" && !xl && yl)) {
-      let s = location.toString().substring(0, location.toString().indexOf('?') + 1);
+    if (!(10 == prerow && 10 == precol && 2 == premode && u === c && sou.length <= 0 && !soundc && !colorc && b.length == 0 && preteams == 0 && 40 == prefont && document.getElementById("seed_field").value == "" && !xl && yl)) {
       if (document.getElementById("seed_field").value != "") {
         s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
       } else {
         s += "seed=" + Hex_r_seed;
       }
       if (colorc) {
-        s += '&'
+        s += '&';
         s += "color";
       }
       if (soundc) {
-        s += '&'
+        s += '&';
         s += "sound";
       }
       if (prerow != 10) {
-        s += '&'
+        s += '&';
         s += "rows=" + prerow;
       }
       if (precol != 10) {
-        s += '&'
+        s += '&';
         s += "columns=" + precol;
       }
       if (premode != 2) {
-        s += '&'
+        s += '&';
         s += "mode=" + premode;
       }
       if (prefont != 40) {
-        s += '&'
+        s += '&';
         s += "font_size=" + prefont;
       }
       if (u != c) {
-        s += '&'
+        s += '&';
         s += "calcs=" + u;
       }
       if (xl != false) {
-        s += '&'
+        s += '&';
         s += "xcord=" + xl;
       }
       if (yl != true) {
-        s += '&'
+        s += '&';
         s += "ycord=" + yl;
       }
       if (preteams != 0) {
-        s += '&'
+        s += '&';
         s += "teams=" + preteams;
+        s += '&';
+        s += 'points=';
+        for (let i = team_count.length; i < preteams; i++) {
+          team_count[i] = 0;
+        }
+        team_count.splice(preteams, team_count.length - preteams);
+        team_count.forEach((data) => {
+          s += data + "$";
+        });
+        s = s.substring(0, s.length - 1);
       }
       if (b.length != 0) {
         s += '&';
@@ -959,61 +1282,86 @@ function close_settings(settings) {
           s += data + "$";
         });
       }
+      if (sou.length > 0) {
+        s += '&';
+        s += "sounds=";
+        sou.forEach((so) => {
+          s += so;
+          s += "$";
+        });
+      }
       location.href = s;
     }
   } else {
-    if (!(rows == prerow && columns == precol && u === calculation_bools && sound === soundc && color === colorc && [b].contains(team_names) != -1 && preteams == teams && mode == premode && prefont == font_size && document.getElementById("seed_field").value == "" && ((xl).toString() === (xlabeled).toString()) && (yl).toString() === (ylabeled).toString())) {
-      let s = location.toString().substring(0, location.toString().indexOf('?') + 1);
+    if (!(rows == prerow && columns == precol && u === calculation_bools && sounds === sou && sound === soundc && color === colorc && [b].contains(team_names) != -1 && preteams == teams && mode == premode && prefont == font_size && document.getElementById("seed_field").value == "" && ((xl).toString() === (xlabeled).toString()) && (yl).toString() === (ylabeled).toString())) {
       if (document.getElementById("seed_field").value != "") {
         s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
       } else {
         s += "seed=" + Hex_r_seed;
       }
       if (colorc) {
-        s += '&'
+        s += '&';
         s += "color";
       }
       if (soundc) {
-        s += '&'
+        s += '&';
         s += "sound";
       }
       if (prerow != 10) {
-        s += '&'
+        s += '&';
         s += "rows=" + prerow;
       }
       if (precol != 10) {
-        s += '&'
+        s += '&';
         s += "columns=" + precol;
       }
       if (premode != 2) {
-        s += '&'
+        s += '&';
         s += "mode=" + premode;
       }
       if (prefont != 40) {
-        s += '&'
+        s += '&';
         s += "font_size=" + prefont;
       }
       if (u != c) {
-        s += '&'
+        s += '&';
         s += "calcs=" + u;
       }
       if (xl != false) {
-        s += '&'
+        s += '&';
         s += "xcord=" + xl;
       }
       if (yl != true) {
-        s += '&'
+        s += '&';
         s += "ycord=" + yl;
       }
       if (preteams != 0) {
-        s += '&'
+        s += '&';
         s += "teams=" + preteams;
+        s += '&';
+        s += 'points=';
+        for (let i = team_count.length; i < preteams; i++) {
+          team_count[i] = 0;
+        }
+        team_count.splice(preteams, team_count.length - preteams);
+        team_count.forEach((data) => {
+          s += data + "$";
+        });
+        s = s.substring(0, s.length - 1);
       }
       if (b.length != 0) {
         s += '&';
         s += "names=";
         b.forEach((data) => {
           s += data + "$";
+        });
+      }
+      if (sou.length > 0) {
+        s += '&';
+        s += "sounds=";
+        sou.forEach((so) => {
+          s += so;
+          s += "$";
         });
       }
       location.href = s;
@@ -1227,6 +1575,18 @@ function other_buttons() {
   b.style.width = "100%";
   b.style.height = (100 / (rows)) / 3 + "%";
   b.style.marginTop = "1rem";
+  b = document.getElementById("reset_points_b");
+  if (teams >= 2) {
+    button_styles(b, height, width);
+    b.style.fontSize = "89%";
+    b.style.minWidth = "72px";
+    b.style.width = "100%";
+    b.style.height = (100 / (rows)) / 3 + "%";
+    b.style.marginTop = "1rem";
+    b.style.display = "block";
+  } else {
+    b.style.display = "none";
+  }
   b = document.getElementById("darkmode_b");
   button_styles(b, height, width);
   b.style.width = "100%";
@@ -1524,6 +1884,7 @@ function field_pressed(o, u) {
           });
           clicked_row_column(true, clicked_rows, true, '#000000', right_color);
           clicked_row_column(false, clicked_columns, true, '#000000', right_color);
+          playindex(3);
         } else {
           b.style.backgroundColor = wrong_color;
           b.style.color = '#FFFFFF';
@@ -1533,6 +1894,7 @@ function field_pressed(o, u) {
           });
           clicked_row_column(true, clicked_rows, true, '#FFFFFF', wrong_color);
           clicked_row_column(false, clicked_columns, true, '#FFFFFF', wrong_color);
+          playindex(2);
         }
       } else {
         b.style.backgroundColor = pending_color;
@@ -1880,11 +2242,12 @@ function help_calc(one_, sec_, thi_) {
   }
 }
 
-function play() {
+function playstand(freq) {
   let context = new AudioContext();
   let o = context.createOscillator();
+  o.frequency.setValueAtTime(freq, context.currentTime);
   let g = context.createGain();
-  let time = 1.3;
+  let time = 1.5;
   o.connect(g);
   g.connect(context.destination);
   o.start(0);
@@ -1893,9 +2256,7 @@ function play() {
 }
 
 function rerand() {
-  if (sound) {
-    play();
-  }
+  playindex(0);
   r.rerand();
   if (color) {
     document.getElementsByClassName("container-fluid")[0].style.backgroundColor = "#F8A000";
