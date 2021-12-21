@@ -3,7 +3,6 @@ var urlp = []; if (location.toString().indexOf('?') != -1) { s = location.toStri
 var xlabeled = urlp['xcord'] || false;
 var ylabeled = urlp['ycord'] || true;
 
-var sound = false;
 var color = false;
 
 var darkmode = false;
@@ -53,8 +52,9 @@ var helps = 0;
 
 //audio
 var sounds = (urlp['sounds'] != null) ? ((urlp['sounds'].indexOf('$') != -1) ? urlp['sounds'].split('$') : []) : [];
-var events = ["Würfeln", "Rechnung - falsch", "Rechnung - richtig", "Sieges Bedingung", "Punkt"];
+var events = ["Wuerfeln", "Rechnung - falsch", "Rechnung - richtig", "Sieges Bedingung", "Punkt"];
 var wincon = (urlp['sounds'] != null) ? ((urlp['sounds'].indexOf('$') != -1) ? urlp['sounds'].split('$')[0] : 10) : 10;
+var w_sound;
 
 var coll = document.getElementsByClassName("collapsible");
 
@@ -100,9 +100,7 @@ function setup() {
   if (urlp['darkmode'] === "") {
     dark_switch();
   }
-  if (urlp['sound'] === "") {
-    sound = true;
-  }
+
   if (urlp['color'] === "") {
     color = true;
   }
@@ -117,13 +115,7 @@ function setup() {
   });
 
   if (teams != team_count.length) {
-    for (let i = team_count.length; i < preteams; i++) {
-      team_count[i] = 0;
-    }
-    team_count.splice(preteams, team_count.length - preteams);
-    let c;
-    for (let i = 0; i < r.getprecalcs().length; i += 2) { if (r.getprecalcs().length > i + 1) { c += "1"; } };
-    saveSettings(c, c, sound, color, team_names, xlabeled, ylabeled);
+    close_settings(null);
   }
 
   teamssetup();
@@ -144,7 +136,7 @@ function setup() {
   document.getElementsByClassName("container-fluid")[0].style.display = "block";
 
   document.addEventListener('keydown', (e) => {
-    if (document.getElementById("instructions_modal").style.display === none) {
+    if (document.getElementById("instructions_modal").style.display === "none") {
       switch (e.code) {
         case "Escape":
           clickedBoxClear(); if (help) { show_help(); } else {
@@ -524,123 +516,186 @@ function tempAlert(msg, duration) {
 }
 
 function loadFolder(folderPath) {
-  var result = null;
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.open("GET", folderPath, false);
-  xmlhttp.send();
-  if (xmlhttp.status == 200) {
-    result = xmlhttp.responseText;
-  }
-  return result;
+  return new Promise(function (resolve, reject) {
+    let result;
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", folderPath, true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        if (this.status >= 200 && this.status < 300) {
+          resolve(xhr.response);
+        } else {
+          reject({
+            status: this.status,
+            statusText: xhr.statusText
+          });
+          return result;
+        }
+      }
+    };
+    xhr.onerror = function () {
+      reject({
+        status: this.status,
+        statusText: xhr.statusText
+      });
+      return result;
+    };
+    xhr.send(() => {
+      if (xmlhttp.status == 200) {
+        result = xmlhttp.responseText;
+      }
+      return result;
+    });
+  });
 }
 
-function loadFiles(folderPath) {
-  let folder = loadFolder(folderPath);
+async function loadFiles(folderPath) {
+  let folder = [];
+  try {
+    folder = await loadFolder(folderPath);
+    if (folder == null || folder.length <= 0) {
+      folder = await loadFolder(folderPath);
+      if (folder == null || folder.length <= 0) {
+        return null;
+      }
+    }
+  }
+  catch (e) {
+    folder = [];
+  }
+  if (folder == null || folder.length <= 0) {
+    soundsetup(null);
+  }
   let folderentries = folder.split("href=");
   folderentries.splice(0, 6);
   for (let i = 0; i < folderentries.length; i++) {
     folderentries[i] = folderentries[i].split('"')[1];
   }
-  return folderentries;
+  soundsetup(folderentries);
 }
 
-function soundsetup(teams) {
-  var files = loadFiles("Media/");
-  for (let i = 0; i < files.length; i++) {
-    if (!files[i].endsWith(".mp3")) {
-      files.splice(i, 1);
+function soundsetup(files) {
+  if (files != null && files.length > 0) {
+    for (let i = 0; i < files.length; i++) {
+      if (!files[i].endsWith(".mp3")) {
+        files.splice(i, 1);
+      }
     }
+    files = ["------------", ...files];
+    files = [...files, "frequence"];
+    if (files.length > 2) {
+      files = [...files, "random"];
+    }
+  } else {
+    files = ["------------"];
+    files = [...files, "frequence"];
   }
-  files.splice(0, 0, "------------");
-  files.splice(files.length, 0, "frequence");
-  files.splice(files.length, 0, "random");
-
   let container = document.getElementById("sound container");
   container.innerHTML = null;
+  console.log(teams);
   for (let i = 0; i < teams; i++) {
     events.splice(events.indexOf("Punkt") + i + 1, 0, "Punkt Team " + (i + 1));
   }
   events.forEach((data) => {
-    let row1 = document.createElement("div");
-    row1.classList.add("row");
-    row1.style.marginTop = "1rem";
-    let col1 = document.createElement("div");
-    col1.classList.add("col-lg-3");
-    let p1 = document.createElement("p");
-    p1.classList.add("titel");
-    p1.innerHTML = data;
-    col1.appendChild(p1);
-    p1.style.textAlign = "center";
-    let col2 = document.createElement("div");
-    col2.classList.add("col-lg-6");
-    col2.style.display = "block";
-    col2.style.textAlign = "left";
-    let sel = document.createElement("select");
-    sel.id = "sound_select_" + data;
-    sel.title = "sound " + data;
-    files.forEach((file) => {
-      let opt = document.createElement("option");
-      opt.value = file;
-      if (file.indexOf(".mp3") != -1) {
-        opt.innerHTML = file.substring(0, file.length - 4);
+    console.log(data);
+    if (!((data === "Sieges Bedingung" || data === "Punkt") && teams < 1)) {
+      console.log(3);
+      let row1 = document.createElement("div");
+      row1.classList.add("row");
+      row1.style.marginTop = "1rem";
+      let col1 = document.createElement("div");
+      col1.classList.add("col-lg-3");
+      let p1 = document.createElement("p");
+      p1.classList.add("titel");
+      p1.innerHTML = data;
+      col1.appendChild(p1);
+      p1.style.textAlign = "center";
+      let col2 = document.createElement("div");
+      col2.classList.add("col-lg-6");
+      col2.style.display = "block";
+      col2.style.textAlign = "center";
+      let sel = document.createElement("select");
+      sel.id = "sound_select_" + data;
+      sel.title = "sound " + data;
+      files.forEach((file) => {
+        let opt = document.createElement("option");
+        opt.value = file;
+        if (file.indexOf(".mp3") != -1) {
+          opt.innerHTML = file.substring(0, file.length - 4);
+        } else {
+          opt.innerHTML = file;
+        }
+        sel.appendChild(opt);
+      });
+      if (sounds.length > 0) {
+        let inde = files.indexOf(sounds[events.indexOf(data)].split('!')[0]);
+        if (inde <= 0) {
+          sel.value = "------------";
+        } else {
+          sel.value = files[inde];
+        }
       } else {
-        opt.innerHTML = file;
-      }
-      sel.appendChild(opt);
-    });
-    if (sounds.length > 0) {
-      let inde = files.indexOf(sounds[events.indexOf(data)].split('!')[0]);
-      if (inde <= 0) {
         sel.value = "------------";
-      } else {
-        sel.value = files[inde];
       }
-    } else {
-      sel.value = "------------";
-    }
 
-    let div = document.createElement("div");
-    div.style.display = "inline";
+      let div = document.createElement("div");
+      div.style.display = "inline";
+      div.id = "div_sound_select_" + data;
 
-    if (sel.value === "frequence") {
-      addinputforfreq(div, data);
-    }
-
-    sel.onchange = function () {
       if (sel.value === "frequence") {
         addinputforfreq(div, data);
-      } else {
-        div.innerHTML = null;
       }
-    };
 
-    let col3 = document.createElement("div");
-    col3.classList.add("col-lg-3");
-    if (data === "Sieges Bedingung") {
-      let p = document.createElement("p");
-      p.innerHTML = "Punkte: ";
-      p.classList.add("titel");
-      col3.appendChild(p);
-      let input = document.createElement("input");
-      input.type = "number";
-      input.placeholder = wincon;
-      input.style.marginLeft = "1rem";
-      input.id = "wincon_input"
-      col3.appendChild(input);
+      sel.onchange = function () {
+        if (sel.value === "frequence") {
+          addinputforfreq(div, data);
+          if (sel.id.endsWith("Wuerfeln")) {
+            document.getElementById("sound_checkbox").checked = true;
+          }
+        } else if (sel.id.endsWith("Wuerfeln")) {
+          if (sel.value === "------------") {
+            div.innerHTML = null;
+            document.getElementById("sound_checkbox").checked = false;
+            w_sound = false;
+          } else {
+            div.innerHTML = null;
+            document.getElementById("sound_checkbox").checked = true;
+            w_sound = true;
+          }
+        } else {
+          div.innerHTML = null;
+        }
+      };
+
+      let col3 = document.createElement("div");
+      col3.classList.add("col-lg-3");
+      col3.style.textAlign = "center";
+      if (data === "Sieges Bedingung") {
+        let p = document.createElement("p");
+        p.innerHTML = "Punkte: ";
+        p.classList.add("titel");
+        col3.appendChild(p);
+        let input = document.createElement("input");
+        input.type = "number";
+        input.placeholder = wincon;
+        input.style.marginLeft = "1rem";
+        input.id = "wincon_input"
+        col3.appendChild(input);
+      }
+
+      let play1 = document.createElement("button");
+      play1.setAttribute("onclick", "playsel('" + data + "')");
+      play1.innerHTML = "&#9654";
+      play1.style.margin = "0.5rem";
+
+      col2.appendChild(sel);
+      col2.appendChild(play1);
+      col2.appendChild(div);
+      row1.appendChild(col1);
+      row1.appendChild(col3);
+      row1.appendChild(col2);
+      container.appendChild(row1);
     }
-
-    let play1 = document.createElement("button");
-    play1.setAttribute("onclick", "playsel('" + data + "')");
-    play1.innerHTML = "&#9654";
-    play1.style.margin = "0.5rem";
-
-    col2.appendChild(sel);
-    col2.appendChild(play1);
-    col2.appendChild(div);
-    row1.appendChild(col1);
-    row1.appendChild(col3);
-    row1.appendChild(col2);
-    container.appendChild(row1);
   });
 }
 
@@ -670,6 +725,10 @@ function addinputforfreq(div, data) {
   }
   div.appendChild(p);
   div.appendChild(input);
+  div.addEventListener('dblclick', () => {
+    input.value = 450;
+    p.innerHTML = "Frequenz (Hz): " + input.value;
+  });
 }
 
 function playsel(datas) {
@@ -908,7 +967,7 @@ function clicked_column(e) {
 
 function modal() {
 
-  soundsetup(teams);
+  loadFiles("Media/");
   //modal instructions
   var instruction = document.getElementById("instructions_modal");
   var btn_instruction = document.getElementById("instructions_b");
@@ -1007,7 +1066,31 @@ function modal() {
     }
 
     document.getElementById("color_checkbox").checked = (color === true || color === "true" ? true : false);
-    document.getElementById("sound_checkbox").checked = (sound === true || sound === "true" ? true : false);
+    if (sounds[0] != null && sounds[0].length > 0) {
+      document.getElementById("sound_checkbox").checked = true;
+      w_sound = true;
+    } else {
+      document.getElementById("sound_checkbox").checked = false;
+      w_sound = false;
+    }
+    document.getElementById("sound_checkbox").onclick = function () {
+      try {
+        if (!w_sound) {
+          document.getElementById("sound_select_Wuerfeln").value = "frequence";
+          let div = document.getElementById("div_sound_select_Wuerfeln");
+          if (document.getElementById("sound_select_Wuerfeln").value === "frequence") {
+            addinputforfreq(div, "Wuerfeln");
+          }
+          w_sound = true;
+        } else {
+          document.getElementById("sound_select_Wuerfeln").value = "------------";
+          document.getElementById("div_sound_select_Wuerfeln").innerHTML = null;
+          w_sound = false;
+        }
+      } catch (e) {
+
+      }
+    };
 
     settings.style.display = "block";
     button_styles(document.getElementById("row+"), "80%", "48%");
@@ -1152,10 +1235,11 @@ function reset_url() {
 }
 
 function close_settings(settings) {
-  settings.style.display = "none";
+  if (settings != null) {
+    settings.style.display = "none";
+  }
   let yl;
   let xl;
-  let soundc = document.getElementById("sound_checkbox").checked;
   let colorc = document.getElementById("color_checkbox").checked;
   if (document.getElementById("xabc").checked) {
     xl = true;
@@ -1174,15 +1258,20 @@ function close_settings(settings) {
   }
   sou.splice(0, 0, value);
   events.forEach((eve) => {
-    let choose = document.getElementById("sound_select_" + eve).value;
-    if (choose.indexOf("-----") != -1) {
-      choose = "";
+    try {
+      let choose = document.getElementById("sound_select_" + eve).value;
+      if (choose.indexOf("-----") != -1) {
+        choose = "";
+      }
+      if (choose === "frequence") {
+        choose += '!';
+        choose += document.getElementById("freq_input_" + eve).value;
+      }
+      sou.splice(sou.length, 0, choose);
     }
-    if (choose === "frequence") {
-      choose += '!';
-      choose += document.getElementById("freq_input_" + eve).value;
+    catch (e) {
+
     }
-    sou.splice(sou.length, 0, choose);
   });
   let c = "";
   for (let i = 0; i < r.getprecalcs().length; i += 2) { if (r.getprecalcs().length > i + 1) { c += "1"; } }
@@ -1213,13 +1302,13 @@ function close_settings(settings) {
       }
     }
   }
-  saveSettings(u, c, soundc, colorc, b, xl, yl, sou);
+  saveSettings(u, c, colorc, b, xl, yl, sou);
 }
 
-function saveSettings(u, c, soundc, colorc, b, xl, yl, sou) {
+function saveSettings(u, c, colorc, b, xl, yl, sou) {
   let s = location.toString().substring(location.toString().indexOf('/'), location.toString().indexOf('?') + 1);
   if (location.toString().indexOf('&') == -1) {
-    if (!(10 == prerow && 10 == precol && 2 == premode && u === c && sou.length <= 0 && !soundc && !colorc && b.length == 0 && preteams == 0 && 40 == prefont && document.getElementById("seed_field").value == "" && !xl && yl)) {
+    if (!(10 == prerow && 10 == precol && 2 == premode && u === c && sou.length <= 0 && !colorc && b.length == 0 && preteams == 0 && 40 == prefont && document.getElementById("seed_field").value == "" && !xl && yl)) {
       if (document.getElementById("seed_field").value != "") {
         s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
       } else {
@@ -1228,10 +1317,6 @@ function saveSettings(u, c, soundc, colorc, b, xl, yl, sou) {
       if (colorc) {
         s += '&';
         s += "color";
-      }
-      if (soundc) {
-        s += '&';
-        s += "sound";
       }
       if (prerow != 10) {
         s += '&';
@@ -1293,7 +1378,7 @@ function saveSettings(u, c, soundc, colorc, b, xl, yl, sou) {
       location.href = s;
     }
   } else {
-    if (!(rows == prerow && columns == precol && u === calculation_bools && sounds === sou && sound === soundc && color === colorc && [b].contains(team_names) != -1 && preteams == teams && mode == premode && prefont == font_size && document.getElementById("seed_field").value == "" && ((xl).toString() === (xlabeled).toString()) && (yl).toString() === (ylabeled).toString())) {
+    if (!(rows == prerow && columns == precol && u === calculation_bools && sounds === sou && color === colorc && [b].contains(team_names) != -1 && preteams == teams && mode == premode && prefont == font_size && document.getElementById("seed_field").value == "" && ((xl).toString() === (xlabeled).toString()) && (yl).toString() === (ylabeled).toString())) {
       if (document.getElementById("seed_field").value != "") {
         s += "seed=" + document.getElementById("seed_field").value.toString().substring(0, 4);
       } else {
@@ -1302,10 +1387,6 @@ function saveSettings(u, c, soundc, colorc, b, xl, yl, sou) {
       if (colorc) {
         s += '&';
         s += "color";
-      }
-      if (soundc) {
-        s += '&';
-        s += "sound";
       }
       if (prerow != 10) {
         s += '&';
