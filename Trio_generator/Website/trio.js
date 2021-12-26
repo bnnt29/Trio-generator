@@ -11,7 +11,7 @@ var calculation_bools = ((urlp['calcs'] != null || urlp['calcs'] != "") ? urlp['
 var font_size = ((parseInt(urlp['font_size']) == null || parseInt(urlp['font_size']) == "" || !Number.isNaN(parseInt(urlp['font_size']))) ? (parseInt(urlp['font_size']) <= 100 ? ((parseInt(urlp['font_size']) >= 0) ? parseInt(urlp['font_size']) : 0) : 100) : 40) || 40;
 var prefont = font_size;
 
-var teams = ((parseInt(urlp['teams']) == null || parseInt(urlp['teams']) == "" || !Number.isNaN(parseInt(urlp['teams']))) ? (parseInt(urlp['teams']) <= 4 ? ((parseInt(urlp['teams']) >= 0) ? parseInt(urlp['teams']) : 0) : 4) : 0) || 0;
+var teams = ((parseInt(urlp['teams']) == null || parseInt(urlp['teams']) == "" || !Number.isNaN(parseInt(urlp['teams']))) ? (parseInt(urlp['teams']) <= 12 ? ((parseInt(urlp['teams']) >= 0) ? parseInt(urlp['teams']) : 0) : 12) : 0) || 0;
 var team_names = (urlp['names'] != null) ? ((urlp['names'].indexOf('$') != -1) ? urlp['names'].split('$') : []) : [];
 team_names = team_names.splice(0, team_names.length - 1);
 var team_count = (urlp['points'] != null) ? ((urlp['points'].indexOf('$') != -1) ? urlp['points'].split('$').map(Number) : []) : [];
@@ -54,7 +54,7 @@ var helps = 0;
 var sounds = (urlp['sounds'] != null) ? ((urlp['sounds'].indexOf('$') != -1) ? urlp['sounds'].split('$') : []) : [];
 var events = ["Wuerfeln", "Rechnung - falsch", "Rechnung - richtig", "Sieges Bedingung", "Punkt"];
 var wincon = (urlp['sounds'] != null) ? ((urlp['sounds'].indexOf('$') != -1) ? urlp['sounds'].split('$')[0] : 10) : 10;
-var w_sound;
+var music_files = [];
 
 var coll = document.getElementsByClassName("collapsible");
 
@@ -70,7 +70,7 @@ function playindex(index) {
       if (sounds[index].indexOf(".mp3") != -1) {
         play("Media/" + sounds[index]);
       } else if (sounds[index] === "random") {
-        let files = loadFiles("Media/");
+        let files = music_files;
         for (let i = 0; i < files.length; i++) {
           if (!files[i].endsWith(".mp3")) {
             files.splice(i, 1);
@@ -96,7 +96,7 @@ function setup() {
   r = new init_numbers(parseInt(Hex_r_seed, 16), this);
   r.rand();
   gen_html_fields();
-  modal();
+
   if (urlp['darkmode'] === "") {
     dark_switch();
   }
@@ -115,6 +115,7 @@ function setup() {
   });
 
   if (teams != team_count.length) {
+    console.log(teams + "; " + team_count);
     close_settings(null);
   }
 
@@ -492,6 +493,8 @@ function setup() {
       }
     }
   });
+
+  modal();
 }
 
 function copyclip() {
@@ -563,18 +566,22 @@ async function loadFiles(folderPath) {
   catch (e) {
     folder = [];
   }
+
   if (folder == null || folder.length <= 0) {
-    soundsetup(null);
+    presetup();
+    return null;
   }
   let folderentries = folder.split("href=");
   folderentries.splice(0, 6);
   for (let i = 0; i < folderentries.length; i++) {
     folderentries[i] = folderentries[i].split('"')[1];
   }
-  soundsetup(folderentries);
+  music_files = folderentries;
+  presetup();
 }
 
-function soundsetup(files) {
+function presetup() {
+  let files = music_files.slice(0, music_files.length);
   if (files != null && files.length > 0) {
     for (let i = 0; i < files.length; i++) {
       if (!files[i].endsWith(".mp3")) {
@@ -590,16 +597,44 @@ function soundsetup(files) {
     files = ["------------"];
     files = [...files, "frequence"];
   }
-  let container = document.getElementById("sound container");
-  container.innerHTML = null;
-  console.log(teams);
-  for (let i = 0; i < teams; i++) {
-    events.splice(events.indexOf("Punkt") + i + 1, 0, "Punkt Team " + (i + 1));
+  soundsetup(files);
+}
+
+function createevents() {
+  let events2 = events.slice(0, events.length);
+  for (let i = 0; i < preteams; i++) {
+    events2.splice(events2.indexOf("Punkt") + i + 1, 0, "Punkt Team: ");
+    if (team_names[i] == null || team_names[i] == "") {
+      events2[events2.length - 1] += (i + 1);
+    } else {
+      events2[events2.length - 1] += team_names[i];
+    }
   }
-  events.forEach((data) => {
-    console.log(data);
-    if (!((data === "Sieges Bedingung" || data === "Punkt") && teams < 1)) {
-      console.log(3);
+  return events2;
+}
+
+function updatesound(a, b, c) {
+  sounds[a] = b;
+  console.log(b);
+  console.log(b === "frequence");
+  if (b === "frequence") {
+    try {
+      console.log(c);
+      console.log(document.getElementById("freq_input_" + c));
+      sounds[a] += "!";
+      sounds[a] += document.getElementById("freq_input_" + c).value;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+}
+
+function soundsetup(files) {
+  let container = document.getElementById("sound_container");
+  container.innerHTML = null;
+  let events2 = createevents();
+  events2.forEach((data) => {
+    if (!((data === "Sieges Bedingung" || data === "Punkt") && preteams < 1)) {
       let row1 = document.createElement("div");
       row1.classList.add("row");
       row1.style.marginTop = "1rem";
@@ -607,7 +642,28 @@ function soundsetup(files) {
       col1.classList.add("col-lg-3");
       let p1 = document.createElement("p");
       p1.classList.add("titel");
-      p1.innerHTML = data;
+      p1.innerHTML = data + " :";
+      p1.id = data;
+      if (data.startsWith("Punkt Team:")) {
+      }
+      if (data.startsWith("Punkt Team:")) {
+        document.getElementById("name Team " + (events2.indexOf(data) - events2.indexOf("Punkt"))).oninput = function () {
+          if (this.value === null || this.value === "") {
+            p1.innerHTML = "Punkt Team: " + this.placeholder + " : ";
+          } else {
+            p1.innerHTML = "Punkt Team: " + this.value + " : ";
+          }
+          team_names[(events2.indexOf(data) - events2.indexOf("Punkt")) - 1] = this.value;
+        }
+        document.getElementById("name Team " + (events2.indexOf(data) - events2.indexOf("Punkt"))).addEventListener('propertychange', () => {
+          if (this.value === null || this.value === "") {
+            p1.innerHTML = "Punkt Team: " + this.placeholder + " : ";
+          } else {
+            p1.innerHTML = "Punkt Team: " + this.value + " : ";
+          }
+          team_names[(events2.indexOf(data) - events2.indexOf("Punkt")) - 1] = this.value;
+        });
+      }
       col1.appendChild(p1);
       p1.style.textAlign = "center";
       let col2 = document.createElement("div");
@@ -627,8 +683,12 @@ function soundsetup(files) {
         }
         sel.appendChild(opt);
       });
-      if (sounds.length > 0) {
-        let inde = files.indexOf(sounds[events.indexOf(data)].split('!')[0]);
+      if (sounds.length > events2.indexOf(data) && sounds[events2.indexOf(data)] != null && sounds[events2.indexOf(data)] != "") {
+        console.log(data);
+        console.log(events2.indexOf(data));
+        console.log(sounds[events2.indexOf(data)]);
+        console.log(sounds);
+        let inde = files.indexOf(sounds[events2.indexOf(data)].split('!')[0]);
         if (inde <= 0) {
           sel.value = "------------";
         } else {
@@ -643,12 +703,11 @@ function soundsetup(files) {
       div.id = "div_sound_select_" + data;
 
       if (sel.value === "frequence") {
-        addinputforfreq(div, data);
+        addinputforfreq(div, data, events2);
       }
-
       sel.onchange = function () {
         if (sel.value === "frequence") {
-          addinputforfreq(div, data);
+          addinputforfreq(div, data, events2);
           if (sel.id.endsWith("Wuerfeln")) {
             document.getElementById("sound_checkbox").checked = true;
           }
@@ -656,15 +715,14 @@ function soundsetup(files) {
           if (sel.value === "------------") {
             div.innerHTML = null;
             document.getElementById("sound_checkbox").checked = false;
-            w_sound = false;
           } else {
             div.innerHTML = null;
             document.getElementById("sound_checkbox").checked = true;
-            w_sound = true;
           }
         } else {
           div.innerHTML = null;
         }
+        updatesound((events2.indexOf(data)), sel.value, data);
       };
 
       let col3 = document.createElement("div");
@@ -687,7 +745,6 @@ function soundsetup(files) {
       play1.setAttribute("onclick", "playsel('" + data + "')");
       play1.innerHTML = "&#9654";
       play1.style.margin = "0.5rem";
-
       col2.appendChild(sel);
       col2.appendChild(play1);
       col2.appendChild(div);
@@ -699,13 +756,13 @@ function soundsetup(files) {
   });
 }
 
-function addinputforfreq(div, data) {
+function addinputforfreq(div, data, events) {
   let input = document.createElement("input");
   input.type = "range";
   input.min = 20;
   input.max = 3000;
   input.width = "60%";
-  if (sounds.length > events.indexOf(data) && sounds[events.indexOf(data)].indexOf("frequence") != -1) {
+  if (sounds.length > createevents().indexOf(data) && sounds[createevents().indexOf(data)].indexOf("frequence") != -1 && sounds[createevents().indexOf(data)] != null && sounds[createevents().indexOf(data)] != "") {
     input.value = sounds[events.indexOf(data)].split('!')[1];
   } else {
     input.value = 450;
@@ -739,7 +796,7 @@ function playsel(datas) {
     if (data === "frequence") {
       playstand(document.getElementById("freq_input_" + datas).value);
     } else if (data === "random") {
-      let files = loadFiles("Media/");
+      let files = music_files;
       for (let i = 0; i < files.length; i++) {
         if (!files[i].endsWith(".mp3")) {
           files.splice(i, 1);
@@ -966,8 +1023,6 @@ function clicked_column(e) {
 }
 
 function modal() {
-
-  loadFiles("Media/");
   //modal instructions
   var instruction = document.getElementById("instructions_modal");
   var btn_instruction = document.getElementById("instructions_b");
@@ -988,52 +1043,21 @@ function modal() {
   var btn_settings = document.getElementById("settings_b");
   var span_settings = document.getElementById("settings_close");
 
+  if (teams >= 2) {
+    document.getElementById("teams_checkbox").checked = true;
+    preteams = teams;
+    Array.prototype.forEach.call(document.getElementsByClassName("team_element"), (data) => {
+      data.style.display = "";
+    });
+    addfields(true);
+    document.getElementById("teams_count").innerHTML = preteams;
+  }
+
   // When the user clicks the button, open the modal 
   btn_settings.onclick = function () {
-    if (teams >= 2) {
-      document.getElementById("teams_checkbox").checked = true;
-      preteams = teams;
-      Array.prototype.forEach.call(document.getElementsByClassName("team_element"), (data) => {
-        data.style.display = "";
-      });
-      addfields(true);
-
-      document.getElementById("teams_count").innerHTML = preteams;
-    }
-    if (!setmodalcalcs) {
-      setmodalcalcs = true;
-      for (let i = 0; i < r.getprecalcs().length; i += 4) {
-        let col = document.createElement("div");
-        col.classList.add("col-lg-3");
-        col.style.width = "15%";
-        col.style.margin = "0 auto";
-        for (let e = i; e < (((4 * (i / 4 + 1)) > r.getprecalcs().length) ? r.getprecalcs().length : (4 * (i / 4 + 1))); e += 2) {
-          if (r.getprecalcs().length > e + 1) {
-            let input = document.createElement("input");
-            input.setAttribute("type", "checkbox");
-            input.id = r.getprecalcs()[e];
-            input.name = r.getprecalcs()[e];
-            input.value = r.getprecalcs()[e];
-            col.appendChild(input);
-            let label = document.createElement("label");
-            label.style.marginLeft = "1rem";
-            label.id = "l_" + r.getprecalcs()[e];
-            label.for = r.getprecalcs()[e];
-            label.style.marginRight = "2rem";
-            label.innerHTML = r.getprecalcs()[e].charAt(0) + " und " + r.getprecalcs()[e].charAt(1);
-            col.appendChild(label);
-            if (e < 4 * (i / 4 + 1)) {
-              col.appendChild(document.createElement("br"));
-            }
-          }
-        }
-        document.getElementById("calcs_container").appendChild(col);
-      }
-    }
-
     if (black) {
       document.getElementById("settings_body").style.backgroundColor = darkmode_black;
-      document.getElementById("sound container").style.backgroundColor = darkmode_black;
+      document.getElementById("sound_container").style.backgroundColor = darkmode_black;
       document.getElementById("row_count").style.color = "#FFFFFF";
       document.getElementById("col_count").style.color = "#FFFFFF";
       document.getElementById("font_size").style.color = "#FFFFFF";
@@ -1049,7 +1073,7 @@ function modal() {
       }
     } else {
       document.getElementById("settings_body").style.backgroundColor = "#FFFFFF";
-      document.getElementById("sound container").style.backgroundColor = "#FFFFFF";
+      document.getElementById("sound_container").style.backgroundColor = "#FFFFFF";
       document.getElementById("row_count").style.color = "#000000";
       document.getElementById("col_count").style.color = "#000000";
       document.getElementById("font_size").style.color = "#000000";
@@ -1064,82 +1088,107 @@ function modal() {
         }
       }
     }
-
-    document.getElementById("color_checkbox").checked = (color === true || color === "true" ? true : false);
-    if (sounds[0] != null && sounds[0].length > 0) {
-      document.getElementById("sound_checkbox").checked = true;
-      w_sound = true;
-    } else {
-      document.getElementById("sound_checkbox").checked = false;
-      w_sound = false;
-    }
-    document.getElementById("sound_checkbox").onclick = function () {
-      try {
-        if (!w_sound) {
-          document.getElementById("sound_select_Wuerfeln").value = "frequence";
-          let div = document.getElementById("div_sound_select_Wuerfeln");
-          if (document.getElementById("sound_select_Wuerfeln").value === "frequence") {
-            addinputforfreq(div, "Wuerfeln");
-          }
-          w_sound = true;
-        } else {
-          document.getElementById("sound_select_Wuerfeln").value = "------------";
-          document.getElementById("div_sound_select_Wuerfeln").innerHTML = null;
-          w_sound = false;
-        }
-      } catch (e) {
-
-      }
-    };
-
     settings.style.display = "block";
-    button_styles(document.getElementById("row+"), "80%", "48%");
-    document.getElementById("row+").style.fontSize = "150%";
-    button_styles(document.getElementById("row-"), "80%", "48%");
-    document.getElementById("row-").style.fontSize = "150%";
-    button_styles(document.getElementById("col+"), "80%", "48%");
-    document.getElementById("col+").style.fontSize = "150%";
-    button_styles(document.getElementById("col-"), "80%", "48%");
-    document.getElementById("col-").style.fontSize = "150%";
-    button_styles(document.getElementById("font+"), "80%", "48%");
-    document.getElementById("font+").style.fontSize = "150%";
-    button_styles(document.getElementById("font-"), "80%", "48%");
-    document.getElementById("font-").style.fontSize = "150%";
-    button_styles(document.getElementById("mode+"), "80%", "48%");
-    document.getElementById("mode+").style.fontSize = "150%";
-    button_styles(document.getElementById("mode-"), "80%", "48%");
-    document.getElementById("mode-").style.fontSize = "150%";
-    button_styles(document.getElementById("teams+"), "80%", "48%");
-    document.getElementById("teams+").style.fontSize = "150%";
-    button_styles(document.getElementById("teams-"), "80%", "48%");
-    document.getElementById("teams-").style.fontSize = "150%";
-
-    document.getElementById("row_count").innerHTML = prerow;
-    document.getElementById("col_count").innerHTML = precol;
-    document.getElementById("font_size").innerHTML = prefont + "%";
-    document.getElementById("mode_count").innerHTML = premode;
-    document.getElementById("current_seed").innerHTML = Hex_r_seed
-
-    if (xlabeled === true || xlabeled === "true") {
-      document.getElementById("x123").checked = false;
-      document.getElementById("xabc").checked = true;
-    } else {
-      document.getElementById("xabc").checked = false;
-      document.getElementById("x123").checked = true;
-    }
-    if (ylabeled === true || ylabeled === "true") {
-      document.getElementById("y123").checked = false;
-      document.getElementById("yabc").checked = true;
-    } else {
-      document.getElementById("yabc").checked = false;
-      document.getElementById("y123").checked = true;
-    }
-    for (let o = 0; o < r.getcalculationlist().length; o += 2) {
-      if (r.getprecalcs().length > o + 1) {
-        document.getElementById(r.getcalculationlist()[o]).checked = true;
+  }
+  if (!setmodalcalcs) {
+    setmodalcalcs = true;
+    for (let i = 0; i < r.getprecalcs().length; i += 4) {
+      let col = document.createElement("div");
+      col.classList.add("col-lg-3");
+      col.style.width = "15%";
+      col.style.margin = "0 auto";
+      for (let e = i; e < (((4 * (i / 4 + 1)) > r.getprecalcs().length) ? r.getprecalcs().length : (4 * (i / 4 + 1))); e += 2) {
+        if (r.getprecalcs().length > e + 1) {
+          let input = document.createElement("input");
+          input.setAttribute("type", "checkbox");
+          input.id = r.getprecalcs()[e];
+          input.name = r.getprecalcs()[e];
+          input.value = r.getprecalcs()[e];
+          col.appendChild(input);
+          let label = document.createElement("label");
+          label.style.marginLeft = "1rem";
+          label.id = "l_" + r.getprecalcs()[e];
+          label.for = r.getprecalcs()[e];
+          label.style.marginRight = "2rem";
+          label.innerHTML = r.getprecalcs()[e].charAt(0) + " und " + r.getprecalcs()[e].charAt(1);
+          col.appendChild(label);
+          if (e < 4 * (i / 4 + 1)) {
+            col.appendChild(document.createElement("br"));
+          }
+        }
       }
+      document.getElementById("calcs_container").appendChild(col);
     }
-    addfields(true);
+  }
+
+  document.getElementById("color_checkbox").checked = (color === true || color === "true" ? true : false);
+  if (sounds[0] != null && sounds[0].length > 0) {
+    document.getElementById("sound_checkbox").checked = true;
+  } else {
+    document.getElementById("sound_checkbox").checked = false;
+  }
+  document.getElementById("sound_checkbox").onclick = function () {
+    try {
+      if (document.getElementById("sound_checkbox").checked) {
+        document.getElementById("sound_select_Wuerfeln").value = "frequence";
+        let div = document.getElementById("div_sound_select_Wuerfeln");
+        addinputforfreq(div, "Wuerfeln", createevents());
+      } else {
+        document.getElementById("sound_select_Wuerfeln").value = "------------";
+        document.getElementById("div_sound_select_Wuerfeln").innerHTML = null;
+      }
+      updatesound(0, document.getElementById("sound_select_Wuerfeln").value, "Wuerfeln");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+
+  button_styles(document.getElementById("row+"), "80%", "48%");
+  document.getElementById("row+").style.fontSize = "150%";
+  button_styles(document.getElementById("row-"), "80%", "48%");
+  document.getElementById("row-").style.fontSize = "150%";
+  button_styles(document.getElementById("col+"), "80%", "48%");
+  document.getElementById("col+").style.fontSize = "150%";
+  button_styles(document.getElementById("col-"), "80%", "48%");
+  document.getElementById("col-").style.fontSize = "150%";
+  button_styles(document.getElementById("font+"), "80%", "48%");
+  document.getElementById("font+").style.fontSize = "150%";
+  button_styles(document.getElementById("font-"), "80%", "48%");
+  document.getElementById("font-").style.fontSize = "150%";
+  button_styles(document.getElementById("mode+"), "80%", "48%");
+  document.getElementById("mode+").style.fontSize = "150%";
+  button_styles(document.getElementById("mode-"), "80%", "48%");
+  document.getElementById("mode-").style.fontSize = "150%";
+  button_styles(document.getElementById("teams+"), "80%", "48%");
+  document.getElementById("teams+").style.fontSize = "150%";
+  button_styles(document.getElementById("teams-"), "80%", "48%");
+  document.getElementById("teams-").style.fontSize = "150%";
+
+  document.getElementById("row_count").innerHTML = prerow;
+  document.getElementById("col_count").innerHTML = precol;
+  document.getElementById("font_size").innerHTML = prefont + "%";
+  document.getElementById("mode_count").innerHTML = premode;
+  document.getElementById("current_seed").innerHTML = Hex_r_seed
+
+  if (xlabeled === true || xlabeled === "true") {
+    document.getElementById("x123").checked = false;
+    document.getElementById("xabc").checked = true;
+  } else {
+    document.getElementById("xabc").checked = false;
+    document.getElementById("x123").checked = true;
+  }
+  if (ylabeled === true || ylabeled === "true") {
+    document.getElementById("y123").checked = false;
+    document.getElementById("yabc").checked = true;
+  } else {
+    document.getElementById("yabc").checked = false;
+    document.getElementById("y123").checked = true;
+  }
+  for (let o = 0; o < r.getcalculationlist().length; o += 2) {
+    if (r.getprecalcs().length > o + 1) {
+      document.getElementById(r.getcalculationlist()[o]).checked = true;
+    }
   }
 
   document.getElementById("seed_field").placeholder = Hex_r_seed;
@@ -1172,6 +1221,7 @@ function modal() {
       instruction.style.display = "none";
     }
   }
+  loadFiles("Media/", true);
 }
 
 function addfields(a) {
@@ -1181,11 +1231,10 @@ function addfields(a) {
       let input = document.createElement("input");
       if (team_names.length <= o || team_names[o] == null || team_names[o] == "") {
         input.placeholder = "Team " + (o + 1);
-        input.id = "name" + "Team " + (o + 1);
       } else {
         input.placeholder = team_names[o];
-        input.id = "name" + team_names[o];
       }
+      input.id = "name " + "Team " + (o + 1);
       input.style.width = 100 / preteams + "%";
       document.getElementById("names_container").appendChild(input);
     }
@@ -1195,29 +1244,45 @@ function addfields(a) {
 }
 
 function teamsco(a) {
-  if (a === '+' && preteams < 4) {
-    preteams += 1;
-    addfields(true);
-  } else if (a === '-' && preteams > 2) {
-    preteams -= 1;
-    addfields(true);
-  } else if (a === '-' && preteams <= 2) {
-    toggleteam();
+  if (a === '+') {
+    if (preteams < 4) {
+      preteams += 1;
+      addfields(true);
+    } else if (preteams == 4) {
+      preteams = 6;
+      addfields(true);
+    } else if (preteams == 6) {
+      preteams = 12;
+      addfields(true);
+    }
+  } else if (a === '-') {
+    if (preteams > 2 && preteams <= 4) {
+      preteams -= 1;
+      addfields(true);
+    } else if (preteams <= 2) {
+      toggleteam();
+    } else if (preteams == 6) {
+      preteams = 4;
+      addfields(true);
+    } else if (preteams == 12) {
+      preteams = 6;
+      addfields(true);
+    }
   }
   document.getElementById("teams_count").innerHTML = preteams;
+  presetup();
 }
 
 function toggleteam() {
   if (teams >= 2) {
     teams = 0;
     preteams = teams;
-    team_count = [];
-    team_names = [];
     Array.prototype.forEach.call(document.getElementsByClassName("team_element"), (data) => {
       data.style.display = "none";
     });
     document.getElementById("teams_checkbox").checked = false;
     addfields(false);
+    team_names = [];
   } else {
     document.getElementById("teams_checkbox").checked = true;
     teams = 2;
@@ -1228,6 +1293,7 @@ function toggleteam() {
     addfields(true);
   }
   document.getElementById("teams_count").innerHTML = preteams;
+  presetup();
 }
 
 function reset_url() {
@@ -1252,12 +1318,19 @@ function close_settings(settings) {
     yl = false;
   }
   let sou = [];
-  let value = document.getElementById("wincon_input").value;
+  let value;
+  if (document.getElementById("wincon_input") === null || document.getElementById("wincon_input") === 0 || document.getElementById("wincon_input") === "") {
+    value = 10;
+  } else {
+    value = document.getElementById("wincon_input").value;
+  }
+
   if (value == null || value == 0) {
     value = 10;
   }
-  sou.splice(0, 0, value);
-  events.forEach((eve) => {
+
+  sou = [value];
+  createevents().forEach((eve) => {
     try {
       let choose = document.getElementById("sound_select_" + eve).value;
       if (choose.indexOf("-----") != -1) {
@@ -1268,11 +1341,13 @@ function close_settings(settings) {
         choose += document.getElementById("freq_input_" + eve).value;
       }
       sou.splice(sou.length, 0, choose);
+      console.log(choose);
     }
     catch (e) {
 
     }
   });
+  console.log(sou);
   let c = "";
   for (let i = 0; i < r.getprecalcs().length; i += 2) { if (r.getprecalcs().length > i + 1) { c += "1"; } }
   let u = "";
@@ -1287,11 +1362,7 @@ function close_settings(settings) {
   }
   let b = [];
   for (let i = 0; i < preteams; i++) {
-    if (i >= team_names.length || team_names[i] == null || team_names[i] == "") {
-      b = [...b, document.getElementById("name" + "Team " + (i + 1)).value];
-    } else {
-      b = [...b, document.getElementById("name" + team_names[i]).value];
-    }
+    b = [...b, document.getElementById("name " + "Team " + (i + 1)).value];
   }
   for (let i = 0; i < b.length; i++) {
     if (b[i] == null || b[i] == "" || b[i] == '$') {
@@ -1514,6 +1585,15 @@ function gen_html_fields() {
     body = doc.getElementsByTagName('body')[0],
     x = win.innerWidth || docElem.clientWidth || body.clientWidth,
     y = win.innerHeight || docElem.clientHeight || body.clientHeight;
+  window.onresize = function () {
+    var win = window,
+      doc = document,
+      docElem = doc.documentElement,
+      body = doc.getElementsByTagName('body')[0],
+      x = win.innerWidth || docElem.clientWidth || body.clientWidth,
+      y = win.innerHeight || docElem.clientHeight || body.clientHeight;
+    document.getElementById("container").style.height = y * 0.9 + "px";
+  };
   let height = (100 / (rows + 1)) + "%";
   let width = ((100 / ((columns + 1) * 1.025))) - 0.2 + "%";
   let row = document.createElement("div");
