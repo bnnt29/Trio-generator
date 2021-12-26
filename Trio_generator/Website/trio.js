@@ -115,7 +115,6 @@ function setup() {
   });
 
   if (teams != team_count.length) {
-    console.log(teams + "; " + team_count);
     close_settings(null);
   }
 
@@ -615,12 +614,8 @@ function createevents() {
 
 function updatesound(a, b, c) {
   sounds[a] = b;
-  console.log(b);
-  console.log(b === "frequence");
   if (b === "frequence") {
     try {
-      console.log(c);
-      console.log(document.getElementById("freq_input_" + c));
       sounds[a] += "!";
       sounds[a] += document.getElementById("freq_input_" + c).value;
     } catch (e) {
@@ -684,10 +679,6 @@ function soundsetup(files) {
         sel.appendChild(opt);
       });
       if (sounds.length > events2.indexOf(data) && sounds[events2.indexOf(data)] != null && sounds[events2.indexOf(data)] != "") {
-        console.log(data);
-        console.log(events2.indexOf(data));
-        console.log(sounds[events2.indexOf(data)]);
-        console.log(sounds);
         let inde = files.indexOf(sounds[events2.indexOf(data)].split('!')[0]);
         if (inde <= 0) {
           sel.value = "------------";
@@ -752,6 +743,11 @@ function soundsetup(files) {
       row1.appendChild(col3);
       row1.appendChild(col2);
       container.appendChild(row1);
+      if (data === "Sieges Bedingung" || (data.indexOf("6") != -1 && preteams > 6)) {
+        let hr = document.createElement("hr");
+        hr.style.borderWidth = "0.5rem";
+        container.appendChild(hr);
+      }
     }
   });
 }
@@ -762,8 +758,8 @@ function addinputforfreq(div, data, events) {
   input.min = 20;
   input.max = 3000;
   input.width = "60%";
-  if (sounds.length > createevents().indexOf(data) && sounds[createevents().indexOf(data)].indexOf("frequence") != -1 && sounds[createevents().indexOf(data)] != null && sounds[createevents().indexOf(data)] != "") {
-    input.value = sounds[events.indexOf(data)].split('!')[1];
+  if (sounds.length > createevents().indexOf(data) && sounds[createevents().indexOf(data)] != null && sounds[createevents().indexOf(data)] != "" && sounds[createevents().indexOf(data)].indexOf("frequence") != -1) {
+    input.value = sounds[createevents().indexOf(data)].split('!')[1];
   } else {
     input.value = 450;
   }
@@ -778,7 +774,8 @@ function addinputforfreq(div, data, events) {
     p.style.color = "#000000";
   }
   input.onchange = function () {
-    p.innerHTML = "Frequenz (Hz): " + input.value;
+    p.innerHTML = "Frequenz (Hz): " + this.value;
+    sounds[createevents().indexOf(data)] = "frequence!" + this.value;
   }
   div.appendChild(p);
   div.appendChild(input);
@@ -897,10 +894,10 @@ function teampoints(e, i) {
   if (e === "+") {
     team_count[i] += 1;
     if (team_count[i] % wincon == 0) {
-      playindex(4);
+      playindex(3);
     } else {
-      playindex(5);
-      playindex(6 + i);
+      playindex(4);
+      playindex(5 + i);
     }
   } else if (e === "-") {
     team_count[i] -= 1;
@@ -1319,8 +1316,12 @@ function close_settings(settings) {
   }
   let sou = [];
   let value;
-  if (document.getElementById("wincon_input") === null || document.getElementById("wincon_input") === 0 || document.getElementById("wincon_input") === "") {
-    value = 10;
+  if (document.getElementById("wincon_input") === null || document.getElementById("wincon_input") === 0 || document.getElementById("wincon_input").value === "" || document.getElementById("wincon_input").value === null) {
+    if (document.getElementById("wincon_input") === null || document.getElementById("wincon_input") === 0 || document.getElementById("wincon_input").placeholder === "" || document.getElementById("wincon_input").placeholder === null) {
+      value = 10;
+    } else {
+      value = document.getElementById("wincon_input").placeholder;
+    }
   } else {
     value = document.getElementById("wincon_input").value;
   }
@@ -1341,13 +1342,11 @@ function close_settings(settings) {
         choose += document.getElementById("freq_input_" + eve).value;
       }
       sou.splice(sou.length, 0, choose);
-      console.log(choose);
     }
     catch (e) {
-
+      console.log(e);
     }
   });
-  console.log(sou);
   let c = "";
   for (let i = 0; i < r.getprecalcs().length; i += 2) { if (r.getprecalcs().length > i + 1) { c += "1"; } }
   let u = "";
@@ -1735,7 +1734,7 @@ function other_buttons() {
   b.style.minWidth = "72px";
   b.style.width = "100%";
   b.style.height = (100 / (rows)) / 3 + "%";
-  b.style.marginTop = "1rem";
+  b.style.marginTop = "5rem";
   b = document.getElementById("reset_points_b");
   if (teams >= 2) {
     button_styles(b, height, width);
@@ -2045,7 +2044,7 @@ function field_pressed(o, u) {
           });
           clicked_row_column(true, clicked_rows, true, '#000000', right_color);
           clicked_row_column(false, clicked_columns, true, '#000000', right_color);
-          playindex(3);
+          playindex(2);
         } else {
           b.style.backgroundColor = wrong_color;
           b.style.color = '#FFFFFF';
@@ -2055,7 +2054,7 @@ function field_pressed(o, u) {
           });
           clicked_row_column(true, clicked_rows, true, '#FFFFFF', wrong_color);
           clicked_row_column(false, clicked_columns, true, '#FFFFFF', wrong_color);
-          playindex(2);
+          playindex(1);
         }
       } else {
         b.style.backgroundColor = pending_color;
