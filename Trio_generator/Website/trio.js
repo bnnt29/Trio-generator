@@ -526,6 +526,20 @@ function loadFolder(folderPath) {
       if (xhr.readyState === 4) {
         if (this.status >= 200 && this.status < 300) {
           resolve(xhr.response);
+        } else if (this.status >= 400 && this.status <= 405) {
+          let entries = document.getElementById("folder_entries").innerHTML;
+          let save = entries.toString().split("/");
+          entries = [];
+          for (let i = 1; i < save.length - 1; i++) {
+            if (!(save[i] === '')) {
+              entries = [...entries, save[i]];
+            }
+          }
+          music_files = entries;
+          reject({
+            status: this.status,
+            statusText: xhr.statusText
+          });
         } else {
           reject({
             status: this.status,
@@ -565,7 +579,6 @@ async function loadFiles(folderPath) {
   catch (e) {
     folder = [];
   }
-
   if (folder == null || folder.length <= 0) {
     presetup();
     return null;

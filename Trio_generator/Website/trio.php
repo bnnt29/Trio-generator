@@ -135,8 +135,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
@@ -294,8 +293,7 @@
           </div>
           <div class="row" style="margin-bottom: 1rem;">
             <div class="col-lg-3">
-              <p id="dif_l" class="titel" style="text-align: center;">Schwierigkeit <abbr
-                  title='Je groeßer die Zahl, desto kleiner ist die hoechste gesuchte Zahl (Je kleiner die Schwierigkeit, desto Schwieriger)'>
+              <p id="dif_l" class="titel" style="text-align: center;">Schwierigkeit <abbr title='Je groeßer die Zahl, desto kleiner ist die hoechste gesuchte Zahl (Je kleiner die Schwierigkeit, desto Schwieriger)'>
                   ? </abbr>
               </p>
             </div>
@@ -342,10 +340,8 @@
               <input type="checkbox" id="teams_checkbox" onclick="toggleteam()"></input>
             </div>
             <div class="col-lg-6">
-              <button id="teams+" class="team_element" onclick="teamsco('+')"
-                style="text-align: center; display: none;">+</button>
-              <button id="teams-" class="team_element" onclick="teamsco('-')"
-                style="text-align: center; display: none;">-</button>
+              <button id="teams+" class="team_element" onclick="teamsco('+')" style="text-align: center; display: none;">+</button>
+              <button id="teams-" class="team_element" onclick="teamsco('-')" style="text-align: center; display: none;">-</button>
             </div>
           </div>
           <div class="row team_element" style="margin-bottom: 1rem; display: none;">
@@ -387,12 +383,23 @@
       <div class="col">
       </div>
     </div>
+    <div id="folder_entries" style="display: none;">
+      <?php
+      if ($handle = opendir('Media')) {
+        while (false !== ($entry = readdir($handle))) {
+          if ($entry != "." && $entry != "..") {
+            echo "/";
+            echo "$entry/";
+          }
+        }
+        closedir($handle);
+      }
+      ?>
+    </div>
     <div class="row">
       <div class="col-lg-1 clear_b" style="display: flex; padding-right: 0px; margin-top: 3rem;">
-        <div class="row"
-          style="justify-content: center; height: inherit; display: flex; width: 100%; margin-bottom: 1rem;">
-          <div id="buts_container_left" class="col-lg-10"
-            style="height: inherit; width: 100%; padding-right: 0px; margin-top: 1rem;">
+        <div class="row" style="justify-content: center; height: inherit; display: flex; width: 100%; margin-bottom: 1rem;">
+          <div id="buts_container_left" class="col-lg-10" style="height: inherit; width: 100%; padding-right: 0px; margin-top: 1rem;">
             <button id="current_rand" onclick="rerand()" style="min-height: 30px;">Noch keine Zahl berechnet. Einen
               Moment bitte</button>
             <button id="reroll_b" onclick="rerand()" style="min-height: 30px;">würfeln</button>
@@ -425,22 +432,17 @@
         </div>
       </div>
       <div class="col-lg-1" style="display: flex; padding-right: 0px; max-height: 100%; margin-top: 3rem;">
-        <div class="row"
-          style="justify-content: center; height: 100%; display: flex; width: 100%; margin-bottom: 1rem;">
+        <div class="row" style="justify-content: center; height: 100%; display: flex; width: 100%; margin-bottom: 1rem;">
           <div class="col-lg-12" style="margin-right: 0px; padding-right: 0px;">
             <div class="row">
-              <div id="buts_container_right" class="col-lg-10"
-                style="height: inherit; width: 100%; padding-right: 0px;">
-                <button id="darkmode_b" onclick="dark_switch()" style="min-height: 30px;font-size:24px"
-                  class="fa">&#xf186;</button>
+              <div id="buts_container_right" class="col-lg-10" style="height: inherit; width: 100%; padding-right: 0px;">
+                <button id="darkmode_b" onclick="dark_switch()" style="min-height: 30px;font-size:24px" class="fa">&#xf186;</button>
                 <button id="settings_b" style="min-height: 30px;font-size:24px" class="fa">&#x2699;</button>
                 <button id="instructions_b" style="min-height: 30px;font-size:24px" class="fa">&#128196;</button>
-                <button id="help_b" onclick="show_help()" style="min-height: 30px;font-size:24px"
-                  class="fa">&#x3F;</button>
+                <button id="help_b" onclick="show_help()" style="min-height: 30px;font-size:24px" class="fa">&#x3F;</button>
               </div>
             </div>
-            <div class="row clear_b"
-              style="justify-content: center; height: 100%; max-height: inherit; width: 100%; margin-bottom: 1rem;margin-top: 1.5rem; padding-right: 0px; margin-right: 0px;">
+            <div class="row clear_b" style="justify-content: center; height: 100%; max-height: inherit; width: 100%; margin-bottom: 1rem;margin-top: 1.5rem; padding-right: 0px; margin-right: 0px;">
               <div id="calculation_list" class="col-lg-12">
 
               </div>
@@ -471,15 +473,9 @@
     setup();
   </script>
   <!--Bootstrap JS-->
-  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-    crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 </body>
 <footer>
 
