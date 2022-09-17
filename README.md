@@ -10,7 +10,7 @@ Die gesuchte Zahl muss:
 - Die gesuchte Zahl muss durch genau 3 Zahlen aus dem Feld berechnet werden
 - Die gesuchte Zahl muss durch die gaengigen Rechenarten erreicht werden (+ , - ,* , /), welche aber nur jeweils einmal verwendet werden duerfen.
 - Es gilt Punkt-vor-Strich
-- Die 3 Zahlen müssen in nebeneinanderliegenden Feldern sein (waagerecht - , senkrecht | , diagonal / \)
+- Die 3 Zahlen müssen in nebeneinanderliegenden Feldern sein (waagerecht - , senkrecht | , diagonal / \\)
 
 Sobald sich 3 Personen melden, werden diese der Reihe nach vom Moderator aufgefordert, ihre Rechnungen zu nennen. Der Moderator überprüft das Ergebnis, indem er die entsprechenden Zahlen auf dem Feld antippt. Alternativ kann er auch die entsprechenden Koordinaten auf den Achsen antippen. Für jede richtige Rechnung, bekommt das Team einen Punkt. Jede Rechnung zählt jedoch nur einmal, das bedeutet, wenn der dritte Spieler dieselbe Rechnung hatte, wie der erste Spieler, dann bekommt nur der erste Spieler einen Punkt. Wenn die Punkte verteilt wurden, wird neu gewürfelt und eine neue Runde beginnt.
 
